@@ -8,665 +8,573 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui','sans-serif']}}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui']}}}}</script>
     <style>
-        @media print{.no-print{display:none!important}body{background:#fff!important;font-size:8pt;color:#000!important}.container-print{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}.overflow-x-auto{overflow:visible!important}table{page-break-inside:auto;width:100%!important}tr{page-break-inside:avoid}th,td{padding:3px 2px!important;font-size:7.5pt!important;border-color:#334155!important}@page{margin:8mm}}
+        @media print{.no-print{display:none!important}body{background:#fff!important;font-size:7.5pt;color:#000!important}table{page-break-inside:auto;width:100%!important}th,td{padding:2px!important;font-size:7pt!important;border-color:#000!important}@page{margin:7mm;size:landscape}}
         *{scrollbar-width:thin;scrollbar-color:#334155 transparent}
-        .table-matrix td,.table-matrix th{text-align:center;vertical-align:middle}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes slideIn{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
-        @keyframes pulseGlow{0%,100%{box-shadow:0 0 6px rgba(99,102,241,.3)}50%{box-shadow:0 0 20px rgba(99,102,241,.55)}}
-        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-        @keyframes gradX{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-        .anim-fade{animation:fadeUp .4s ease-out forwards}
-        .anim-slide{animation:slideIn .3s ease-out forwards}
-        .anim-glow{animation:pulseGlow 2.5s ease-in-out infinite}
-        .grad-anim{background-size:200% 200%;animation:gradX 4s ease infinite}
-        .shimmer-bar{background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);background-size:200% 100%;animation:shimmer 2.5s infinite}
+        @keyframes pulseG{0%,100%{box-shadow:0 0 6px rgba(99,102,241,.3)}50%{box-shadow:0 0 18px rgba(99,102,241,.5)}}
+        .anim-fade{animation:fadeUp .35s ease-out}.anim-glow{animation:pulseG 2.5s ease-in-out infinite}
         .glass{background:rgba(15,23,42,.92);backdrop-filter:blur(20px)}
-        .glass-card{background:rgba(255,255,255,.93);backdrop-filter:blur(12px)}
-        .hover-lift{transition:transform .2s,box-shadow .2s}
-        .hover-lift:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.1)}
-        .nav-btn{position:relative;overflow:hidden;transition:all .25s}
-        .nav-active{background:linear-gradient(135deg,#4f46e5,#6366f1)!important;color:#fff!important;box-shadow:0 4px 15px rgba(79,70,229,.4)}
-        .input-g:focus{box-shadow:0 0 0 3px rgba(99,102,241,.15);outline:none}
-        aside::-webkit-scrollbar{width:4px}
-        aside::-webkit-scrollbar-track{background:transparent}
-        aside::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
-        .sidebar-panel{transition:transform .35s cubic-bezier(.4,0,.2,1)}
-        .table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch}
-        .table-responsive::-webkit-scrollbar{height:5px}
-        .table-responsive::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:10px}
-        .tab-content{animation:fadeUp .35s ease-out}
-        .fab{transition:all .3s cubic-bezier(.4,0,.2,1)}
-        .fab:hover{transform:scale(1.1);box-shadow:0 8px 30px rgba(0,0,0,.25)}
-        .drop-zone{border:2px dashed #4f46e5;border-radius:16px;transition:all .25s}
-        .drop-zone.dragover{border-color:#22c55e;background:rgba(34,197,94,.05);transform:scale(1.01)}
-        .sect-div{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
-        .sect-div::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
-        .coll-content{max-height:0;overflow:hidden;transition:max-height .4s ease}
-        .coll-content.open{max-height:5000px}
-        .bg-grid{background-image:radial-gradient(circle at 25% 25%,rgba(99,102,241,.03) 0%,transparent 50%),radial-gradient(circle at 75% 75%,rgba(16,185,129,.03) 0%,transparent 50%)}
+        .glass-card{background:rgba(255,255,255,.95);backdrop-filter:blur(10px)}
+        .nav-btn{transition:all .2s}.nav-active{background:linear-gradient(135deg,#4f46e5,#6366f1)!important;color:#fff!important;box-shadow:0 4px 12px rgba(79,70,229,.35)}
+        .input-s{background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.6);color:#e2e8f0;border-radius:8px;padding:4px 8px;font-size:10px;transition:box-shadow .2s}
+        .input-s:focus{outline:none;box-shadow:0 0 0 2px rgba(99,102,241,.3)}
+        .sidebar-panel{transition:transform .3s cubic-bezier(.4,0,.2,1)}
+        .coll{max-height:0;overflow:hidden;transition:max-height .35s ease}.coll.open{max-height:9999px}
+        .sect{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b}.sect::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
+        .drop-zone{border:2px dashed #4f46e5;border-radius:12px;transition:all .2s}.drop-zone.dragover{border-color:#22c55e;background:rgba(34,197,94,.05)}
         .badge-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-        .sync-ind{position:fixed;top:4px;right:4px;z-index:60;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;transition:all .3s}
-        .sync-saving{background:#fef3c7;color:#92400e}
-        .sync-saved{background:#d1fae5;color:#065f46}
-        .sync-err{background:#fecaca;color:#991b1b}
-        .sync-off{background:#e2e8f0;color:#475569}
-        .loading-ov{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.95);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .4s}
-        .spinner{width:40px;height:40px;border:4px solid rgba(99,102,241,.2);border-top-color:#6366f1;border-radius:50%;animation:spin .8s linear infinite}
+        .sync-i{position:fixed;top:3px;right:3px;z-index:60;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;transition:all .3s}
+        .sync-saving{background:#fef3c7;color:#92400e}.sync-saved{background:#d1fae5;color:#065f46}.sync-err{background:#fecaca;color:#991b1b}
+        .loading-ov{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.95);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;transition:opacity .4s}
+        .spinner{width:36px;height:36px;border:3px solid rgba(99,102,241,.2);border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite}
+        .hover-lift{transition:transform .2s,box-shadow .2s}.hover-lift:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08)}
+        aside::-webkit-scrollbar{width:3px}aside::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
+        .tbl-r{overflow-x:auto;-webkit-overflow-scrolling:touch}.tbl-r::-webkit-scrollbar{height:4px}.tbl-r::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:10px}
+        .bg-grid{background-image:radial-gradient(circle at 20% 20%,rgba(99,102,241,.02) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(16,185,129,.02) 0%,transparent 50%)}
+        input[type=number]::-webkit-inner-spin-button{opacity:1}
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased bg-grid">
 
-<!-- LOADING -->
-<div id="loadOv" class="loading-ov no-print">
-    <div class="spinner"></div>
-    <p class="text-white font-bold text-sm">Memuat Si-Gumart...</p>
-    <p class="text-slate-400 text-xs" id="loadSt">Menghubungkan ke Firebase Firestore...</p>
-</div>
-
-<!-- SYNC -->
-<div id="syncInd" class="sync-ind no-print sync-off">⏳ Menghubungkan...</div>
+<div id="loadOv" class="loading-ov no-print"><div class="spinner"></div><p class="text-white font-bold text-sm">Memuat Si-Gumart...</p><p class="text-slate-400 text-xs" id="loadSt">Menghubungkan ke Firestore...</p></div>
+<div id="syncI" class="sync-i no-print sync-saving">⏳ Menghubungkan...</div>
 
 <!-- MOBILE HEADER -->
 <header class="md:hidden fixed top-0 left-0 right-0 z-50 glass border-b border-slate-700/50 no-print">
-    <div class="flex items-center justify-between px-4 py-2.5">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg"><span class="text-white font-black text-xs">SG</span></div>
-            <div><h1 class="font-black text-sm text-white leading-none">Si-Gumart</h1><p class="text-[8px] text-indigo-300 font-semibold">Administrasi Guru Smart</p></div>
-        </div>
-        <button onclick="toggleSB()" class="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 active:scale-90 transition">
-            <svg id="icO" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            <svg id="icC" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-    </div>
+<div class="flex items-center justify-between px-3 py-2">
+    <div class="flex items-center gap-2"><div class="w-7 h-7 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center shadow"><span class="text-white font-black text-[10px]">SG</span></div><div><h1 class="font-black text-xs text-white leading-none">Si-Gumart</h1><p class="text-[7px] text-indigo-300 font-semibold">Administrasi Guru Smart</p></div></div>
+    <button onclick="toggleSB()" class="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 active:scale-90"><svg id="icO" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg><svg id="icC" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+</div>
 </header>
-<div id="sbOv" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden no-print" onclick="toggleSB()"></div>
+<div id="sbOv" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden no-print" onclick="toggleSB()"></div>
 
-<!-- SIDEBAR -->
-<aside id="sbP" class="no-print w-[330px] lg:w-[340px] bg-slate-900/95 backdrop-blur-xl text-slate-200 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto flex flex-col justify-between border-r border-slate-800/80 shadow-2xl z-40 fixed md:relative top-0 left-0 h-full -translate-x-full md:translate-x-0 sidebar-panel">
+<!-- ======== SIDEBAR ======== -->
+<aside id="sbP" class="no-print w-[320px] bg-slate-900/95 backdrop-blur-xl text-slate-200 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto flex flex-col justify-between border-r border-slate-800 shadow-2xl z-40 fixed md:relative top-0 left-0 h-full -translate-x-full md:translate-x-0 sidebar-panel">
 <div>
-    <!-- HEADER -->
-    <div class="p-4 border-b border-slate-800/60 bg-gradient-to-br from-indigo-950/50 to-slate-950 relative overflow-hidden">
-        <div class="absolute -top-8 -right-8 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>
-        <div class="flex items-center gap-3 relative z-10">
-            <div class="w-11 h-11 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-xl anim-glow"><span class="text-white font-black text-lg">SG</span></div>
-            <div>
-                <h1 class="font-black text-lg bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">Si-Gumart</h1>
-                <p class="text-[10px] text-slate-400">Sistem Administrasi Guru Smart</p>
-                <div class="flex items-center gap-1.5 mt-0.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span><p class="text-[10px] text-emerald-400 font-bold" id="lblTA">T.A. 2026/2027</p></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- USER ID Display -->
-    <div class="px-4 py-2 border-b border-slate-800/40 bg-slate-950/40">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1.5">
-                <span class="text-[9px] text-slate-500 font-semibold">🔑 ID Anda:</span>
-                <code class="text-[9px] text-indigo-400 font-bold bg-slate-800 px-1.5 py-0.5 rounded" id="dispUID">-</code>
-            </div>
-            <button onclick="copyUID()" class="text-[9px] text-slate-500 hover:text-indigo-400 transition" title="Salin ID">📋</button>
-        </div>
-        <div class="mt-1 flex gap-1">
-            <input type="text" id="loadUIDInput" placeholder="Masukkan ID untuk load data..." class="flex-1 bg-slate-900 border border-slate-700/60 text-slate-200 rounded-lg p-1 text-[9px] input-g">
-            <button onclick="loadOtherUID()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded-lg transition active:scale-95">Load</button>
-        </div>
-    </div>
-
-    <!-- CETAK -->
-    <div class="p-3 border-b border-slate-800/50">
-        <button onclick="window.print()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold py-2 px-3 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-xs">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>Cetak / PDF
-        </button>
-    </div>
-
-    <!-- IMPORT CSV -->
-    <div class="p-3 border-b border-slate-800/50">
-        <button onclick="toggleColl('pCSV')" class="sect-div w-full text-indigo-400 cursor-pointer hover:text-indigo-300">📂 Import Data CP/TP (CSV)</button>
-        <div id="pCSV" class="coll-content open mt-2 space-y-2">
-            <div id="csvDZ" class="drop-zone p-3 text-center cursor-pointer hover:bg-indigo-950/20" onclick="document.getElementById('csvF').click()">
-                <input type="file" id="csvF" accept=".csv" class="hidden" onchange="handleCSV(event)">
-                <div class="text-xl mb-0.5">📄</div>
-                <p class="text-[11px] font-bold text-indigo-300">Klik / Seret CSV</p>
-                <p class="text-[9px] text-slate-500 mt-0.5">Fase,Kelas,Semester,Elemen,CP,TP,Dimensi,Pertemuan</p>
-            </div>
-            <div id="csvSt" class="hidden p-2 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs">
-                <span class="text-emerald-400">✅</span> <span id="csvStT" class="font-bold text-emerald-300">0 data dimuat</span>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="dlTemplate()" class="flex-1 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 border border-slate-700/50 py-1.5 px-2 rounded-xl text-[10px] font-semibold transition">📥 Template</button>
-                <button onclick="clearAllTP()" class="flex-1 bg-rose-950/30 hover:bg-rose-900/40 text-rose-400 border border-rose-800/40 py-1.5 px-2 rounded-xl text-[10px] font-semibold transition">🗑️ Hapus TP</button>
-            </div>
-            <button onclick="toggleColl('pManual')" class="w-full text-left text-[9px] font-bold text-slate-500 hover:text-indigo-400 transition uppercase tracking-wider py-0.5">＋ Tambah Manual...</button>
-            <div id="pManual" class="coll-content space-y-1.5">
-                <div class="grid grid-cols-3 gap-1.5">
-                    <select id="mFase" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option>Fase A</option><option>Fase B</option><option>Fase C</option><option>Fase D</option><option>Fase E</option><option>Fase F</option></select>
-                    <select id="mKelas" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></select>
-                    <select id="mSmt" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option>Semester 1</option><option>Semester 2</option></select>
-                </div>
-                <input type="text" id="mElem" placeholder="Elemen (cth: Akidah)" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-                <textarea id="mCP" placeholder="Capaian Pembelajaran (CP)..." rows="2" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g resize-none"></textarea>
-                <textarea id="mTP" placeholder="Tujuan Pembelajaran (TP)* WAJIB" rows="2" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g resize-none"></textarea>
-                <div class="grid grid-cols-2 gap-1.5">
-                    <input type="text" id="mDim" placeholder="Dimensi Profil" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-                    <input type="number" id="mPrt" placeholder="Jml Pertemuan" min="1" value="2" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-                </div>
-                <button onclick="addManual()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-1.5 rounded-xl text-[11px] transition active:scale-95">＋ Tambah TP</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JADWAL ROMBEL -->
-    <div class="p-3 border-b border-slate-800/50">
-        <button onclick="toggleColl('pJdw')" class="sect-div w-full text-violet-400 cursor-pointer hover:text-violet-300">📅 Jadwal Multi-Rombel</button>
-        <div id="pJdw" class="coll-content open mt-2 space-y-2">
-            <div id="rombelBox" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
-            <button onclick="addRombel()" class="w-full bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 font-bold py-1.5 rounded-xl text-[11px] transition active:scale-95">＋ Tambah Rombel</button>
-        </div>
-    </div>
-
-    <!-- IDENTITAS -->
-    <div class="p-3 border-b border-slate-800/50">
-        <button onclick="toggleColl('pID')" class="sect-div w-full text-slate-400 cursor-pointer hover:text-slate-300">🏫 Identitas & Pengaturan</button>
-        <div id="pID" class="coll-content mt-2 space-y-1.5">
-            <div class="grid grid-cols-2 gap-1.5">
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tahun Ajaran</label><input id="iTA" value="2026/2027" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Jenjang</label>
-                    <select id="iJenjang" onchange="populateKO();debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-                        <option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option><option>SMK</option>
-                    </select>
-                </div>
-            </div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Mata Pelajaran</label><input id="iMapel" value="Pendidikan Agama Islam dan Budi Pekerti" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Satuan Pendidikan</label><input id="iSekolah" value="SDN Nagreg 05" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            <div class="grid grid-cols-2 gap-1.5">
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Kepala Sekolah</label><input id="iKepsek" value="Aep Sudrajat, S.Pd" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">NIP Kepsek</label><input id="iNipK" value="19750812 199803 1 002" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            </div>
-            <div class="grid grid-cols-2 gap-1.5">
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Nama Guru</label><input id="iGuru" value="Apipudin, S.Pd.I." oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">NIP Guru</label><input id="iNipG" value="19880520 201212 2 004" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            </div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Metode Utama</label><input id="iMetode" value="Talaqqi, Experiential Learning, & Peer Tutoring" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Kota & Tgl</label><input id="iKotaTgl" value="Bandung, 13 Juli 2026" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            <div class="grid grid-cols-2 gap-1.5">
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tgl Awal Smt 1</label><input type="date" id="iTgl1" value="2026-07-13" onchange="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tgl Awal Smt 2</label><input type="date" id="iTgl2" value="2027-01-11" onchange="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            </div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Jumlah Minggu/Semester</label><input type="number" id="iMgg" value="24" min="16" max="30" onchange="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-        </div>
-    </div>
-
-    <!-- FILTER & NAV -->
-    <div class="p-3 border-b border-slate-800/50">
-        <div class="sect-div text-emerald-400 mb-2"><span>🎯 Filter Tampilan</span></div>
-        <div class="space-y-1.5 mb-3">
-            <div class="grid grid-cols-3 gap-1.5">
-                <select id="fFase" onchange="renderAll()" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option value="">Semua Fase</option></select>
-                <select id="fKelas" onchange="renderAll()" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option value="">Semua Kelas</option></select>
-                <select id="fSmt" onchange="renderAll()" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option value="">Semua Smt</option><option>Semester 1</option><option>Semester 2</option></select>
-            </div>
-            <select id="fRombel" onchange="renderAll()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option value="">Semua Rombel</option></select>
-        </div>
-        <div class="sect-div text-slate-500 mb-2"><span>📑 Navigasi</span></div>
-        <nav class="space-y-1">
-            <button onclick="swTab('jadwal')" id="tJadwal" class="nav-btn nav-active w-full text-left py-2 px-3 rounded-xl text-[11px] font-bold flex items-center gap-2">📅 Jadwal Multi-Rombel</button>
-            <button onclick="swTab('data')" id="tData" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">📊 Data CP/TP</button>
-            <button onclick="swTab('atp')" id="tAtp" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">🗺️ ATP / Silabus</button>
-            <button onclick="swTab('prota')" id="tProta" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">📋 PROTA</button>
-            <button onclick="swTab('promes')" id="tPromes" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">🗓️ PROMES</button>
-            <button onclick="swTab('modul')" id="tModul" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">🧠 Modul Ajar</button>
-            <button onclick="swTab('kktp')" id="tKktp" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">🎯 KKTP</button>
-        </nav>
+<!-- Header -->
+<div class="p-3 border-b border-slate-800/60 bg-gradient-to-br from-indigo-950/50 to-slate-950">
+    <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-xl anim-glow"><span class="text-white font-black text-base">SG</span></div>
+        <div><h1 class="font-black text-base bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">Si-Gumart</h1><p class="text-[9px] text-slate-400">Sistem Administrasi Guru Smart</p><p class="text-[9px] text-emerald-400 font-bold" id="lblTA">T.A. 2026/2027</p></div>
     </div>
 </div>
-<div class="p-3 bg-gradient-to-t from-slate-950 to-transparent border-t border-slate-800/50 space-y-1.5">
-    <button onclick="genPrompt()" class="w-full bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 text-white font-bold py-2 rounded-xl shadow-lg transition active:scale-95 text-xs grad-anim relative overflow-hidden"><span class="relative z-10">✨ Prompt LKPD AI</span></button>
-    <button onclick="resetAll()" class="w-full bg-rose-950/30 hover:bg-rose-900/50 text-rose-400 border border-rose-800/40 font-semibold py-1.5 rounded-xl text-[10px] transition">🔄 Reset Semua</button>
+
+<!-- User ID -->
+<div class="px-3 py-1.5 border-b border-slate-800/40 bg-slate-950/40 flex items-center justify-between">
+    <div class="flex items-center gap-1"><span class="text-[8px] text-slate-500">🔑</span><code class="text-[8px] text-indigo-400 font-bold bg-slate-800 px-1 rounded" id="dUID">-</code></div>
+    <div class="flex gap-1"><button onclick="copyUID()" class="text-[8px] text-slate-500 hover:text-indigo-400">📋</button></div>
 </div>
-<div class="p-2 border-t border-slate-800/50 text-center text-[9px] text-slate-600 bg-slate-950/80">Si-Gumart © <span id="footYr">2026</span> • Cloud Firestore</div>
+
+<!-- Cetak -->
+<div class="p-2.5 border-b border-slate-800/50">
+    <button onclick="window.print()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold py-1.5 rounded-lg shadow transition active:scale-95 text-[11px] flex items-center justify-center gap-1.5">🖨️ Cetak / PDF</button>
+</div>
+
+<!-- CSV IMPORT -->
+<div class="p-2.5 border-b border-slate-800/50">
+    <button onclick="toggleC('pCSV')" class="sect w-full text-indigo-400 cursor-pointer hover:text-indigo-300">📂 Import CP/TP (CSV)</button>
+    <div id="pCSV" class="coll open mt-2 space-y-1.5">
+        <div id="csvDZ" class="drop-zone p-2.5 text-center cursor-pointer" onclick="$('csvF').click()">
+            <input type="file" id="csvF" accept=".csv" class="hidden" onchange="handleCSV(event)">
+            <p class="text-[10px] font-bold text-indigo-300">📄 Klik / Seret CSV</p>
+            <p class="text-[8px] text-slate-500">Kelas,Semester,Elemen,CP,TP,Dimensi,Pertemuan</p>
+        </div>
+        <div id="csvSt" class="hidden p-1.5 bg-emerald-950/40 border border-emerald-500/30 rounded-lg text-[10px] text-emerald-300 font-bold">✅ <span id="csvStT">0</span></div>
+        <div class="flex gap-1.5">
+            <button onclick="dlTemplate()" class="flex-1 bg-slate-800/60 text-slate-300 border border-slate-700/50 py-1 rounded-lg text-[9px] font-semibold">📥 Template</button>
+            <button onclick="clearTP()" class="flex-1 bg-rose-950/30 text-rose-400 border border-rose-800/40 py-1 rounded-lg text-[9px] font-semibold">🗑️ Hapus TP</button>
+        </div>
+        <button onclick="toggleC('pMan')" class="text-[8px] font-bold text-slate-500 hover:text-indigo-400 uppercase">＋ Manual...</button>
+        <div id="pMan" class="coll space-y-1">
+            <div class="grid grid-cols-2 gap-1"><select id="mKls" class="input-s"></select><select id="mSmt" class="input-s"><option>Semester 1</option><option>Semester 2</option></select></div>
+            <input id="mElem" placeholder="Elemen" class="w-full input-s">
+            <textarea id="mCP" placeholder="CP..." rows="2" class="w-full input-s resize-none"></textarea>
+            <textarea id="mTP" placeholder="TP* (wajib)" rows="2" class="w-full input-s resize-none"></textarea>
+            <div class="grid grid-cols-2 gap-1"><input id="mDim" placeholder="Dimensi" class="input-s"><input type="number" id="mPrt" value="2" min="1" class="input-s"></div>
+            <button onclick="addManTP()" class="w-full bg-indigo-600 text-white font-bold py-1 rounded-lg text-[10px] active:scale-95">＋ Tambah</button>
+        </div>
+    </div>
+</div>
+
+<!-- ROMBEL -->
+<div class="p-2.5 border-b border-slate-800/50">
+    <button onclick="toggleC('pJdw')" class="sect w-full text-violet-400 cursor-pointer hover:text-violet-300">📅 Jadwal & Rombel</button>
+    <div id="pJdw" class="coll open mt-2 space-y-1.5">
+        <div id="rombelBox" class="space-y-1 max-h-40 overflow-y-auto pr-1"></div>
+        <button onclick="addRombel()" class="w-full bg-violet-600/20 text-violet-300 border border-violet-500/30 font-bold py-1 rounded-lg text-[10px] active:scale-95">＋ Tambah Rombel</button>
+    </div>
+</div>
+
+<!-- IDENTITAS SEKOLAH & GURU -->
+<div class="p-2.5 border-b border-slate-800/50">
+    <button onclick="toggleC('pID')" class="sect w-full text-slate-400 cursor-pointer hover:text-slate-300">🏫 Identitas</button>
+    <div id="pID" class="coll mt-2 space-y-1">
+        <div class="grid grid-cols-2 gap-1">
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">Tahun Ajaran</label><input id="iTA" value="2026/2027" oninput="debSave()" class="w-full input-s"></div>
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">Jenjang</label><select id="iJnj" onchange="popKls();debSave()" class="w-full input-s"><option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option><option>SMK</option></select></div>
+        </div>
+        <div><label class="text-[7px] font-bold text-slate-500 uppercase">Nama Sekolah</label><input id="iSek" value="SDN Nagreg 05" oninput="debSave()" class="w-full input-s"></div>
+        <div><label class="text-[7px] font-bold text-slate-500 uppercase">NPSN</label><input id="iNPSN" value="20254321" oninput="debSave()" class="w-full input-s"></div>
+        <div class="grid grid-cols-2 gap-1">
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">Kepala Sekolah</label><input id="iKep" value="Aep Sudrajat, S.Pd" oninput="debSave()" class="w-full input-s"></div>
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">NIP Kepsek</label><input id="iNipK" value="197508121998031002" oninput="debSave()" class="w-full input-s"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-1">
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">Nama Guru</label><input id="iGuru" value="Apipudin, S.Pd.I." oninput="debSave()" class="w-full input-s"></div>
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">NIP Guru</label><input id="iNipG" value="198805202012122004" oninput="debSave()" class="w-full input-s"></div>
+        </div>
+        <div><label class="text-[7px] font-bold text-slate-500 uppercase">Mata Pelajaran</label><input id="iMapel" value="Pendidikan Agama Islam dan Budi Pekerti" oninput="debSave()" class="w-full input-s"></div>
+        <div><label class="text-[7px] font-bold text-slate-500 uppercase">Metode</label><input id="iMetode" value="Talaqqi, Experiential Learning" oninput="debSave()" class="w-full input-s"></div>
+        <div><label class="text-[7px] font-bold text-slate-500 uppercase">Kota & Tgl</label><input id="iKotaTgl" value="Bandung, 13 Juli 2026" oninput="debSave()" class="w-full input-s"></div>
+        <div class="grid grid-cols-2 gap-1">
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">Tgl Awal Smt1</label><input type="date" id="iTgl1" value="2026-07-13" onchange="debSave()" class="w-full input-s"></div>
+            <div><label class="text-[7px] font-bold text-slate-500 uppercase">Tgl Awal Smt2</label><input type="date" id="iTgl2" value="2027-01-11" onchange="debSave()" class="w-full input-s"></div>
+        </div>
+        <div><label class="text-[7px] font-bold text-slate-500 uppercase">Minggu/Semester</label><input type="number" id="iMgg" value="24" min="16" max="30" onchange="debSave()" class="w-full input-s"></div>
+    </div>
+</div>
+
+<!-- PENGATURAN NILAI -->
+<div class="p-2.5 border-b border-slate-800/50">
+    <button onclick="toggleC('pNilai')" class="sect w-full text-amber-400 cursor-pointer hover:text-amber-300">📊 Pengaturan Nilai</button>
+    <div id="pNilai" class="coll mt-2 space-y-1">
+        <p class="text-[8px] text-slate-500">Kriteria & Bobot Penilaian (%)</p>
+        <div id="nilaiKriteriaBox" class="space-y-1"></div>
+        <button onclick="addKriteria()" class="w-full bg-amber-600/20 text-amber-300 border border-amber-500/30 font-bold py-1 rounded-lg text-[9px] active:scale-95">＋ Tambah Kriteria</button>
+    </div>
+</div>
+
+<!-- FILTER & NAV -->
+<div class="p-2.5 border-b border-slate-800/50">
+    <div class="sect text-emerald-400 mb-1.5"><span>🎯 Filter</span></div>
+    <div class="grid grid-cols-3 gap-1 mb-1.5">
+        <select id="fKls" onchange="renderAll()" class="input-s"><option value="">Semua Kls</option></select>
+        <select id="fSmt" onchange="renderAll()" class="input-s"><option value="">Semua Smt</option><option>Semester 1</option><option>Semester 2</option></select>
+        <select id="fRbl" onchange="renderAll()" class="input-s"><option value="">Semua Rbl</option></select>
+    </div>
+    <div class="sect text-slate-500 mb-1.5"><span>📑 Menu</span></div>
+    <nav class="space-y-0.5" id="navBox">
+        <button onclick="swTab('jadwal')" id="tJadwal" class="nav-btn nav-active w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-bold flex items-center gap-2">📅 Jadwal</button>
+        <button onclick="swTab('data')" id="tData" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">📊 Data CP/TP</button>
+        <button onclick="swTab('siswa')" id="tSiswa" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">👨‍🎓 Data Siswa</button>
+        <button onclick="swTab('atp')" id="tAtp" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">🗺️ ATP/Silabus</button>
+        <button onclick="swTab('prota')" id="tProta" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">📋 PROTA</button>
+        <button onclick="swTab('promes')" id="tPromes" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">🗓️ PROMES</button>
+        <button onclick="swTab('modul')" id="tModul" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">🧠 Modul Ajar</button>
+        <button onclick="swTab('kktp')" id="tKktp" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">🎯 KKTP</button>
+        <button onclick="swTab('nilai')" id="tNilai" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">📝 Daftar Nilai</button>
+        <button onclick="swTab('absen')" id="tAbsen" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">📋 Absen Siswa</button>
+        <button onclick="swTab('jurnal')" id="tJurnal" class="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2">📔 Jurnal Pembelajaran</button>
+    </nav>
+</div>
+</div>
+<div class="p-2.5 bg-gradient-to-t from-slate-950 to-transparent border-t border-slate-800/50 space-y-1">
+    <button onclick="genPrompt()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-1.5 rounded-lg shadow text-[10px] active:scale-95">✨ Prompt LKPD AI</button>
+    <button onclick="resetAll()" class="w-full bg-rose-950/30 text-rose-400 border border-rose-800/40 py-1 rounded-lg text-[9px]">🔄 Reset</button>
+</div>
+<div class="p-1.5 border-t border-slate-800/50 text-center text-[8px] text-slate-600 bg-slate-950/80">Si-Gumart © <span id="footYr">2026</span></div>
 </aside>
 
-<!-- MAIN -->
-<main class="flex-1 overflow-y-auto container-print min-h-screen pt-12 md:pt-0">
-<div class="p-3 md:p-5 lg:p-7 pb-20 md:pb-6">
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-5 no-print">
-        <div class="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl p-3 border border-indigo-200/50 hover-lift"><span class="text-[9px] text-indigo-600 font-bold uppercase">Total TP</span><p id="sTP" class="text-xl font-black text-indigo-900 mt-0.5">0</p><p id="sJP" class="text-[10px] text-indigo-600 font-semibold">0 JP</p></div>
-        <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-3 border border-violet-200/50 hover-lift"><span class="text-[9px] text-violet-600 font-bold uppercase">Rombel</span><p id="sRB" class="text-xl font-black text-violet-900 mt-0.5">0</p><p id="sRBd" class="text-[10px] text-violet-600 font-semibold">-</p></div>
-        <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-3 border border-emerald-200/50 hover-lift"><span class="text-[9px] text-emerald-600 font-bold uppercase">Elemen</span><p id="sEL" class="text-xl font-black text-emerald-900 mt-0.5">0</p><p id="sELd" class="text-[10px] text-emerald-600 font-semibold">-</p></div>
-        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-3 border border-amber-200/50 hover-lift"><span class="text-[9px] text-amber-600 font-bold uppercase">Filter</span><p id="sFT" class="text-base font-black text-amber-900 mt-0.5">Semua</p><p id="sFTd" class="text-[10px] text-amber-600 font-semibold">-</p></div>
+<!-- ======== MAIN ======== -->
+<main class="flex-1 overflow-y-auto min-h-screen pt-11 md:pt-0">
+<div class="p-2.5 md:p-4 lg:p-6 pb-16 md:pb-4">
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4 no-print">
+        <div class="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl p-2.5 border border-indigo-200/50 hover-lift"><span class="text-[8px] text-indigo-600 font-bold uppercase">Total TP</span><p id="sTP" class="text-lg font-black text-indigo-900">0</p><p id="sJP" class="text-[9px] text-indigo-600 font-semibold">0 JP</p></div>
+        <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-2.5 border border-violet-200/50 hover-lift"><span class="text-[8px] text-violet-600 font-bold uppercase">Rombel</span><p id="sRB" class="text-lg font-black text-violet-900">0</p><p id="sRBd" class="text-[9px] text-violet-600 font-semibold">-</p></div>
+        <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-2.5 border border-emerald-200/50 hover-lift"><span class="text-[8px] text-emerald-600 font-bold uppercase">Siswa</span><p id="sSW" class="text-lg font-black text-emerald-900">0</p><p id="sSWd" class="text-[9px] text-emerald-600 font-semibold">-</p></div>
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-2.5 border border-amber-200/50 hover-lift"><span class="text-[8px] text-amber-600 font-bold uppercase">Filter</span><p id="sFT" class="text-sm font-black text-amber-900">Semua</p><p id="sFTd" class="text-[9px] text-amber-600 font-semibold">-</p></div>
     </div>
-    <div id="cJadwal" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 tab-content"></div>
-    <div id="cData" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
-    <div id="cAtp" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
-    <div id="cProta" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
-    <div id="cPromes" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
-    <div id="cModul" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
-    <div id="cKktp" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
+    <!-- Tab Contents -->
+    <div id="cJadwal" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 anim-fade"></div>
+    <div id="cData" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cSiswa" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cAtp" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cProta" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cPromes" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cModul" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cKktp" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cNilai" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cAbsen" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
+    <div id="cJurnal" class="glass-card rounded-xl shadow-lg p-3 md:p-5 border border-slate-200/60 hidden anim-fade"></div>
 </div>
 </main>
 
-<!-- MOBILE BOTTOM NAV -->
+<!-- Mobile Bottom Nav -->
 <div class="md:hidden fixed bottom-0 left-0 right-0 z-45 no-print">
 <div class="glass border-t border-slate-700/50 px-1 py-1">
     <div class="flex items-center justify-around">
-        <button onclick="swTab('jadwal');closeMob()" class="mnav flex flex-col items-center px-1 py-0.5 text-indigo-400 active:scale-90" data-t="jadwal"><span class="text-sm">📅</span><span class="text-[7px] font-bold">Jadwal</span></button>
-        <button onclick="swTab('data');closeMob()" class="mnav flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90" data-t="data"><span class="text-sm">📊</span><span class="text-[7px] font-bold">Data</span></button>
-        <button onclick="swTab('promes');closeMob()" class="mnav flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90" data-t="promes"><span class="text-sm">🗓️</span><span class="text-[7px] font-bold">Promes</span></button>
-        <button onclick="swTab('modul');closeMob()" class="mnav flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90" data-t="modul"><span class="text-sm">🧠</span><span class="text-[7px] font-bold">Modul</span></button>
-        <button onclick="toggleSB()" class="flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90"><span class="text-sm">⚙️</span><span class="text-[7px] font-bold">Menu</span></button>
+        <button onclick="swTab('jadwal');closeMob()" class="mnav flex flex-col items-center px-1 text-indigo-400 active:scale-90" data-t="jadwal"><span class="text-sm">📅</span><span class="text-[6px] font-bold">Jadwal</span></button>
+        <button onclick="swTab('siswa');closeMob()" class="mnav flex flex-col items-center px-1 text-slate-400 active:scale-90" data-t="siswa"><span class="text-sm">👨‍🎓</span><span class="text-[6px] font-bold">Siswa</span></button>
+        <button onclick="swTab('nilai');closeMob()" class="mnav flex flex-col items-center px-1 text-slate-400 active:scale-90" data-t="nilai"><span class="text-sm">📝</span><span class="text-[6px] font-bold">Nilai</span></button>
+        <button onclick="swTab('absen');closeMob()" class="mnav flex flex-col items-center px-1 text-slate-400 active:scale-90" data-t="absen"><span class="text-sm">📋</span><span class="text-[6px] font-bold">Absen</span></button>
+        <button onclick="toggleSB()" class="flex flex-col items-center px-1 text-slate-400 active:scale-90"><span class="text-sm">⚙️</span><span class="text-[6px] font-bold">Menu</span></button>
     </div>
 </div>
 </div>
 
-<!-- FAB -->
-<button onclick="genPrompt()" class="fab no-print fixed bottom-14 md:bottom-5 right-3 z-30 w-11 h-11 bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-2xl shadow-xl flex items-center justify-center" title="✨ LKPD AI">
-    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-</button>
-
-<!-- MODAL -->
+<!-- Modal -->
 <div id="modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 hidden no-print">
-<div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-4 border border-slate-200 flex flex-col max-h-[92vh] anim-fade">
-    <div class="flex justify-between items-center border-b pb-2 mb-2">
-        <div class="flex items-center gap-2"><span class="p-2 bg-purple-100 rounded-xl text-lg">✨</span><h3 class="text-sm font-black text-slate-900">Prompt AI - Si-Gumart</h3></div>
-        <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 text-lg">&times;</button>
-    </div>
-    <textarea id="promptTA" readonly class="flex-1 w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-800 focus:outline-none resize-none leading-relaxed min-h-[180px]"></textarea>
-    <div class="flex justify-end items-center mt-2 pt-2 border-t gap-2">
-        <span id="cpFB" class="text-xs text-emerald-600 font-bold hidden">✓ Disalin!</span>
-        <button onclick="document.getElementById('modal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition">Tutup</button>
-        <button onclick="cpPrompt()" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow active:scale-95 transition">📋 Salin</button>
-    </div>
+<div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-4 border flex flex-col max-h-[92vh] anim-fade">
+    <div class="flex justify-between items-center border-b pb-2 mb-2"><h3 class="text-sm font-black">✨ Prompt AI</h3><button onclick="$('modal').classList.add('hidden')" class="text-slate-400 text-lg">&times;</button></div>
+    <textarea id="promptTA" readonly class="flex-1 w-full bg-slate-50 border rounded-lg p-3 text-xs font-mono focus:outline-none resize-none min-h-[150px]"></textarea>
+    <div class="flex justify-end mt-2 pt-2 border-t gap-2"><span id="cpFB" class="text-xs text-emerald-600 font-bold hidden">✓</span><button onclick="$('modal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 text-xs font-bold rounded-lg">Tutup</button><button onclick="cpP()" class="px-4 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-lg shadow active:scale-95">📋 Salin</button></div>
 </div>
 </div>
 
 <script>
-// ============================================
-// FIREBASE FIRESTORE INIT
-// ============================================
-const firebaseConfig = {
-    apiKey: "AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",
-    authDomain: "si-gumart.firebaseapp.com",
-    projectId: "si-gumart",
-    storageBucket: "si-gumart.firebasestorage.app"
+// ============================================================
+// FIREBASE FIRESTORE
+// ============================================================
+firebase.initializeApp({apiKey:"AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",authDomain:"si-gumart.firebaseapp.com",projectId:"si-gumart",storageBucket:"si-gumart.firebasestorage.app"});
+const db=firebase.firestore();
+let uid=localStorage.getItem('sg_uid');if(!uid){uid='u'+Date.now().toString(36)+Math.random().toString(36).substr(2,6);localStorage.setItem('sg_uid',uid);}
+function uDoc(){return db.collection('users').doc(uid);}
+const $=id=>document.getElementById(id);
+
+// ============================================================
+// DATA STORE
+// ============================================================
+let D={
+    tp:[],          // [{kelas,semester,elemen,cp,tp,dimensi,pertemuan}]
+    rombel:[],      // [{id,nama,hari,jp1,jp2,kelas,warna}]
+    siswa:[],       // [{id,nama,nis,rombel_id,jk}]
+    nilai:{},       // {rombel_id: {siswa_id: {tp_idx: {NH1:x,...}}}}
+    absen:{},       // {rombel_id: {tanggal: {siswa_id: 'H'|'I'|'S'|'A'}}}
+    jurnal:[],      // [{tanggal,rombel_id,materi,kegiatan,catatan}]
+    kriteriaNilai:[{nama:'NH1',bobot:20},{nama:'NH2',bobot:20},{nama:'NH3',bobot:20},{nama:'ATS',bobot:15},{nama:'ASSAS',bobot:25}],
+    rombelCtr:0,siswaCtr:0
 };
-firebase.initializeApp(firebaseConfig);
-const fsDb = firebase.firestore();
+let saveTimer=null;
+const HARI=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const BULAN=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const W=[{bg:'bg-indigo-600',hex:'#4f46e5',lt:'bg-indigo-50',bd:'border-indigo-200',tx:'text-indigo-700'},{bg:'bg-emerald-600',hex:'#059669',lt:'bg-emerald-50',bd:'border-emerald-200',tx:'text-emerald-700'},{bg:'bg-violet-600',hex:'#7c3aed',lt:'bg-violet-50',bd:'border-violet-200',tx:'text-violet-700'},{bg:'bg-amber-600',hex:'#d97706',lt:'bg-amber-50',bd:'border-amber-200',tx:'text-amber-700'},{bg:'bg-rose-600',hex:'#e11d48',lt:'bg-rose-50',bd:'border-rose-200',tx:'text-rose-700'},{bg:'bg-cyan-600',hex:'#0891b2',lt:'bg-cyan-50',bd:'border-cyan-200',tx:'text-cyan-700'},{bg:'bg-teal-600',hex:'#0d9488',lt:'bg-teal-50',bd:'border-teal-200',tx:'text-teal-700'},{bg:'bg-pink-600',hex:'#db2777',lt:'bg-pink-50',bd:'border-pink-200',tx:'text-pink-700'}];
+const liburNas=["2026-08-17","2026-08-25","2026-12-25","2027-01-01","2027-02-06","2027-02-17","2027-03-09","2027-03-10","2027-03-11","2027-03-12","2027-03-26","2027-05-01","2027-05-06","2027-05-20","2027-06-01"];
 
-// User ID
-let uid = localStorage.getItem('sg_uid');
-if (!uid) { uid = 'u' + Date.now().toString(36) + Math.random().toString(36).substr(2,6); localStorage.setItem('sg_uid', uid); }
+function faseFromKelas(k){const n=parseInt(k.replace(/\D/g,''));if(n<=2)return'A';if(n<=4)return'B';if(n<=6)return'C';if(n<=8)return'D';if(n<=10)return'E';return'F';}
 
-function getUserDoc() { return fsDb.collection('users').doc(uid); }
-
-// ============================================
-// CORE DATA
-// ============================================
-let tpData = [], rombelList = [], rombelCtr = 0, saveTimer = null;
-const HARI = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-const BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-const W = [
-    {bg:'bg-indigo-600',hex:'#4f46e5',lt:'bg-indigo-50',bd:'border-indigo-200',tx:'text-indigo-700'},
-    {bg:'bg-emerald-600',hex:'#059669',lt:'bg-emerald-50',bd:'border-emerald-200',tx:'text-emerald-700'},
-    {bg:'bg-violet-600',hex:'#7c3aed',lt:'bg-violet-50',bd:'border-violet-200',tx:'text-violet-700'},
-    {bg:'bg-amber-600',hex:'#d97706',lt:'bg-amber-50',bd:'border-amber-200',tx:'text-amber-700'},
-    {bg:'bg-rose-600',hex:'#e11d48',lt:'bg-rose-50',bd:'border-rose-200',tx:'text-rose-700'},
-    {bg:'bg-cyan-600',hex:'#0891b2',lt:'bg-cyan-50',bd:'border-cyan-200',tx:'text-cyan-700'},
-    {bg:'bg-pink-600',hex:'#db2777',lt:'bg-pink-50',bd:'border-pink-200',tx:'text-pink-700'},
-    {bg:'bg-teal-600',hex:'#0d9488',lt:'bg-teal-50',bd:'border-teal-200',tx:'text-teal-700'},
-];
-const liburNas = ["2026-08-17","2026-08-25","2026-12-25","2027-01-01","2027-02-06","2027-02-17","2027-03-09","2027-03-10","2027-03-11","2027-03-12","2027-03-26","2027-05-01","2027-05-06","2027-05-20","2027-06-01"];
-
-// ============================================
-// SIDEBAR MOBILE
-// ============================================
-let sbOpen = false;
-function toggleSB() {
-    sbOpen=!sbOpen;
-    const p=document.getElementById('sbP'),o=document.getElementById('sbOv');
-    if(sbOpen){p.classList.replace('-translate-x-full','translate-x-0');o.classList.remove('hidden');document.getElementById('icC').classList.remove('hidden');document.getElementById('icO').classList.add('hidden');document.body.style.overflow='hidden';}
-    else{p.classList.replace('translate-x-0','-translate-x-full');o.classList.add('hidden');document.getElementById('icC').classList.add('hidden');document.getElementById('icO').classList.remove('hidden');document.body.style.overflow='';}
-}
+// ============================================================
+// SIDEBAR / UI
+// ============================================================
+let sbOpen=false;
+function toggleSB(){sbOpen=!sbOpen;const p=$('sbP'),o=$('sbOv');if(sbOpen){p.classList.replace('-translate-x-full','translate-x-0');o.classList.remove('hidden');$('icC').classList.remove('hidden');$('icO').classList.add('hidden');document.body.style.overflow='hidden';}else{p.classList.replace('translate-x-0','-translate-x-full');o.classList.add('hidden');$('icC').classList.add('hidden');$('icO').classList.remove('hidden');document.body.style.overflow='';}}
 function closeMob(){if(sbOpen&&window.innerWidth<768)toggleSB();}
-function toggleColl(id){document.getElementById(id)?.classList.toggle('open');}
+function toggleC(id){$(id)?.classList.toggle('open');}
+function showSync(t,txt){const e=$('syncI');e.className='sync-i no-print sync-'+t;e.textContent=txt;}
 
-// ============================================
-// SYNC UI
-// ============================================
-function showSync(t,txt){const e=document.getElementById('syncInd');e.className='sync-ind no-print sync-'+t;e.textContent=txt;}
+// ============================================================
+// FIRESTORE SAVE/LOAD
+// ============================================================
+function saveFS(){
+    showSync('saving','💾 ...');
+    const data={...D,settings:gatherSet(),ts:firebase.firestore.FieldValue.serverTimestamp()};
+    uDoc().set(data,{merge:true}).then(()=>showSync('saved','☁️ Tersimpan')).catch(e=>{console.error(e);showSync('err','❌ Gagal');localStorage.setItem('sg_bk',JSON.stringify(data));});
+}
+function debSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{saveFS();renderAll();},600);}
 
-// ============================================
-// FIRESTORE SAVE / LOAD
-// ============================================
-function saveToFS(){
-    showSync('saving','💾 Menyimpan...');
-    const data={tpData,rombelList,rombelCtr,settings:gatherSet(),ts:firebase.firestore.FieldValue.serverTimestamp()};
-    getUserDoc().set(data,{merge:true}).then(()=>{showSync('saved','☁️ Tersimpan');}).catch(err=>{
-        console.error('Firestore save error:',err);showSync('err','❌ Gagal simpan');
-        localStorage.setItem('sg_backup',JSON.stringify({tpData,rombelList,rombelCtr,settings:gatherSet()}));
-    });
+async function loadFS(){
+    try{$('loadSt').textContent='Mengambil data...';const doc=await uDoc().get();if(doc.exists){const d=doc.data();D.tp=d.tp||[];D.rombel=d.rombel||[];D.siswa=d.siswa||[];D.nilai=d.nilai||{};D.absen=d.absen||{};D.jurnal=d.jurnal||[];D.kriteriaNilai=d.kriteriaNilai||D.kriteriaNilai;D.rombelCtr=d.rombelCtr||0;D.siswaCtr=d.siswaCtr||0;if(d.settings)applySet(d.settings);return true;}return false;
+    }catch(e){console.error(e);try{const bk=localStorage.getItem('sg_bk');if(bk){const d=JSON.parse(bk);Object.assign(D,d);if(d.settings)applySet(d.settings);}}catch(ex){}return false;}
 }
 
-function debSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{saveToFS();renderAll();},700);}
+function gatherSet(){const ids=['iTA','iJnj','iMapel','iSek','iNPSN','iKep','iNipK','iGuru','iNipG','iMetode','iKotaTgl','iTgl1','iTgl2','iMgg'];const s={};ids.forEach(id=>{const el=$(id);if(el)s[id]=el.value;});return s;}
+function applySet(s){if(!s)return;Object.keys(s).forEach(id=>{const el=$(id);if(el)el.value=s[id];});}
+function getS(){return{ta:$('iTA')?.value||'2026/2027',jnj:$('iJnj')?.value||'SD',mapel:$('iMapel')?.value||'PAI',sek:$('iSek')?.value||'-',npsn:$('iNPSN')?.value||'-',kep:$('iKep')?.value||'-',nipK:$('iNipK')?.value||'-',guru:$('iGuru')?.value||'-',nipG:$('iNipG')?.value||'-',metode:$('iMetode')?.value||'-',kotaTgl:$('iKotaTgl')?.value||'-',tgl1:$('iTgl1')?.value||'2026-07-13',tgl2:$('iTgl2')?.value||'2027-01-11',mgg:parseInt($('iMgg')?.value)||24};}
+function copyUID(){navigator.clipboard?.writeText(uid);const e=$('dUID');e.textContent='✓ Disalin!';setTimeout(()=>e.textContent=uid.substring(0,14)+'...',1500);}
 
-async function loadFromFS(loadUid){
-    const targetUid = loadUid || uid;
-    document.getElementById('loadSt').textContent='Mengambil data dari Firestore...';
-    try{
-        const doc = await fsDb.collection('users').doc(targetUid).get();
-        if(doc.exists){
-            const d=doc.data();
-            tpData=d.tpData||[];rombelList=d.rombelList||[];rombelCtr=d.rombelCtr||0;
-            if(d.settings)applySet(d.settings);
-            return true;
-        }
-        return false;
-    }catch(err){
-        console.error('Firestore load error:',err);showSync('err','❌ Gagal load');
-        try{const bk=localStorage.getItem('sg_backup');if(bk){const d=JSON.parse(bk);tpData=d.tpData||[];rombelList=d.rombelList||[];rombelCtr=d.rombelCtr||0;if(d.settings)applySet(d.settings);}}catch(e){}
-        return false;
-    }
+// ============================================================
+// KELAS 1-12 + FASE AUTO
+// ============================================================
+function popKls(){
+    ['fKls','mKls'].forEach(id=>{const el=$(id);if(!el)return;const pv=el.value;el.innerHTML=id==='fKls'?'<option value="">Semua Kls</option>':'';for(let i=1;i<=12;i++)el.innerHTML+=`<option>Kelas ${i}</option>`;el.value=pv;});
 }
 
-function copyUID(){
-    navigator.clipboard.writeText(uid).then(()=>{
-        const el=document.getElementById('dispUID');el.textContent='✓ Disalin!';setTimeout(()=>{el.textContent=uid.substring(0,16)+'...';},1500);
-    }).catch(()=>{prompt('Salin ID ini:',uid);});
-}
-
-async function loadOtherUID(){
-    const newUid=document.getElementById('loadUIDInput').value.trim();
-    if(!newUid){alert('Masukkan ID yang valid.');return;}
-    if(confirm(`Load data dari ID: ${newUid}?\nData lokal saat ini akan diganti.`)){
-        uid=newUid;localStorage.setItem('sg_uid',uid);
-        document.getElementById('dispUID').textContent=uid.substring(0,16)+'...';
-        await loadFromFS(uid);renderRombel();renderAll();showSync('saved','🔄 Data dimuat');
-    }
-}
-
-function gatherSet(){
-    const ids=['iTA','iJenjang','iMapel','iSekolah','iKepsek','iNipK','iGuru','iNipG','iMetode','iKotaTgl','iTgl1','iTgl2','iMgg'];
-    const s={};ids.forEach(id=>{const el=document.getElementById(id);if(el)s[id]=el.value;});return s;
-}
-function applySet(s){if(!s)return;Object.keys(s).forEach(id=>{const el=document.getElementById(id);if(el)el.value=s[id];});}
-
-function getS(){
-    return{ta:document.getElementById('iTA')?.value||'2026/2027',jenjang:document.getElementById('iJenjang')?.value||'SD',mapel:document.getElementById('iMapel')?.value||'PAI & BP',sekolah:document.getElementById('iSekolah')?.value||'-',kepsek:document.getElementById('iKepsek')?.value||'-',nipK:document.getElementById('iNipK')?.value||'-',guru:document.getElementById('iGuru')?.value||'-',nipG:document.getElementById('iNipG')?.value||'-',metode:document.getElementById('iMetode')?.value||'-',kotaTgl:document.getElementById('iKotaTgl')?.value||'-',tgl1:document.getElementById('iTgl1')?.value||'2026-07-13',tgl2:document.getElementById('iTgl2')?.value||'2027-01-11',mgg:parseInt(document.getElementById('iMgg')?.value)||24};
-}
-
-// ============================================
-// KELAS OPTIONS (Universal 1-12)
-// ============================================
-function getKRange(){
-    const j=document.getElementById('iJenjang')?.value||'SD';
-    if(['SD','MI'].includes(j))return[1,6];if(['SMP','MTs'].includes(j))return[7,9];return[10,12];
-}
-function populateKO(){
-    const[s,e]=getKRange();
-    ['fKelas','mKelas'].forEach(id=>{
-        const el=document.getElementById(id);if(!el)return;const pv=el.value;
-        el.innerHTML=id==='fKelas'?'<option value="">Semua Kelas</option>':'';
-        for(let i=s;i<=e;i++)el.innerHTML+=`<option>Kelas ${i}</option>`;
-        el.value=pv;
-    });
-    const ff=document.getElementById('fFase');const pfv=ff.value;
-    ff.innerHTML='<option value="">Semua Fase</option>';
-    'ABCDEF'.split('').forEach(f=>ff.innerHTML+=`<option>Fase ${f}</option>`);ff.value=pfv;
-}
-
-// ============================================
-// CSV HANDLING
-// ============================================
+// ============================================================
+// CSV
+// ============================================================
 function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
+function handleCSV(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=ev=>{const lines=ev.target.result.split(/\r?\n/).filter(l=>l.trim());let cnt=0;for(let i=1;i<lines.length;i++){const c=parseLine(lines[i]);if(c.length<7)continue;D.tp.push({kelas:c[0],semester:c[1],elemen:c[2],cp:c[3],tp:c[4],dimensi:c[5],pertemuan:parseInt(c[6])||2});cnt++;}$('csvSt').classList.remove('hidden');$('csvStT').textContent=`${cnt} TP dimuat (Total: ${D.tp.length})`;saveFS();renderAll();};reader.readAsText(f);e.target.value='';}
+function dlTemplate(){const h='Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan';const r=['Kelas 1,Semester 1,Al-Qur\'an Hadis,"Membaca huruf hijaiah","Membaca dan menulis huruf hijaiyah","keimanan; kreativitas",3','Kelas 1,Semester 1,Akidah,"Mengenal rukun iman","Menjelaskan 6 rukun iman","keimanan; penalaran kritis",2'];const blob=new Blob(['\uFEFF'+h+'\n'+r.join('\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='template_sigumart.csv';a.click();}
+function addManTP(){const en={kelas:$('mKls').value,semester:$('mSmt').value,elemen:$('mElem').value||'Umum',cp:$('mCP').value||'-',tp:$('mTP').value,dimensi:$('mDim').value||'-',pertemuan:parseInt($('mPrt').value)||2};if(!en.tp){alert('TP wajib!');return;}D.tp.push(en);$('mCP').value='';$('mTP').value='';saveFS();renderAll();}
+function delTP(i){D.tp.splice(i,1);saveFS();renderAll();}
+function clearTP(){if(confirm('Hapus semua TP?')){D.tp=[];$('csvSt').classList.add('hidden');saveFS();renderAll();}}
 
-function handleCSV(e){
-    const f=e.target.files[0];if(!f)return;
-    const reader=new FileReader();
-    reader.onload=function(ev){
-        const lines=ev.target.result.split(/\r?\n/).filter(l=>l.trim());if(lines.length<2){alert('CSV kosong');return;}
-        let cnt=0;
-        for(let i=1;i<lines.length;i++){const c=parseLine(lines[i]);if(c.length<8)continue;const en={fase:c[0],kelas:c[1],semester:c[2],elemen:c[3],cp:c[4],tp:c[5],dimensi:c[6],pertemuan:parseInt(c[7])||2};if(en.tp){tpData.push(en);cnt++;}}
-        document.getElementById('csvSt').classList.remove('hidden');
-        document.getElementById('csvStT').textContent=`${cnt} TP dimuat! (Total: ${tpData.length})`;
-        saveToFS();renderAll();
-    };reader.readAsText(f);e.target.value='';
-}
-
-function dlTemplate(){
-    const h='Fase,Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan';
-    const rows=['Fase A,Kelas 1,Semester 1,Al-Qur\'an Hadis,"Membaca dan membedakan huruf hijaiah berharakat","Membaca dan menulis huruf hijaiyah dengan makhrojul huruf yang tepat","keimanan dan ketakwaan; kreativitas; komunikasi",3','Fase A,Kelas 1,Semester 1,Akidah,"Mengenal rukun iman dan Rukun Islam","Menjelaskan dan meyakini 6 rukun iman","keimanan dan ketakwaan; penalaran kritis",2','Fase A,Kelas 1,Semester 1,Akhlak,"Mempraktikkan akhlak terpuji","Menerapkan Akhlak melalui Kalimat Basmallah","keimanan; kolaborasi",2','Fase A,Kelas 1,Semester 1,Fikih,"Mengenal dan mempraktikkan Rukun Islam","Menerapkan 5 Rukun Islam dan makna Syahadatain","keimanan; kemandirian",2','Fase A,Kelas 1,Semester 1,Sejarah,"Menceritakan kisah keteladanan Nabi","Menceritakan kisah dan keteladanan Nabi Adam AS","keimanan; kreativitas",2'];
-    const blob=new Blob(['\uFEFF'+h+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='template_sigumart.csv';a.click();
-}
-
-function addManual(){
-    const en={fase:document.getElementById('mFase').value,kelas:document.getElementById('mKelas').value,semester:document.getElementById('mSmt').value,elemen:document.getElementById('mElem').value||'Umum',cp:document.getElementById('mCP').value||'-',tp:document.getElementById('mTP').value,dimensi:document.getElementById('mDim').value||'-',pertemuan:parseInt(document.getElementById('mPrt').value)||2};
-    if(!en.tp){alert('TP wajib diisi!');return;}tpData.push(en);document.getElementById('mCP').value='';document.getElementById('mTP').value='';saveToFS();renderAll();
-}
-function delTP(i){tpData.splice(i,1);saveToFS();renderAll();}
-function clearAllTP(){if(confirm('Hapus semua data TP?')){tpData=[];document.getElementById('csvSt').classList.add('hidden');saveToFS();renderAll();}}
-
-// ============================================
+// ============================================================
 // ROMBEL
-// ============================================
-function addRombel(){
-    const id=++rombelCtr;const[sk]=getKRange();
-    rombelList.push({id,nama:`${sk}A`,hari:4,jamMulai:1,jamAkhir:4,kelas:`Kelas ${sk}`,warna:rombelList.length%W.length});
-    renderRombel();saveToFS();renderAll();
-}
-function rmRombel(id){rombelList=rombelList.filter(r=>r.id!==id);renderRombel();saveToFS();renderAll();}
-function updRombel(id,f,v){const r=rombelList.find(x=>x.id===id);if(!r)return;if(['hari','jamMulai','jamAkhir','warna'].includes(f))r[f]=parseInt(v);else r[f]=v;saveToFS();renderAll();}
-
+// ============================================================
+function addRombel(){const id=++D.rombelCtr;D.rombel.push({id,nama:`${1}A`,hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:D.rombel.length%W.length});renderRombel();saveFS();renderAll();}
+function rmRombel(id){D.rombel=D.rombel.filter(r=>r.id!==id);D.siswa=D.siswa.filter(s=>s.rombel_id!==id);renderRombel();saveFS();renderAll();}
+function updR(id,f,v){const r=D.rombel.find(x=>x.id===id);if(!r)return;if(['hari','jp1','jp2','warna'].includes(f))r[f]=parseInt(v);else r[f]=v;saveFS();renderAll();}
 function renderRombel(){
-    const box=document.getElementById('rombelBox');const[sk,ek]=getKRange();
-    if(!rombelList.length){box.innerHTML='<p class="text-center py-3 text-[10px] text-slate-500">Belum ada rombel.</p>';updRombelFilter();return;}
-    let h='';
-    rombelList.forEach((r,idx)=>{
-        const w=W[r.warna%W.length];let ko='';for(let i=sk;i<=ek;i++)ko+=`<option ${r.kelas==='Kelas '+i?'selected':''}>Kelas ${i}</option>`;
-        h+=`<div class="p-2 bg-slate-800/50 border border-slate-700/40 rounded-xl space-y-1 anim-slide" style="animation-delay:${idx*40}ms;border-left:3px solid ${w.hex}">
-            <div class="flex items-center justify-between"><div class="flex items-center gap-1.5"><span class="badge-dot" style="background:${w.hex}"></span><input value="${r.nama}" onchange="updRombel(${r.id},'nama',this.value)" class="bg-transparent border-none text-white font-black text-xs w-14 focus:outline-none p-0"></div><button onclick="rmRombel(${r.id})" class="text-rose-400 hover:text-rose-300 text-[10px] px-1 rounded hover:bg-rose-900/30">✕</button></div>
-            <div class="grid grid-cols-3 gap-1"><select onchange="updRombel(${r.id},'hari',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${HARI.map((h,i)=>`<option value="${i}" ${r.hari===i?'selected':''}>${h}</option>`).join('')}</select><select onchange="updRombel(${r.id},'jamMulai',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jamMulai===j?'selected':''}>JP${j}</option>`).join('')}</select><select onchange="updRombel(${r.id},'jamAkhir',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jamAkhir===j?'selected':''}>sd${j}</option>`).join('')}</select></div>
-            <select onchange="updRombel(${r.id},'kelas',this.value)" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${ko}</select>
-        </div>`;
-    });box.innerHTML=h;updRombelFilter();
+    const box=$('rombelBox');if(!D.rombel.length){box.innerHTML='<p class="text-center py-2 text-[9px] text-slate-500">Belum ada rombel.</p>';updRF();return;}
+    let h='';D.rombel.forEach((r,idx)=>{const w=W[r.warna%W.length];let ko='';for(let i=1;i<=12;i++)ko+=`<option ${r.kelas==='Kelas '+i?'selected':''}>Kelas ${i}</option>`;
+    h+=`<div class="p-1.5 bg-slate-800/50 border-l-[3px] border-slate-700/40 rounded-lg space-y-0.5" style="border-left-color:${w.hex}"><div class="flex items-center justify-between"><div class="flex items-center gap-1"><span class="badge-dot" style="background:${w.hex}"></span><input value="${r.nama}" onchange="updR(${r.id},'nama',this.value)" class="bg-transparent text-white font-black text-[11px] w-12 focus:outline-none p-0"></div><button onclick="rmRombel(${r.id})" class="text-rose-400 text-[9px] px-1 hover:bg-rose-900/30 rounded">✕</button></div><div class="grid grid-cols-4 gap-0.5"><select onchange="updR(${r.id},'hari',this.value)" class="input-s text-[8px] p-0.5">${HARI.map((h,i)=>`<option value="${i}" ${r.hari===i?'selected':''}>${h.substr(0,3)}</option>`).join('')}</select><select onchange="updR(${r.id},'jp1',this.value)" class="input-s text-[8px] p-0.5">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jp1===j?'selected':''}>${j}</option>`).join('')}</select><select onchange="updR(${r.id},'jp2',this.value)" class="input-s text-[8px] p-0.5">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jp2===j?'selected':''}>-${j}</option>`).join('')}</select><select onchange="updR(${r.id},'kelas',this.value)" class="input-s text-[8px] p-0.5">${ko}</select></div></div>`;});
+    box.innerHTML=h;updRF();
 }
-function updRombelFilter(){const f=document.getElementById('fRombel');f.innerHTML='<option value="">Semua Rombel</option>';rombelList.forEach(r=>{f.innerHTML+=`<option value="${r.id}">Rombel ${r.nama} (${HARI[r.hari]})</option>`;});}
+function updRF(){const f=$('fRbl');f.innerHTML='<option value="">Semua Rbl</option>';D.rombel.forEach(r=>{f.innerHTML+=`<option value="${r.id}">${r.nama} (${HARI[r.hari]})</option>`;});}
 
-// ============================================
-// PROMES DATE GENERATOR
-// ============================================
+// ============================================================
+// SISWA
+// ============================================================
+function addSiswa(rblId){const id=++D.siswaCtr;D.siswa.push({id,nama:'',nis:'',rombel_id:rblId,jk:'L'});saveFS();renderAll();}
+function rmSiswa(id){D.siswa=D.siswa.filter(s=>s.id!==id);saveFS();renderAll();}
+function updSiswa(id,f,v){const s=D.siswa.find(x=>x.id===id);if(s){s[f]=v;debSave();}}
+function getSiswaByRombel(rblId){return D.siswa.filter(s=>s.rombel_id===rblId).sort((a,b)=>a.nama.localeCompare(b.nama));}
+
+// ============================================================
+// KRITERIA NILAI
+// ============================================================
+function renderKriteria(){
+    const box=$('nilaiKriteriaBox');let h='';
+    D.kriteriaNilai.forEach((k,i)=>{h+=`<div class="flex gap-1 items-center"><input value="${k.nama}" onchange="D.kriteriaNilai[${i}].nama=this.value;debSave()" class="flex-1 input-s text-[9px]"><input type="number" value="${k.bobot}" min="0" max="100" onchange="D.kriteriaNilai[${i}].bobot=parseInt(this.value);debSave()" class="w-12 input-s text-[9px]"><span class="text-[8px] text-slate-500">%</span><button onclick="D.kriteriaNilai.splice(${i},1);renderKriteria();debSave()" class="text-rose-400 text-[9px]">✕</button></div>`;});
+    const total=D.kriteriaNilai.reduce((s,k)=>s+k.bobot,0);
+    h+=`<p class="text-[8px] ${total===100?'text-emerald-400':'text-rose-400'} font-bold">Total Bobot: ${total}%${total!==100?' (harus 100%)':' ✓'}</p>`;
+    box.innerHTML=h;
+}
+function addKriteria(){D.kriteriaNilai.push({nama:'Baru',bobot:0});renderKriteria();debSave();}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getFL(){let l=[...D.tp];const fk=$('fKls')?.value,fs=$('fSmt')?.value;if(fk)l=l.filter(d=>d.kelas===fk);if(fs)l=l.filter(d=>d.semester===fs);return l;}
 function fmtISO(d){let m=''+(d.getMonth()+1),dy=''+d.getDate(),y=d.getFullYear();if(m.length<2)m='0'+m;if(dy.length<2)dy='0'+dy;return[y,m,dy].join('-');}
+function genWeeks(semKey,dayIdx,total){const s=getS();const bs=semKey==='Semester 1'?s.tgl1:s.tgl2;const bp=bs.split('-');const bd=new Date(+bp[0],+bp[1]-1,+bp[2]);const bDow=bd.getDay();const tDow=(dayIdx+1)%7;let diff=tDow-bDow;if(diff<0)diff+=7;const first=new Date(bd);first.setDate(bd.getDate()+diff);const weeks=[];for(let w=0;w<total;w++){const d=new Date(first);d.setDate(first.getDate()+w*7);const iso=fmtISO(d);weeks.push({wn:w+1,date:d,dn:d.getDate(),mn:BULAN[d.getMonth()],iso,lib:liburNas.includes(iso),eff:!liburNas.includes(iso)});}return weeks;}
+function sig(){const s=getS();return`<div class="mt-5 pt-3 border-t-2 border-slate-300 grid grid-cols-2 gap-4 text-[10px]"><div class="text-center"><p class="font-bold">Mengetahui,</p><p class="font-bold mb-12">Kepala ${s.sek}</p><p class="font-extrabold underline">${s.kep}</p><p class="text-slate-500">NIP. ${s.nipK}</p></div><div class="text-center"><p>${s.kotaTgl}</p><p class="font-bold mb-12">Guru ${s.mapel}</p><p class="font-extrabold underline">${s.guru}</p><p class="text-slate-500">NIP. ${s.nipG}</p></div></div>`;}
+function docHeader(title,sub){const s=getS();return`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-sm md:text-base font-black uppercase text-slate-900">${title}</h2><p class="text-[9px] text-slate-600 font-bold uppercase">${sub||s.mapel}</p><p class="text-[8px] text-slate-500">${s.sek} (NPSN: ${s.npsn}) • T.A. ${s.ta}</p></div>`;}
 
-function genWeeks(semKey, dayIdx, total){
-    const s=getS();const bs=semKey==='Semester 1'?s.tgl1:s.tgl2;
-    const bp=bs.split('-');const bd=new Date(+bp[0],+bp[1]-1,+bp[2]);
-    const bDow=bd.getDay();const tDow=(dayIdx+1)%7;
-    let diff=tDow-bDow;if(diff<0)diff+=7;
-    const first=new Date(bd);first.setDate(bd.getDate()+diff);
-    const weeks=[];
-    for(let w=0;w<total;w++){const d=new Date(first);d.setDate(first.getDate()+w*7);const iso=fmtISO(d);const lib=liburNas.includes(iso);weeks.push({wn:w+1,date:d,dn:d.getDate(),mn:BULAN[d.getMonth()],iso,lib,eff:!lib});}
-    return weeks;
-}
+// ============================================================
+// TAB SWITCH
+// ============================================================
+const TABS=['Jadwal','Data','Siswa','Atp','Prota','Promes','Modul','Kktp','Nilai','Absen','Jurnal'];
+function swTab(t){TABS.forEach(x=>{$('c'+x)?.classList.add('hidden');const b=$('t'+x);if(b)b.className="nav-btn w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-2";});const cap=t.charAt(0).toUpperCase()+t.slice(1);$('c'+cap)?.classList.remove('hidden');const ab=$('t'+cap);if(ab)ab.className="nav-btn nav-active w-full text-left py-1.5 px-3 rounded-lg text-[10px] font-bold flex items-center gap-2";document.querySelectorAll('.mnav').forEach(b=>{b.classList.toggle('text-indigo-400',b.dataset.t===t);b.classList.toggle('text-slate-400',b.dataset.t!==t);});}
 
-// ============================================
-// FILTERS & HELPERS
-// ============================================
-function getFL(){let l=[...tpData];const ff=document.getElementById('fFase')?.value,fk=document.getElementById('fKelas')?.value,fs=document.getElementById('fSmt')?.value;if(ff)l=l.filter(d=>d.fase===ff);if(fk)l=l.filter(d=>d.kelas===fk);if(fs)l=l.filter(d=>d.semester===fs);return l;}
-function uniq(a,k){return[...new Set(a.map(d=>d[k]).filter(Boolean))];}
-function swTab(t){const tabs=['Jadwal','Data','Atp','Prota','Promes','Modul','Kktp'];tabs.forEach(x=>{document.getElementById('c'+x)?.classList.add('hidden');const b=document.getElementById('t'+x);if(b)b.className="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2";});const cap=t.charAt(0).toUpperCase()+t.slice(1);document.getElementById('c'+cap)?.classList.remove('hidden');const ab=document.getElementById('t'+cap);if(ab)ab.className="nav-btn nav-active w-full text-left py-2 px-3 rounded-xl text-[11px] font-bold flex items-center gap-2";document.querySelectorAll('.mnav').forEach(b=>{b.classList.remove('text-indigo-400');b.classList.add('text-slate-400');if(b.dataset.t===t){b.classList.remove('text-slate-400');b.classList.add('text-indigo-400');}});}
-function sig(){const s=getS();return`<div class="mt-6 pt-4 border-t-2 border-slate-300 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"><div class="text-center"><p class="font-bold">Mengetahui,</p><p class="font-bold mb-14">Kepala ${s.sekolah}</p><p class="font-extrabold underline">${s.kepsek}</p><p class="text-slate-500">NIP. ${s.nipK}</p></div><div class="text-center"><p>${s.kotaTgl}</p><p class="font-bold mb-14">Guru ${s.mapel}</p><p class="font-extrabold underline">${s.guru}</p><p class="text-slate-500">NIP. ${s.nipG}</p></div></div>`;}
+// ============================================================
+// RENDER: JADWAL
+// ============================================================
+function rJadwal(){const s=getS(),fR=$('fRbl')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):[...D.rombel];const jm={};HARI.forEach((_,i)=>{jm[i]={};});rbs.forEach(r=>{for(let jp=r.jp1;jp<=r.jp2;jp++){if(!jm[r.hari][jp])jm[r.hari][jp]=[];jm[r.hari][jp].push(r);}});let chips='';rbs.forEach(r=>{const w=W[r.warna%W.length];chips+=`<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full ${w.lt} ${w.tx} ${w.bd} border text-[8px] font-bold"><span class="badge-dot" style="background:${w.hex}"></span>${r.nama}(${HARI[r.hari].substr(0,3)} JP${r.jp1}-${r.jp2})</span> `;});
+const tm=['07.00-07.35','07.35-08.10','08.10-08.45','08.45-09.20','09.20-09.50','09.50-10.25','10.25-11.00','11.00-11.35','11.35-12.10','12.10-12.45'];let rows='';for(let jp=1;jp<=10;jp++){if(jp===5){rows+=`<tr class="bg-amber-50 text-amber-700 font-bold text-[9px]"><td class="p-0.5 border text-center" colspan="8">ISTIRAHAT ${tm[4]}</td></tr>`;continue;}let cells='';HARI.forEach((_,hi)=>{const rs=jm[hi][jp]||[];if(!rs.length)cells+=`<td class="p-0.5 border text-center text-slate-300 text-[8px]">-</td>`;else{const tags=rs.map(r=>{const w=W[r.warna%W.length];return`<span class="${w.bg} text-white px-0.5 rounded text-[7px] font-bold">${r.nama}</span>`;}).join(' ');cells+=`<td class="p-0.5 border text-center ${rs.length===1?W[rs[0].warna%W.length].bg+' text-white font-bold text-[8px]':'bg-slate-50'}">${rs.length===1?rs[0].nama:tags}</td>`;}});rows+=`<tr class="border-b"><td class="p-0.5 border text-center font-bold bg-slate-50 text-[8px]">${jp}</td><td class="p-0.5 border text-center text-[7px] text-slate-500 bg-slate-50">${tm[jp>5?jp-1:jp-1]||''}</td>${cells}</tr>`;}
+$('cJadwal').innerHTML=docHeader('JADWAL PELAJARAN MULTI-ROMBEL')+`<div class="flex flex-wrap gap-1 mb-3">${chips||'<span class="text-[9px] text-slate-400">Tambah rombel di sidebar</span>'}</div><div class="tbl-r"><table class="w-full text-xs border-collapse border border-slate-400 min-w-[550px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[8px] font-bold"><th class="p-1 border w-8">JP</th><th class="p-1 border w-16">Waktu</th>${HARI.map(h=>`<th class="p-1 border">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${sig()}`;}
 
-// ============================================
-// RENDER FUNCTIONS
-// ============================================
-function rJadwal(){
-    const s=getS(),fR=document.getElementById('fRombel')?.value;let rbs=fR?rombelList.filter(r=>r.id==fR):[...rombelList];
-    const jadMap={};HARI.forEach((_,i)=>{jadMap[i]={};});
-    rbs.forEach(r=>{for(let jp=r.jamMulai;jp<=r.jamAkhir;jp++){if(!jadMap[r.hari][jp])jadMap[r.hari][jp]=[];jadMap[r.hari][jp].push(r);}});
-    let chips='';rbs.forEach(r=>{const w=W[r.warna%W.length];chips+=`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${w.lt} ${w.tx} ${w.bd} border text-[9px] font-bold"><span class="badge-dot" style="background:${w.hex}"></span>${r.nama} (${HARI[r.hari]} JP${r.jamMulai}-${r.jamAkhir})</span> `;});
-    if(!rbs.length)chips='<span class="text-xs text-slate-400">Tambahkan rombel di sidebar</span>';
-    const times=['07.00-07.35','07.35-08.10','08.10-08.45','08.45-09.20','09.20-09.50','09.50-10.25','10.25-11.00','11.00-11.35','11.35-12.10','12.10-12.45'];
-    let rows='';
-    for(let jp=1;jp<=10;jp++){
-        if(jp===5){rows+=`<tr class="bg-amber-50 font-bold text-amber-700 text-[10px]"><td class="p-1 border border-slate-300 text-center">IST</td><td class="p-1 border border-slate-300 text-center text-[9px]">${times[4]}</td><td colspan="6" class="p-1 border border-slate-300 text-center uppercase tracking-widest">Istirahat</td></tr>`;continue;}
-        let cells='';HARI.forEach((_,hi)=>{const rs=jadMap[hi][jp]||[];if(!rs.length)cells+=`<td class="p-1 border border-slate-300 text-center text-slate-300 text-[9px]">-</td>`;else if(rs.length===1){const w=W[rs[0].warna%W.length];cells+=`<td class="p-1 border border-slate-300 text-center ${w.bg} text-white font-bold text-[8px]">${rs[0].nama}</td>`;}else{const tags=rs.map(r=>{const w=W[r.warna%W.length];return`<span class="inline-block px-0.5 ${w.bg} text-white rounded text-[7px] font-bold">${r.nama}</span>`;}).join(' ');cells+=`<td class="p-1 border border-slate-300 text-center bg-slate-100 text-[7px]">${tags}</td>`;}});
-        rows+=`<tr class="border-b border-slate-200"><td class="p-1 border border-slate-300 text-center font-bold bg-slate-50 text-[9px]">${jp}</td><td class="p-1 border border-slate-300 text-center text-[8px] text-slate-600 bg-slate-50">${times[jp>5?jp-1:jp-1]||'-'}</td>${cells}</tr>`;
-    }
-    document.getElementById('cJadwal').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">JADWAL PELAJARAN MULTI-ROMBEL</h2><p class="text-[10px] text-slate-600 font-bold uppercase">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="flex flex-wrap gap-1.5 mb-3">${chips}</div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-400 mb-4 min-w-[600px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[9px] font-bold"><th class="p-1.5 border border-slate-400 w-10">JP</th><th class="p-1.5 border border-slate-400 w-20">Waktu</th>${HARI.map(h=>`<th class="p-1.5 border border-slate-400">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${sig()}`;
-}
+// ============================================================
+// RENDER: DATA CP/TP
+// ============================================================
+function rData(){const fl=getFL();let rows='';fl.forEach((d,i)=>{const ri=D.tp.indexOf(d);const fase=faseFromKelas(d.kelas);rows+=`<tr class="border-b text-[9px] hover:bg-slate-50"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-medium">${d.kelas}</td><td class="p-1 border-r text-indigo-600">${fase}</td><td class="p-1 border-r">${d.semester}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-slate-500 max-w-[120px] truncate" title="${d.cp}">${d.cp}</td><td class="p-1 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1 border-r text-slate-500">${d.dimensi}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan}</td><td class="p-1 text-center no-print"><button onclick="delTP(${ri})" class="text-rose-500 text-[9px]">🗑️</button></td></tr>`;});
+$('cData').innerHTML=docHeader('DATA CP / TP')+`<div class="tbl-r"><table class="w-full text-xs border-collapse border min-w-[900px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[8px] font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border w-12">Kelas</th><th class="p-1 border w-10">Fase</th><th class="p-1 border w-14">Smt</th><th class="p-1 border w-20">Elemen</th><th class="p-1 border">CP</th><th class="p-1 border">TP</th><th class="p-1 border w-24">Dimensi</th><th class="p-1 border w-6">Prt</th><th class="p-1 border w-6 no-print">⚙</th></tr></thead><tbody>${rows||'<tr><td colspan="10" class="p-4 text-center text-slate-400">Belum ada data</td></tr>'}</tbody></table></div>`;}
 
-function rData(){
-    const s=getS(),fl=getFL();let rows='';
-    fl.forEach((d,i)=>{const ri=tpData.indexOf(d);rows+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r text-center font-semibold">${i+1}</td><td class="p-1.5 border-r text-indigo-800 font-medium">${d.fase}</td><td class="p-1.5 border-r">${d.kelas}</td><td class="p-1.5 border-r">${d.semester}</td><td class="p-1.5 border-r font-bold">${d.elemen}</td><td class="p-1.5 border-r text-slate-600 max-w-[150px] truncate" title="${d.cp}">${d.cp}</td><td class="p-1.5 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1.5 border-r text-slate-600">${d.dimensi}</td><td class="p-1.5 border-r text-center font-bold">${d.pertemuan}</td><td class="p-1.5 text-center no-print"><button onclick="delTP(${ri})" class="text-rose-500 text-[10px]">🗑️</button></td></tr>`;});
-    if(!fl.length)rows=`<tr><td colspan="10" class="p-6 text-center text-slate-400">📂 Belum ada data TP. Import CSV atau tambah manual.</td></tr>`;
-    document.getElementById('cData').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">DATA CP / TP</h2><p class="text-[9px] text-slate-500">${s.sekolah} • ${fl.length}/${tpData.length} TP</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-300 mb-4 min-w-[950px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[9px] font-bold"><th class="p-1.5 border w-6">No</th><th class="p-1.5 border w-14">Fase</th><th class="p-1.5 border w-14">Kelas</th><th class="p-1.5 border w-16">Smt</th><th class="p-1.5 border w-24">Elemen</th><th class="p-1.5 border">CP</th><th class="p-1.5 border">TP</th><th class="p-1.5 border w-28">Dimensi</th><th class="p-1.5 border w-8">Prt</th><th class="p-1.5 border w-8 no-print">⚙️</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
-function rAtp(){
-    const s=getS(),fl=getFL();let rows=fl.map((d,i)=>`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r text-center font-semibold">${i+1}</td><td class="p-1.5 border-r font-bold">${d.elemen}</td><td class="p-1.5 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1.5 border-r text-slate-600">${d.cp.substring(0,100)}${d.cp.length>100?'...':''}</td><td class="p-1.5 border-r text-center font-bold">${d.pertemuan*4} JP</td><td class="p-1.5 border-r text-slate-600">${s.metode}</td><td class="p-1.5 text-slate-600">${d.dimensi}</td></tr>`).join('');
-    document.getElementById('cAtp').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">ATP / SILABUS</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-300 mb-4 min-w-[850px]"><thead><tr class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white text-[9px] font-bold"><th class="p-1.5 border w-6">No</th><th class="p-1.5 border w-24">Elemen</th><th class="p-1.5 border">TP</th><th class="p-1.5 border w-40">CP</th><th class="p-1.5 border w-16">Alokasi</th><th class="p-1.5 border w-32">Metode</th><th class="p-1.5 border w-28">Dimensi</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="p-6 text-center text-slate-400">Belum ada data</td></tr>'}</tbody></table></div>${sig()}`;
-}
-
-function rProta(){
-    const s=getS();let body='',gt=0;
-    ['Semester 1','Semester 2'].forEach(sem=>{
-        let list=tpData.filter(d=>d.semester===sem);const ff=document.getElementById('fFase')?.value,fk=document.getElementById('fKelas')?.value;
-        if(ff)list=list.filter(d=>d.fase===ff);if(fk)list=list.filter(d=>d.kelas===fk);
-        let st=0;list.forEach(d=>st+=d.pertemuan*4);gt+=st;
-        body+=`<tr class="bg-indigo-100 font-bold text-indigo-900"><td colspan="5" class="p-1.5 uppercase text-[10px]">${sem.toUpperCase()} — ${st} JP</td></tr>`;
-        list.forEach((d,i)=>{body+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r text-center font-semibold">${i+1}</td><td class="p-1.5 border-r font-bold">${d.elemen}</td><td class="p-1.5 border-r">${d.tp}</td><td class="p-1.5 border-r text-center">${sem}</td><td class="p-1.5 text-center font-bold">${d.pertemuan*4} JP</td></tr>`;});
+// ============================================================
+// RENDER: SISWA
+// ============================================================
+function rSiswa(){
+    const fR=$('fRbl')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):[...D.rombel];
+    let html=docHeader('DATA SISWA');
+    rbs.forEach(rb=>{
+        const w=W[rb.warna%W.length];const siswa=getSiswaByRombel(rb.id);
+        html+=`<div class="mb-4 border rounded-xl overflow-hidden"><div class="px-3 py-2 ${w.bg} text-white font-bold text-xs flex justify-between items-center"><span>Rombel ${rb.nama} — ${rb.kelas} (${siswa.length} siswa)</span><button onclick="addSiswa(${rb.id})" class="bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded text-[9px] no-print">＋ Siswa</button></div><table class="w-full text-[10px] border-collapse"><thead><tr class="bg-slate-100 font-bold text-slate-700"><th class="p-1.5 border w-8">No</th><th class="p-1.5 border w-24">NIS</th><th class="p-1.5 border">Nama Lengkap</th><th class="p-1.5 border w-10">JK</th><th class="p-1.5 border w-8 no-print">⚙</th></tr></thead><tbody>`;
+        siswa.forEach((s,i)=>{html+=`<tr class="border-b hover:bg-slate-50"><td class="p-1 border text-center">${i+1}</td><td class="p-1 border"><input value="${s.nis}" onchange="updSiswa(${s.id},'nis',this.value)" class="w-full bg-transparent focus:outline-none text-[10px] font-medium"></td><td class="p-1 border"><input value="${s.nama}" onchange="updSiswa(${s.id},'nama',this.value)" class="w-full bg-transparent focus:outline-none text-[10px] font-bold"></td><td class="p-1 border text-center"><select onchange="updSiswa(${s.id},'jk',this.value)" class="bg-transparent text-[10px] focus:outline-none"><option ${s.jk==='L'?'selected':''}>L</option><option ${s.jk==='P'?'selected':''}>P</option></select></td><td class="p-1 border text-center no-print"><button onclick="rmSiswa(${s.id})" class="text-rose-500 text-[9px]">🗑️</button></td></tr>`;});
+        if(!siswa.length)html+=`<tr><td colspan="5" class="p-3 text-center text-slate-400 text-[10px]">Belum ada siswa</td></tr>`;
+        html+=`</tbody></table></div>`;
     });
-    body+=`<tr class="bg-gradient-to-r from-indigo-800 to-violet-800 text-white font-black text-xs"><td colspan="4" class="p-2 text-right border-r uppercase">Total 1 Tahun:</td><td class="p-2 text-center">${gt} JP</td></tr>`;
-    document.getElementById('cProta').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">PROGRAM TAHUNAN (PROTA)</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-400 mb-4 min-w-[650px]"><thead><tr class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white text-[9px] font-bold"><th class="p-1.5 border w-6">No</th><th class="p-1.5 border w-24">Elemen</th><th class="p-1.5 border">TP</th><th class="p-1.5 border w-20">Smt</th><th class="p-1.5 border w-16">Alokasi</th></tr></thead><tbody>${body}</tbody></table></div>${sig()}`;
+    if(!rbs.length)html+=`<p class="text-center py-6 text-slate-400">Tambahkan rombel terlebih dahulu</p>`;
+    $('cSiswa').innerHTML=html;
 }
 
-// PROMES WITH REAL DATES
-function rPromes(){
-    const s=getS(),fSem=document.getElementById('fSmt')?.value,sem=fSem||'Semester 1';
-    let fl=tpData.filter(d=>d.semester===sem);
-    const ff=document.getElementById('fFase')?.value,fk=document.getElementById('fKelas')?.value;
-    if(ff)fl=fl.filter(d=>d.fase===ff);if(fk)fl=fl.filter(d=>d.kelas===fk);
-    const fR=document.getElementById('fRombel')?.value;
-    let aR=fR?rombelList.find(r=>r.id==fR):rombelList[0];
-    const dayIdx=aR?aR.hari:4;
-    const weeks=genWeeks(sem,dayIdx,s.mgg);
-    // Group months
-    const mg=[];let cm=null;
-    weeks.forEach(w=>{if(!cm||cm.n!==w.mn){cm={n:w.mn,w:[]};mg.push(cm);}cm.w.push(w);});
-    let th1=`<tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white font-bold text-[8px]"><th rowspan="2" class="border border-slate-400 px-1 py-1 w-6">No</th><th rowspan="2" class="border border-slate-400 px-1 py-1 text-left min-w-[160px]">Tujuan Pembelajaran</th><th rowspan="2" class="border border-slate-400 px-0.5 py-1 w-8">JP</th><th rowspan="2" class="border border-slate-400 px-0.5 py-1 w-8">Mgg</th>`;
-    mg.forEach(m=>{th1+=`<th colspan="${m.w.length}" class="border border-slate-400 px-0.5 py-0.5 uppercase text-center">${m.n.substring(0,3)}</th>`;});
-    th1+=`</tr>`;
-    let th2=`<tr class="bg-indigo-600 text-white font-semibold text-[7px]">`;mg.forEach(m=>{m.w.forEach((_,i)=>{th2+=`<th class="border border-slate-400 px-0.5 py-0.5 w-6">${i+1}</th>`;});});th2+=`</tr>`;
-    const effW=[];weeks.forEach((w,gi)=>{if(w.eff)effW.push(gi);});
-    let tbody='',effPtr=0;
-    fl.forEach((d,di)=>{
-        const mR=d.pertemuan,actIdx=[];
-        for(let k=0;k<mR;k++){if(effPtr<effW.length){actIdx.push(effW[effPtr]);effPtr++;}}
-        tbody+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="border border-slate-300 py-0.5 text-center font-semibold">${di+1}</td><td class="border border-slate-300 px-1 py-0.5 text-left font-medium text-[9px]">${d.tp}</td><td class="border border-slate-300 py-0.5 text-center font-bold">${d.pertemuan*4}</td><td class="border border-slate-300 py-0.5 text-center font-semibold">${d.pertemuan}</td>`;
-        weeks.forEach((w,gi)=>{
-            if(actIdx.includes(gi))tbody+=`<td class="border border-slate-300 py-0.5 text-center font-bold bg-indigo-200 text-indigo-950 text-[9px]">${w.dn}</td>`;
-            else if(w.lib)tbody+=`<td class="border border-slate-300 py-0.5 text-center bg-red-100 text-red-800 font-bold text-[7px]">LBR</td>`;
-            else tbody+=`<td class="border border-slate-300 py-0.5 text-center text-slate-300 text-[8px]">·</td>`;
+// ============================================================
+// RENDER: ATP, PROTA, PROMES, MODUL, KKTP (same logic as before)
+// ============================================================
+function rAtp(){const s=getS(),fl=getFL();let rows=fl.map((d,i)=>`<tr class="border-b text-[9px] hover:bg-slate-50"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-emerald-900 font-medium">${d.tp}</td><td class="p-1 border-r text-slate-500">${d.cp.substring(0,80)}${d.cp.length>80?'...':''}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan*4} JP</td><td class="p-1 border-r text-slate-500">${s.metode}</td><td class="p-1 text-slate-500">${d.dimensi}</td></tr>`).join('');
+$('cAtp').innerHTML=docHeader('ATP / SILABUS')+`<div class="tbl-r"><table class="w-full text-xs border-collapse border min-w-[800px]"><thead><tr class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white text-[8px] font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border w-20">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-32">CP</th><th class="p-1 border w-14">Alokasi</th><th class="p-1 border w-28">Metode</th><th class="p-1 border w-24">Dimensi</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada</td></tr>'}</tbody></table></div>${sig()}`;}
+
+function rProta(){const s=getS();let body='',gt=0;['Semester 1','Semester 2'].forEach(sem=>{let list=D.tp.filter(d=>d.semester===sem);const fk=$('fKls')?.value;if(fk)list=list.filter(d=>d.kelas===fk);let st=0;list.forEach(d=>st+=d.pertemuan*4);gt+=st;body+=`<tr class="bg-indigo-100 font-bold text-indigo-900"><td colspan="5" class="p-1 uppercase text-[9px]">${sem.toUpperCase()} — ${st} JP</td></tr>`;list.forEach((d,i)=>{body+=`<tr class="border-b text-[9px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r">${d.tp}</td><td class="p-1 border-r text-center">${sem}</td><td class="p-1 text-center font-bold">${d.pertemuan*4} JP</td></tr>`;});});body+=`<tr class="bg-indigo-800 text-white font-black text-[10px]"><td colspan="4" class="p-1.5 text-right border-r uppercase">Total:</td><td class="p-1.5 text-center">${gt} JP</td></tr>`;
+$('cProta').innerHTML=docHeader('PROGRAM TAHUNAN (PROTA)')+`<div class="tbl-r"><table class="w-full text-xs border-collapse border min-w-[600px]"><thead><tr class="bg-emerald-700 text-white text-[8px] font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border w-20">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-16">Smt</th><th class="p-1 border w-14">Alokasi</th></tr></thead><tbody>${body}</tbody></table></div>${sig()}`;}
+
+function rPromes(){const s=getS(),fSem=$('fSmt')?.value||'Semester 1',sem=fSem||'Semester 1';let fl=D.tp.filter(d=>d.semester===sem);const fk=$('fKls')?.value;if(fk)fl=fl.filter(d=>d.kelas===fk);const fR=$('fRbl')?.value;let aR=fR?D.rombel.find(r=>r.id==fR):D.rombel[0];const dayIdx=aR?aR.hari:4;const weeks=genWeeks(sem,dayIdx,s.mgg);const mg=[];let cm=null;weeks.forEach(w=>{if(!cm||cm.n!==w.mn){cm={n:w.mn,w:[]};mg.push(cm);}cm.w.push(w);});
+let th1=`<tr class="bg-indigo-700 text-white font-bold text-[7px]"><th rowspan="2" class="border px-0.5 py-1 w-5">No</th><th rowspan="2" class="border px-0.5 py-1 text-left min-w-[140px]">TP</th><th rowspan="2" class="border px-0.5 py-1 w-7">JP</th><th rowspan="2" class="border px-0.5 py-1 w-6">Mg</th>`;mg.forEach(m=>{th1+=`<th colspan="${m.w.length}" class="border px-0.5 py-0.5 text-center">${m.n.substr(0,3)}</th>`;});th1+=`</tr>`;
+let th2=`<tr class="bg-indigo-600 text-white text-[6px]">`;mg.forEach(m=>{m.w.forEach((_,i)=>{th2+=`<th class="border px-0.5 py-0.5 w-5">${i+1}</th>`;});});th2+=`</tr>`;
+const effW=[];weeks.forEach((w,gi)=>{if(w.eff)effW.push(gi);});let tbody='',effPtr=0;
+fl.forEach((d,di)=>{const mR=d.pertemuan,actIdx=[];for(let k=0;k<mR;k++){if(effPtr<effW.length){actIdx.push(effW[effPtr]);effPtr++;}}tbody+=`<tr class="border-b text-[9px] hover:bg-slate-50"><td class="border py-0.5 text-center font-semibold">${di+1}</td><td class="border px-1 py-0.5 text-left font-medium text-[8px]">${d.tp}</td><td class="border py-0.5 text-center font-bold">${d.pertemuan*4}</td><td class="border py-0.5 text-center">${d.pertemuan}</td>`;weeks.forEach((w,gi)=>{if(actIdx.includes(gi))tbody+=`<td class="border py-0.5 text-center font-bold bg-indigo-200 text-indigo-950 text-[8px]">${w.dn}</td>`;else if(w.lib)tbody+=`<td class="border py-0.5 text-center bg-red-100 text-red-800 font-bold text-[6px]">LBR</td>`;else tbody+=`<td class="border py-0.5 text-center text-slate-300 text-[7px]">·</td>`;});tbody+=`</tr>`;});
+tbody+=`<tr class="bg-slate-100 font-bold border-t-2 text-[8px]"><td colspan="4" class="border px-1 py-0.5 text-right text-slate-600">Tgl ${HARI[dayIdx]}:</td>`;weeks.forEach(w=>{tbody+=w.lib?`<td class="border py-0.5 text-center bg-red-200 text-red-900 text-[6px]">LBR</td>`:`<td class="border py-0.5 text-center text-indigo-900 font-extrabold text-[8px]">${w.dn}</td>`;});tbody+=`</tr>`;
+$('cPromes').innerHTML=docHeader(`PROGRAM SEMESTER (PROMES)`,`${s.mapel} • ${sem.toUpperCase()}`)+`<p class="text-[8px] text-indigo-700 font-bold mb-2">* Angka = Tanggal real hari ${HARI[dayIdx]}${aR?' • Rombel: '+aR.nama:''}</p><table class="w-full border-collapse border table-matrix min-w-[800px]"><thead>${th1}${th2}</thead><tbody>${tbody}</tbody></table>${sig()}`;}
+
+function rModul(){const s=getS(),fl=getFL();if(!fl.length){$('cModul').innerHTML=`<div class="text-center py-8 text-slate-400">🧠 Belum ada data</div>`;return;}const d=fl[0];let opts=fl.map((t,i)=>`<option value="${i}">[${t.elemen}] ${t.tp}</option>`).join('');let pH='';for(let i=1;i<=d.pertemuan;i++){pH+=`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><h5 class="font-bold text-indigo-900 text-[10px] uppercase border-b pb-1 mb-1">Pertemuan ${i}</h5><div class="text-[10px] space-y-1"><div class="p-1.5 bg-blue-50 border border-blue-200 rounded"><strong class="text-blue-900 text-[9px]">🧘 Pendahuluan (15m)</strong></div><div class="p-1.5 bg-emerald-50 border border-emerald-200 rounded"><strong class="text-emerald-900 text-[9px]">💡 Inti (110m)</strong><p class="text-[9px]">${s.metode}</p></div><div class="p-1.5 bg-amber-50 border border-amber-200 rounded"><strong class="text-amber-900 text-[9px]">🎉 Penutup (15m)</strong></div></div></div>`;}
+$('cModul').innerHTML=docHeader('MODUL AJAR')+`<table class="w-full text-[10px] border-collapse border mb-3"><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r w-1/3">Guru</td><td class="p-1.5">${s.guru}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Sekolah</td><td class="p-1.5">${s.sek}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Kelas/Fase/Smt</td><td class="p-1.5">${d.kelas} (Fase ${faseFromKelas(d.kelas)}) / ${d.semester}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">TP</td><td class="p-1.5 font-bold text-emerald-900">${d.tp}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Alokasi</td><td class="p-1.5">${d.pertemuan} Pertemuan (${d.pertemuan*4} JP)</td></tr></table><select id="modSel" onchange="rModTP()" class="w-full bg-slate-50 border rounded-lg p-1 text-[10px] mb-2 no-print">${opts}</select><div id="modBox">${pH}</div>${sig()}`;}
+function rModTP(){const fl=getFL();const idx=parseInt($('modSel')?.value)||0;const d=fl[idx];if(!d)return;const s=getS();let h='';for(let i=1;i<=d.pertemuan;i++){h+=`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><h5 class="font-bold text-indigo-900 text-[10px] border-b pb-1 mb-1">Pertemuan ${i} — ${d.tp}</h5><div class="text-[10px] space-y-1"><div class="p-1.5 bg-blue-50 border border-blue-200 rounded"><strong class="text-[9px]">🧘 Pendahuluan</strong></div><div class="p-1.5 bg-emerald-50 border border-emerald-200 rounded"><strong class="text-[9px]">💡 Inti — ${s.metode}</strong></div><div class="p-1.5 bg-amber-50 border border-amber-200 rounded"><strong class="text-[9px]">🎉 Penutup</strong></div></div></div>`;}$('modBox').innerHTML=h;}
+
+function rKktp(){const fl=getFL();let cards=fl.map((d,i)=>`<div class="mb-3 border rounded-lg p-2.5 bg-slate-50"><div class="flex justify-between items-start border-b pb-1.5 mb-1.5"><div><span class="bg-indigo-700 text-white text-[7px] font-black px-1.5 py-0.5 rounded uppercase">${d.elemen} • TP ${i+1}</span><h4 class="font-bold text-xs mt-0.5">${d.tp}</h4></div><span class="text-[9px] bg-indigo-100 text-indigo-900 font-bold px-1.5 py-0.5 rounded">${d.pertemuan*4} JP</span></div><div class="tbl-r"><table class="w-full text-[9px] border-collapse border bg-white min-w-[450px]"><thead><tr class="bg-slate-100 font-bold"><th class="p-1 border text-left w-1/5">Aspek</th><th class="p-1 border bg-rose-50 text-rose-800">0-60%</th><th class="p-1 border bg-amber-50 text-amber-800">61-70%</th><th class="p-1 border bg-emerald-50 text-emerald-800">71-85%</th><th class="p-1 border bg-blue-50 text-blue-800">86-100%</th></tr></thead><tbody><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border">Konsep</td><td class="p-1 border text-slate-500">Belum</td><td class="p-1 border">Bimbingan</td><td class="p-1 border font-medium">Mandiri</td><td class="p-1 border font-bold">Fasih</td></tr><tr><td class="p-1 font-bold bg-slate-50 border">Perilaku</td><td class="p-1 border text-slate-500">Belum</td><td class="p-1 border">Diingatkan</td><td class="p-1 border font-medium">Konsisten</td><td class="p-1 border font-bold">Teladan</td></tr></tbody></table></div></div>`).join('');
+$('cKktp').innerHTML=docHeader('KKTP')+`${cards||'<p class="text-center py-6 text-slate-400">Belum ada data</p>'}${sig()}`;}
+
+// ============================================================
+// RENDER: DAFTAR NILAI
+// ============================================================
+function rNilai(){
+    const s=getS(),fR=$('fRbl')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):[...D.rombel];const fl=getFL();
+    let html=docHeader('DAFTAR NILAI',`${s.mapel} • ${$('fSmt')?.value||'Semester 1'}`);
+    const krits=D.kriteriaNilai;const semKey=$('fSmt')?.value||'Semester 1';
+    // Adjust last criteria name based on semester
+    const lastKritDisplay=krits.map(k=>{if(k.nama==='ASSAS'&&semKey==='Semester 2')return{...k,nama:'ASSAJ'};return k;});
+
+    rbs.forEach(rb=>{
+        const w=W[rb.warna%W.length];const siswa=getSiswaByRombel(rb.id);
+        if(!D.nilai[rb.id])D.nilai[rb.id]={};
+        html+=`<div class="mb-4"><div class="px-2 py-1.5 ${w.bg} text-white font-bold text-[10px] rounded-t-lg">Rombel ${rb.nama} — ${rb.kelas}</div><div class="tbl-r"><table class="w-full text-[9px] border-collapse border min-w-[700px]"><thead><tr class="bg-slate-200 font-bold text-slate-700"><th class="p-1 border w-5" rowspan="2">No</th><th class="p-1 border text-left" rowspan="2">Nama Siswa</th>`;
+        // TP headers
+        fl.forEach((tp,ti)=>{html+=`<th class="p-1 border text-center" colspan="${lastKritDisplay.length+1}">${tp.elemen} - TP${ti+1}</th>`;});
+        html+=`</tr><tr class="bg-slate-100 font-bold text-slate-600 text-[7px]">`;
+        fl.forEach(()=>{lastKritDisplay.forEach(k=>{html+=`<th class="p-0.5 border w-8">${k.nama}</th>`;});html+=`<th class="p-0.5 border w-8 bg-emerald-100 text-emerald-800">NR</th>`;});
+        html+=`</tr></thead><tbody>`;
+
+        siswa.forEach((sw,si)=>{
+            if(!D.nilai[rb.id][sw.id])D.nilai[rb.id][sw.id]={};
+            html+=`<tr class="border-b hover:bg-slate-50"><td class="p-0.5 border text-center">${si+1}</td><td class="p-0.5 border font-medium text-left px-1">${sw.nama||'(belum diisi)'}</td>`;
+            fl.forEach((tp,ti)=>{
+                if(!D.nilai[rb.id][sw.id][ti])D.nilai[rb.id][sw.id][ti]={};
+                const vals=D.nilai[rb.id][sw.id][ti];
+                lastKritDisplay.forEach((k,ki)=>{
+                    const origName=krits[ki].nama;
+                    const val=vals[origName]||'';
+                    html+=`<td class="p-0 border text-center"><input type="number" value="${val}" min="0" max="100" onchange="setNilai(${rb.id},${sw.id},${ti},'${origName}',this.value)" class="w-full text-center text-[9px] bg-transparent focus:outline-none focus:bg-indigo-50 p-0.5" placeholder="-"></td>`;
+                });
+                // NR calculation
+                let nr=0;krits.forEach(k=>{const v=parseFloat(vals[k.nama])||0;nr+=v*(k.bobot/100);});
+                html+=`<td class="p-0.5 border text-center font-bold bg-emerald-50 text-emerald-900">${nr?nr.toFixed(1):'-'}</td>`;
+            });
+            html+=`</tr>`;
         });
-        tbody+=`</tr>`;
+        if(!siswa.length)html+=`<tr><td colspan="100" class="p-3 text-center text-slate-400">Tambah siswa di tab Data Siswa</td></tr>`;
+        html+=`</tbody></table></div></div>`;
     });
-    // Footer dates row
-    tbody+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-400 text-[9px]"><td colspan="4" class="border border-slate-400 px-1 py-1 text-right uppercase text-slate-600 text-[8px]">Tgl ${HARI[dayIdx]}:</td>`;
-    weeks.forEach(w=>{if(w.lib)tbody+=`<td class="border border-slate-400 py-0.5 text-center bg-red-200 text-red-900 font-bold text-[7px]">LBR</td>`;else tbody+=`<td class="border border-slate-400 py-0.5 text-center text-indigo-900 font-extrabold text-[9px]">${w.dn}</td>`;});
-    tbody+=`</tr>`;
-    document.getElementById('cPromes').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800 min-w-[900px]"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">PROGRAM SEMESTER (PROMES)</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel} • ${sem.toUpperCase()}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta} • Hari: ${HARI[dayIdx]}${aR?' • Rombel: '+aR.nama:''}</p><p class="text-[9px] text-indigo-700 font-bold mt-0.5">* Angka = Tanggal real pertemuan hari ${HARI[dayIdx]} setiap minggu</p></div><table class="w-full border-collapse border border-slate-400 mb-4 table-matrix min-w-[900px]"><thead>${th1}${th2}</thead><tbody>${tbody}</tbody></table>${sig()}`;
+    $('cNilai').innerHTML=html+sig();
+}
+function setNilai(rbl,sw,ti,krit,val){if(!D.nilai[rbl])D.nilai[rbl]={};if(!D.nilai[rbl][sw])D.nilai[rbl][sw]={};if(!D.nilai[rbl][sw][ti])D.nilai[rbl][sw][ti]={};D.nilai[rbl][sw][ti][krit]=val?parseInt(val):'';debSave();}
+
+// ============================================================
+// RENDER: ABSEN SISWA
+// ============================================================
+function rAbsen(){
+    const s=getS(),fR=$('fRbl')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):[...D.rombel];
+    // Generate dates for current month or selected semester month
+    const sem=$('fSmt')?.value||'Semester 1';const aR=rbs[0];const dayIdx=aR?aR.hari:4;
+    const weeks=genWeeks(sem,dayIdx,s.mgg);
+    // Group by month
+    const monthMap={};weeks.forEach(w=>{if(!monthMap[w.mn])monthMap[w.mn]=[];if(!w.lib)monthMap[w.mn].push(w);});
+    const monthNames=Object.keys(monthMap);
+
+    let html=docHeader('ABSEN KEHADIRAN SISWA',`${s.mapel} • ${sem}`);
+    html+=`<div class="mb-2 no-print"><select id="absenBulan" onchange="rAbsen()" class="bg-slate-50 border rounded-lg p-1 text-[10px]">${monthNames.map((m,i)=>`<option value="${m}" ${i===0?'selected':''}>${m}</option>`).join('')}</select></div>`;
+
+    const selBulan=$('absenBulan')?.value||monthNames[0]||'Juli';
+    const dates=monthMap[selBulan]||[];
+
+    rbs.forEach(rb=>{
+        const w=W[rb.warna%W.length];const siswa=getSiswaByRombel(rb.id);
+        if(!D.absen[rb.id])D.absen[rb.id]={};
+        html+=`<div class="mb-4"><div class="px-2 py-1.5 ${w.bg} text-white font-bold text-[10px] rounded-t-lg">Rombel ${rb.nama} — ${selBulan}</div><div class="tbl-r"><table class="w-full text-[9px] border-collapse border min-w-[600px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border text-left">Nama</th>`;
+        dates.forEach(d=>{html+=`<th class="p-0.5 border w-7 text-center">${d.dn}</th>`;});
+        html+=`<th class="p-0.5 border w-6 bg-emerald-100">H</th><th class="p-0.5 border w-6 bg-blue-100">I</th><th class="p-0.5 border w-6 bg-amber-100">S</th><th class="p-0.5 border w-6 bg-rose-100">A</th></tr></thead><tbody>`;
+
+        siswa.forEach((sw,si)=>{
+            let counts={H:0,I:0,S:0,A:0};
+            html+=`<tr class="border-b hover:bg-slate-50"><td class="p-0.5 border text-center">${si+1}</td><td class="p-0.5 border px-1 font-medium">${sw.nama||'-'}</td>`;
+            dates.forEach(d=>{
+                if(!D.absen[rb.id][d.iso])D.absen[rb.id][d.iso]={};
+                const val=D.absen[rb.id][d.iso][sw.id]||'';
+                if(val)counts[val]=(counts[val]||0)+1;
+                const bgMap={H:'bg-emerald-100',I:'bg-blue-100',S:'bg-amber-100',A:'bg-rose-100'};
+                html+=`<td class="p-0 border text-center ${bgMap[val]||''}"><select onchange="setAbsen(${rb.id},'${d.iso}',${sw.id},this.value)" class="w-full bg-transparent text-center text-[8px] focus:outline-none p-0.5 cursor-pointer"><option value="" ${!val?'selected':''}>-</option><option value="H" ${val==='H'?'selected':''}>H</option><option value="I" ${val==='I'?'selected':''}>I</option><option value="S" ${val==='S'?'selected':''}>S</option><option value="A" ${val==='A'?'selected':''}>A</option></select></td>`;
+            });
+            html+=`<td class="p-0.5 border text-center font-bold bg-emerald-50 text-emerald-800">${counts.H}</td><td class="p-0.5 border text-center font-bold bg-blue-50 text-blue-800">${counts.I}</td><td class="p-0.5 border text-center font-bold bg-amber-50 text-amber-800">${counts.S}</td><td class="p-0.5 border text-center font-bold bg-rose-50 text-rose-800">${counts.A}</td></tr>`;
+        });
+        if(!siswa.length)html+=`<tr><td colspan="100" class="p-3 text-center text-slate-400">Tambah siswa di Data Siswa</td></tr>`;
+        html+=`</tbody></table></div></div>`;
+    });
+    $('cAbsen').innerHTML=html+sig();
+}
+function setAbsen(rbl,iso,sw,val){if(!D.absen[rbl])D.absen[rbl]={};if(!D.absen[rbl][iso])D.absen[rbl][iso]={};D.absen[rbl][iso][sw]=val;debSave();}
+
+// ============================================================
+// RENDER: JURNAL PEMBELAJARAN
+// ============================================================
+function rJurnal(){
+    const s=getS(),fR=$('fRbl')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):[...D.rombel];
+    const sem=$('fSmt')?.value||'Semester 1';const aR=rbs[0];const dayIdx=aR?aR.hari:4;
+    const weeks=genWeeks(sem,dayIdx,s.mgg).filter(w=>!w.lib);
+    const fl=getFL();
+
+    let html=docHeader('JURNAL PEMBELAJARAN',`${s.mapel} • ${sem}`);
+    rbs.forEach(rb=>{
+        const w=W[rb.warna%W.length];const siswa=getSiswaByRombel(rb.id);
+        html+=`<div class="mb-4"><div class="px-2 py-1.5 ${w.bg} text-white font-bold text-[10px] rounded-t-lg">Rombel ${rb.nama} — ${rb.kelas} — Hari ${HARI[rb.hari]}</div><div class="tbl-r"><table class="w-full text-[9px] border-collapse border min-w-[800px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border w-14">Hari/Tgl</th><th class="p-1 border w-8">JP</th><th class="p-1 border">Materi / TP</th><th class="p-1 border w-40">Kegiatan Pembelajaran</th><th class="p-1 border w-10">Hadir</th><th class="p-1 border w-10">Absen</th><th class="p-1 border w-32">Catatan</th></tr></thead><tbody>`;
+
+        // Map each week to TP
+        let tpIdx=0,tpPrt=0;
+        weeks.forEach((wk,wi)=>{
+            // Determine which TP this week falls into
+            let currentTP=fl[tpIdx];
+            if(!currentTP){tpIdx=0;currentTP=fl[0];}
+            tpPrt++;
+            if(currentTP&&tpPrt>currentTP.pertemuan){tpPrt=1;tpIdx++;currentTP=fl[tpIdx];}
+            if(!currentTP)currentTP={tp:'-',elemen:'-'};
+
+            const dateStr=`${HARI[dayIdx]}, ${wk.dn} ${wk.mn.substr(0,3)}`;
+            // Count attendance
+            const absenData=D.absen[rb.id]?.[wk.iso]||{};
+            let hadir=0,absenCount=0;
+            siswa.forEach(sw=>{const v=absenData[sw.id];if(v==='H')hadir++;else if(v)absenCount++;});
+
+            // Find journal entry
+            const jEntry=D.jurnal.find(j=>j.tanggal===wk.iso&&j.rombel_id===rb.id);
+
+            html+=`<tr class="border-b hover:bg-slate-50"><td class="p-0.5 border text-center">${wi+1}</td><td class="p-0.5 border text-[8px]">${dateStr}</td><td class="p-0.5 border text-center">${rb.jp1}-${rb.jp2}</td><td class="p-0.5 border px-1 font-medium text-emerald-900">${currentTP.tp}</td><td class="p-0 border"><input value="${jEntry?.kegiatan||''}" onchange="setJurnal('${wk.iso}',${rb.id},'kegiatan',this.value)" class="w-full bg-transparent text-[9px] focus:outline-none focus:bg-indigo-50 p-1" placeholder="Kegiatan..."></td><td class="p-0.5 border text-center font-bold text-emerald-700">${hadir||'-'}</td><td class="p-0.5 border text-center font-bold text-rose-700">${absenCount||'-'}</td><td class="p-0 border"><input value="${jEntry?.catatan||''}" onchange="setJurnal('${wk.iso}',${rb.id},'catatan',this.value)" class="w-full bg-transparent text-[9px] focus:outline-none focus:bg-amber-50 p-1" placeholder="Catatan..."></td></tr>`;
+        });
+        html+=`</tbody></table></div></div>`;
+    });
+    $('cJurnal').innerHTML=html+sig();
+}
+function setJurnal(tgl,rblId,field,val){
+    let jIdx=D.jurnal.findIndex(j=>j.tanggal===tgl&&j.rombel_id===rblId);
+    if(jIdx===-1){D.jurnal.push({tanggal:tgl,rombel_id:rblId,kegiatan:'',catatan:''});jIdx=D.jurnal.length-1;}
+    D.jurnal[jIdx][field]=val;debSave();
 }
 
-function rModul(){
-    const s=getS(),fl=getFL();
-    if(!fl.length){document.getElementById('cModul').innerHTML=`<div class="text-center py-10 text-slate-400"><div class="text-3xl mb-2">🧠</div><p class="font-bold">Belum ada data TP</p></div>`;return;}
-    const d=fl[0];let opts=fl.map((t,i)=>`<option value="${i}">[${t.elemen}] ${t.tp}</option>`).join('');
-    let pH='';for(let i=1;i<=d.pertemuan;i++){pH+=`<div class="mb-3 border border-slate-200 rounded-xl p-3 bg-slate-50/70"><h5 class="font-bold text-indigo-900 text-[11px] uppercase border-b pb-1.5 mb-2">🧠 Pertemuan ${i} (4 JP)</h5><div class="text-[11px] space-y-2"><div class="p-2 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-900 text-[10px] uppercase block mb-0.5">🧘 Pendahuluan (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Sapa, tadarus, doa, apersepsi</li><li>Pemantik: "${d.tp}"</li></ul></div><div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg"><strong class="text-emerald-900 text-[10px] uppercase block mb-0.5">💡 Inti (110m)</strong><div class="bg-white p-2 border border-slate-200 rounded text-[10px]"><p>1. Memahami — eksplorasi</p><p>2. Mengalami — ${s.metode}</p><p>3. Mengaplikasikan — LKPD</p></div></div><div class="p-2 bg-amber-50 border border-amber-200 rounded-lg"><strong class="text-amber-900 text-[10px] uppercase block mb-0.5">🎉 Penutup (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Refleksi, apresiasi, doa</li></ul></div></div></div>`;}
-    document.getElementById('cModul').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">MODUL AJAR</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="mb-4"><h3 class="text-xs font-extrabold uppercase bg-gradient-to-r from-indigo-700 to-violet-700 text-white px-3 py-1.5 rounded-xl mb-2">I. Informasi Umum</h3><table class="w-full text-[10px] border-collapse border border-slate-300"><tr class="border-b"><td class="w-1/3 p-1.5 font-bold bg-slate-50 border-r">Guru</td><td class="p-1.5">${s.guru}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Sekolah</td><td class="p-1.5">${s.sekolah}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Fase/Kelas/Smt</td><td class="p-1.5">${d.fase}/${d.kelas}/${d.semester}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Elemen</td><td class="p-1.5 font-bold text-indigo-800">${d.elemen}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">TP</td><td class="p-1.5 font-bold text-emerald-900">${d.tp}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Alokasi</td><td class="p-1.5 font-bold">${d.pertemuan} Pertemuan (${d.pertemuan*4} JP)</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Metode</td><td class="p-1.5">${s.metode}</td></tr><tr><td class="p-1.5 font-bold bg-slate-50 border-r">Dimensi</td><td class="p-1.5">${d.dimensi}</td></tr></table></div><div class="mb-4"><h3 class="text-xs font-extrabold uppercase bg-gradient-to-r from-indigo-700 to-violet-700 text-white px-3 py-1.5 rounded-xl mb-2">II. Langkah Pembelajaran</h3><select id="modSel" onchange="rModTP()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-1.5 text-[10px] mb-3 focus:outline-none no-print">${opts}</select><div id="modBox">${pH}</div></div>${sig()}`;
-}
+// ============================================================
+// PROMPT AI
+// ============================================================
+function genPrompt(){const s=getS(),fl=getFL(),d=fl[0];if(!d){alert('Belum ada TP.');return;}$('promptTA').value=`Buatkan LKPD siap cetak A4:\n- Sekolah: ${s.sek} (NPSN: ${s.npsn})\n- Mapel: ${s.mapel}\n- ${d.kelas} (Fase ${faseFromKelas(d.kelas)}) / ${d.semester}\n- Elemen: ${d.elemen}\n- TP: "${d.tp}"\n- Dimensi: ${d.dimensi}\n- Metode: ${s.metode}\n- Guru: ${s.guru}\n\nSpesifikasi: Header, Pemantik, Menjodohkan, Isian, Refleksi, Rubrik.`;$('cpFB').classList.add('hidden');$('modal').classList.remove('hidden');}
+function cpP(){$('promptTA').select();document.execCommand('copy');$('cpFB').classList.remove('hidden');setTimeout(()=>$('cpFB').classList.add('hidden'),2000);}
 
-function rModTP(){
-    const fl=getFL(),idx=parseInt(document.getElementById('modSel')?.value)||0,d=fl[idx];if(!d)return;const s=getS();
-    let h='';for(let i=1;i<=d.pertemuan;i++){h+=`<div class="mb-3 border border-slate-200 rounded-xl p-3 bg-slate-50/70"><h5 class="font-bold text-indigo-900 text-[11px] uppercase border-b pb-1.5 mb-2">🧠 Pertemuan ${i} — ${d.tp}</h5><div class="text-[11px] space-y-2"><div class="p-2 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-900 text-[10px] uppercase block mb-0.5">🧘 Pendahuluan (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Apersepsi: "${d.tp}"</li></ul></div><div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg"><strong class="text-emerald-900 text-[10px] uppercase block mb-0.5">💡 Inti (110m)</strong><div class="bg-white p-2 border border-slate-200 rounded text-[10px]"><p>1. Memahami ${d.elemen}</p><p>2. ${s.metode}</p><p>3. LKPD & presentasi</p></div></div><div class="p-2 bg-amber-50 border border-amber-200 rounded-lg"><strong class="text-amber-900 text-[10px] uppercase block mb-0.5">🎉 Penutup (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Refleksi & doa</li></ul></div></div></div>`;}
-    document.getElementById('modBox').innerHTML=h;
-}
-
-function rKktp(){
-    const s=getS(),fl=getFL();
-    let cards=fl.map((d,i)=>`<div class="mb-4 border border-slate-200 rounded-xl p-3 bg-slate-50/60 hover:shadow-md transition"><div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-2 mb-2 gap-1"><div><span class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[8px] font-black px-2 py-0.5 rounded-lg uppercase">${d.elemen} • TP ${i+1}</span><h4 class="font-bold text-slate-900 text-xs mt-1">${d.tp}</h4></div><span class="text-[10px] bg-indigo-100 text-indigo-900 font-bold px-2 py-0.5 rounded">${d.pertemuan*4} JP</span></div><div class="table-responsive"><table class="w-full text-[10px] border-collapse border border-slate-300 bg-white min-w-[500px]"><thead><tr class="bg-slate-100 text-slate-700 font-bold text-[9px]"><th class="p-1 border text-left w-1/5">Aspek</th><th class="p-1 border bg-rose-50 text-rose-800">Perlu Bimbingan (0-60%)</th><th class="p-1 border bg-amber-50 text-amber-800">Cukup (61-70%)</th><th class="p-1 border bg-emerald-50 text-emerald-800">Baik (71-85%)</th><th class="p-1 border bg-blue-50 text-blue-800">Sangat Baik (86-100%)</th></tr></thead><tbody><tr class="border-b text-[9px]"><td class="p-1 font-bold bg-slate-50 border">Konsep</td><td class="p-1 border text-slate-500">Belum mampu</td><td class="p-1 border text-slate-600">Bimbingan</td><td class="p-1 border text-slate-700 font-medium">Mandiri</td><td class="p-1 border text-slate-800 font-bold">Fasih</td></tr><tr class="text-[9px]"><td class="p-1 font-bold bg-slate-50 border">Perilaku</td><td class="p-1 border text-slate-500">Belum</td><td class="p-1 border text-slate-600">Diingatkan</td><td class="p-1 border text-slate-700 font-medium">Konsisten</td><td class="p-1 border text-slate-800 font-bold">Teladan</td></tr></tbody></table></div></div>`).join('');
-    document.getElementById('cKktp').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">KKTP</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div>${cards||'<div class="text-center py-8 text-slate-400">Belum ada data</div>'}${sig()}`;
-}
-
-// PROMPT
-function genPrompt(){
-    const s=getS(),fl=getFL(),d=fl[0];if(!d){alert('Belum ada data TP.');return;}
-    document.getElementById('promptTA').value=`Buatkan LKPD interaktif siap cetak A4:\n\n📋 Si-Gumart\n- Sekolah: ${s.sekolah}\n- Mapel: ${s.mapel}\n- ${d.fase} / ${d.kelas} / ${d.semester}\n- Elemen: ${d.elemen}\n- CP: ${d.cp}\n- TP: "${d.tp}"\n- Dimensi: ${d.dimensi}\n- Metode: ${s.metode}\n- Guru: ${s.guru}\n\n🎨 Spesifikasi:\n1. Header identitas siswa\n2. Pertanyaan pemantik\n3. Aktivitas: Menjodohkan, Isian, Analisis Kasus\n4. Jurnal Kebaikan & Refleksi\n5. Rubrik penilaian\n\nGunakan bahasa hangat & ramah anak!`;
-    document.getElementById('cpFB').classList.add('hidden');document.getElementById('modal').classList.remove('hidden');
-}
-function cpPrompt(){const ta=document.getElementById('promptTA');ta.select();document.execCommand('copy');const fb=document.getElementById('cpFB');fb.classList.remove('hidden');setTimeout(()=>fb.classList.add('hidden'),3000);}
-
+// ============================================================
 // RENDER ALL + STATS
+// ============================================================
 function renderAll(){
-    const fl=getFL(),elems=uniq(fl,'elemen');let tj=0;fl.forEach(d=>tj+=d.pertemuan*4);
-    document.getElementById('sTP').textContent=fl.length;document.getElementById('sJP').textContent=tj+' JP';
-    document.getElementById('sRB').textContent=rombelList.length;document.getElementById('sRBd').textContent=rombelList.map(r=>r.nama).join(', ')||'-';
-    document.getElementById('sEL').textContent=elems.length;document.getElementById('sELd').textContent=elems.slice(0,3).join(', ')||'-';
-    const af=[document.getElementById('fFase')?.value,document.getElementById('fKelas')?.value,document.getElementById('fSmt')?.value].filter(Boolean);
-    document.getElementById('sFT').textContent=af.length?af.join(' · '):'Semua';document.getElementById('sFTd').textContent=`${fl.length}/${tpData.length} TP`;
-    const ta=document.getElementById('iTA')?.value||'';document.getElementById('lblTA').textContent=`T.A. ${ta} • ${document.getElementById('iJenjang')?.value||'SD'}`;document.getElementById('footYr').textContent=ta.split('/')[0]||'2026';
-    rJadwal();rData();rAtp();rProta();rPromes();rModul();rKktp();
+    const fl=getFL();let tj=0;fl.forEach(d=>tj+=d.pertemuan*4);
+    $('sTP').textContent=fl.length;$('sJP').textContent=tj+' JP';
+    $('sRB').textContent=D.rombel.length;$('sRBd').textContent=D.rombel.map(r=>r.nama).join(', ')||'-';
+    const totalSiswa=D.siswa.length;$('sSW').textContent=totalSiswa;$('sSWd').textContent=D.rombel.length?D.rombel.map(r=>`${r.nama}:${getSiswaByRombel(r.id).length}`).join(' '):'-';
+    const af=[$('fKls')?.value,$('fSmt')?.value].filter(Boolean);$('sFT').textContent=af.length?af.join(' · '):'Semua';$('sFTd').textContent=`${fl.length}/${D.tp.length} TP`;
+    $('lblTA').textContent=`T.A. ${$('iTA')?.value||''} • ${$('iJnj')?.value||'SD'}`;$('footYr').textContent=($('iTA')?.value||'').split('/')[0]||'2026';
+    rJadwal();rData();rSiswa();rAtp();rProta();rPromes();rModul();rKktp();rNilai();rAbsen();rJurnal();
 }
+function resetAll(){if(confirm('Reset SEMUA data?')){uDoc().delete().then(()=>{localStorage.removeItem('sg_uid');location.reload();}).catch(()=>location.reload());}}
 
-function resetAll(){if(confirm('Reset SEMUA data dari cloud?')){getUserDoc().delete().then(()=>{localStorage.removeItem('sg_uid');location.reload();}).catch(()=>location.reload());}}
-
-// DRAG DROP CSV
+// ============================================================
+// INIT
+// ============================================================
 document.addEventListener('DOMContentLoaded',()=>{
-    const dz=document.getElementById('csvDZ');
-    if(dz){dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.csv')){const dt=new DataTransfer();dt.items.add(f);document.getElementById('csvF').files=dt.files;handleCSV({target:document.getElementById('csvF')});}});}
+    const dz=$('csvDZ');if(dz){dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f?.name.endsWith('.csv')){const dt=new DataTransfer();dt.items.add(f);$('csvF').files=dt.files;handleCSV({target:$('csvF')});}});}
 });
 
-// ============================================
-// INIT
-// ============================================
-window.addEventListener('DOMContentLoaded', async()=>{
-    populateKO();
-    document.getElementById('dispUID').textContent=uid.substring(0,16)+'...';
-    
-    const loaded = await loadFromFS();
-    
-    if(!rombelList.length){
-        rombelCtr=2;
-        const[sk]=getKRange();
-        rombelList=[{id:1,nama:`${sk}A`,hari:4,jamMulai:1,jamAkhir:4,kelas:`Kelas ${sk}`,warna:0},{id:2,nama:`${sk}B`,hari:4,jamMulai:5,jamAkhir:8,kelas:`Kelas ${sk}`,warna:1}];
-    }
-    
-    renderRombel();renderAll();
-    showSync('saved','☁️ Terhubung');
-    
-    // Hide loading
-    setTimeout(()=>{const ov=document.getElementById('loadOv');ov.style.opacity='0';setTimeout(()=>ov.style.display='none',400);},600);
-    
-    // Realtime listener for cross-device sync
-    getUserDoc().onSnapshot(snap=>{
-        if(!snap.exists)return;
-        const d=snap.data();
-        if(d&&d.ts){
-            // Prevent save loop
-            if(window._skipNext){window._skipNext=false;return;}
-            tpData=d.tpData||[];rombelList=d.rombelList||[];rombelCtr=d.rombelCtr||0;
-            if(d.settings)applySet(d.settings);
-            renderRombel();renderAll();
-        }
-    },{includeMetadataChanges:false});
-    
-    // Patch saveToFS to prevent sync loop
-    const origSave=saveToFS;
-    saveToFS=function(){window._skipNext=true;origSave();};
-    
+window.addEventListener('DOMContentLoaded',async()=>{
+    popKls();$('dUID').textContent=uid.substring(0,14)+'...';
+    await loadFS();
+    if(!D.rombel.length){D.rombelCtr=2;D.rombel=[{id:1,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:0},{id:2,nama:'1B',hari:4,jp1:5,jp2:8,kelas:'Kelas 1',warna:1}];}
+    renderRombel();renderKriteria();renderAll();showSync('saved','☁️ Terhubung');
+    setTimeout(()=>{const ov=$('loadOv');ov.style.opacity='0';setTimeout(()=>ov.style.display='none',400);},500);
+    // Realtime sync
+    uDoc().onSnapshot(snap=>{if(!snap.exists||window._skip)return;const d=snap.data();if(d){Object.assign(D,{tp:d.tp||[],rombel:d.rombel||[],siswa:d.siswa||[],nilai:d.nilai||{},absen:d.absen||{},jurnal:d.jurnal||[],kriteriaNilai:d.kriteriaNilai||D.kriteriaNilai,rombelCtr:d.rombelCtr||0,siswaCtr:d.siswaCtr||0});if(d.settings)applySet(d.settings);renderRombel();renderKriteria();renderAll();}},{includeMetadataChanges:false});
+    const origSave=saveFS;saveFS=function(){window._skip=true;origSave();setTimeout(()=>window._skip=false,2000);};
     window.addEventListener('resize',()=>{if(window.innerWidth>=768&&sbOpen)toggleSB();});
 });
 </script>
