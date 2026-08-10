@@ -6,13 +6,12 @@
     <title>Si-Gumart - Sistem Administrasi Guru Smart</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui','sans-serif']}}}}
-    </script>
+    <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui','sans-serif']}}}}</script>
     <style>
-        @media print{.no-print{display:none!important}body{background:#fff!important;font-size:8.5pt;color:#000!important}.container-print{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}.overflow-x-auto{overflow:visible!important}table{page-break-inside:auto;width:100%!important}tr{page-break-inside:avoid}th,td{padding:3px 2px!important;font-size:7.5pt!important;border-color:#334155!important}@page{margin:8mm}}
+        @media print{.no-print{display:none!important}body{background:#fff!important;font-size:8pt;color:#000!important}.container-print{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}.overflow-x-auto{overflow:visible!important}table{page-break-inside:auto;width:100%!important}tr{page-break-inside:avoid}th,td{padding:3px 2px!important;font-size:7.5pt!important;border-color:#334155!important}@page{margin:8mm}}
         *{scrollbar-width:thin;scrollbar-color:#334155 transparent}
         .table-matrix td,.table-matrix th{text-align:center;vertical-align:middle}
         @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -21,40 +20,56 @@
         @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
         @keyframes gradX{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
         @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-        .anim-fade{animation:fadeUp .4s ease-out forwards}.anim-slide{animation:slideIn .3s ease-out forwards}
-        .anim-glow{animation:pulseGlow 2.5s ease-in-out infinite}.grad-anim{background-size:200% 200%;animation:gradX 4s ease infinite}
+        .anim-fade{animation:fadeUp .4s ease-out forwards}
+        .anim-slide{animation:slideIn .3s ease-out forwards}
+        .anim-glow{animation:pulseGlow 2.5s ease-in-out infinite}
+        .grad-anim{background-size:200% 200%;animation:gradX 4s ease infinite}
         .shimmer-bar{background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);background-size:200% 100%;animation:shimmer 2.5s infinite}
-        .glass{background:rgba(15,23,42,.92);backdrop-filter:blur(20px)}.glass-card{background:rgba(255,255,255,.93);backdrop-filter:blur(12px)}
-        .hover-lift{transition:transform .2s,box-shadow .2s}.hover-lift:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.1)}
-        .nav-btn{position:relative;overflow:hidden;transition:all .25s}.nav-active{background:linear-gradient(135deg,#4f46e5,#6366f1)!important;color:#fff!important;box-shadow:0 4px 15px rgba(79,70,229,.4)}
+        .glass{background:rgba(15,23,42,.92);backdrop-filter:blur(20px)}
+        .glass-card{background:rgba(255,255,255,.93);backdrop-filter:blur(12px)}
+        .hover-lift{transition:transform .2s,box-shadow .2s}
+        .hover-lift:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.1)}
+        .nav-btn{position:relative;overflow:hidden;transition:all .25s}
+        .nav-active{background:linear-gradient(135deg,#4f46e5,#6366f1)!important;color:#fff!important;box-shadow:0 4px 15px rgba(79,70,229,.4)}
         .input-g:focus{box-shadow:0 0 0 3px rgba(99,102,241,.15);outline:none}
-        aside::-webkit-scrollbar{width:4px}aside::-webkit-scrollbar-track{background:transparent}aside::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
+        aside::-webkit-scrollbar{width:4px}
+        aside::-webkit-scrollbar-track{background:transparent}
+        aside::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
         .sidebar-panel{transition:transform .35s cubic-bezier(.4,0,.2,1)}
-        .table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch}.table-responsive::-webkit-scrollbar{height:5px}.table-responsive::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:10px}
+        .table-responsive{overflow-x:auto;-webkit-overflow-scrolling:touch}
+        .table-responsive::-webkit-scrollbar{height:5px}
+        .table-responsive::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:10px}
         .tab-content{animation:fadeUp .35s ease-out}
-        .fab{transition:all .3s cubic-bezier(.4,0,.2,1)}.fab:hover{transform:scale(1.1);box-shadow:0 8px 30px rgba(0,0,0,.25)}
-        .drop-zone{border:2px dashed #4f46e5;border-radius:16px;transition:all .25s}.drop-zone.dragover{border-color:#22c55e;background:rgba(34,197,94,.05);transform:scale(1.01)}
-        .sect-div{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}.sect-div::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
-        .coll-content{max-height:0;overflow:hidden;transition:max-height .35s ease}.coll-content.open{max-height:4000px}
+        .fab{transition:all .3s cubic-bezier(.4,0,.2,1)}
+        .fab:hover{transform:scale(1.1);box-shadow:0 8px 30px rgba(0,0,0,.25)}
+        .drop-zone{border:2px dashed #4f46e5;border-radius:16px;transition:all .25s}
+        .drop-zone.dragover{border-color:#22c55e;background:rgba(34,197,94,.05);transform:scale(1.01)}
+        .sect-div{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+        .sect-div::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
+        .coll-content{max-height:0;overflow:hidden;transition:max-height .4s ease}
+        .coll-content.open{max-height:5000px}
         .bg-grid{background-image:radial-gradient(circle at 25% 25%,rgba(99,102,241,.03) 0%,transparent 50%),radial-gradient(circle at 75% 75%,rgba(16,185,129,.03) 0%,transparent 50%)}
         .badge-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-        .sync-indicator{position:fixed;top:4px;right:4px;z-index:60;padding:4px 10px;border-radius:12px;font-size:10px;font-weight:700;transition:all .3s}
-        .sync-saving{background:#fef3c7;color:#92400e}.sync-saved{background:#d1fae5;color:#065f46}.sync-error{background:#fecaca;color:#991b1b}.sync-offline{background:#e2e8f0;color:#475569}
-        .loading-overlay{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.95);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+        .sync-ind{position:fixed;top:4px;right:4px;z-index:60;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;transition:all .3s}
+        .sync-saving{background:#fef3c7;color:#92400e}
+        .sync-saved{background:#d1fae5;color:#065f46}
+        .sync-err{background:#fecaca;color:#991b1b}
+        .sync-off{background:#e2e8f0;color:#475569}
+        .loading-ov{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.95);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .4s}
         .spinner{width:40px;height:40px;border:4px solid rgba(99,102,241,.2);border-top-color:#6366f1;border-radius:50%;animation:spin .8s linear infinite}
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased bg-grid">
 
-<!-- LOADING OVERLAY -->
-<div id="loadingOverlay" class="loading-overlay no-print">
+<!-- LOADING -->
+<div id="loadOv" class="loading-ov no-print">
     <div class="spinner"></div>
     <p class="text-white font-bold text-sm">Memuat Si-Gumart...</p>
-    <p class="text-slate-400 text-xs" id="loadingStatus">Menghubungkan ke Firebase...</p>
+    <p class="text-slate-400 text-xs" id="loadSt">Menghubungkan ke Firebase Firestore...</p>
 </div>
 
-<!-- SYNC INDICATOR -->
-<div id="syncIndicator" class="sync-indicator no-print sync-offline">⏳ Menghubungkan...</div>
+<!-- SYNC -->
+<div id="syncInd" class="sync-ind no-print sync-off">⏳ Menghubungkan...</div>
 
 <!-- MOBILE HEADER -->
 <header class="md:hidden fixed top-0 left-0 right-0 z-50 glass border-b border-slate-700/50 no-print">
@@ -63,16 +78,16 @@
             <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg"><span class="text-white font-black text-xs">SG</span></div>
             <div><h1 class="font-black text-sm text-white leading-none">Si-Gumart</h1><p class="text-[8px] text-indigo-300 font-semibold">Administrasi Guru Smart</p></div>
         </div>
-        <button onclick="toggleSidebar()" class="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 active:scale-90 transition">
-            <svg id="icOpen" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            <svg id="icClose" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button onclick="toggleSB()" class="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 active:scale-90 transition">
+            <svg id="icO" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="icC" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
     </div>
 </header>
-<div id="sbOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden no-print" onclick="toggleSidebar()"></div>
+<div id="sbOv" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden no-print" onclick="toggleSB()"></div>
 
 <!-- SIDEBAR -->
-<aside id="sbPanel" class="no-print w-[330px] lg:w-[340px] bg-slate-900/95 backdrop-blur-xl text-slate-200 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto flex flex-col justify-between border-r border-slate-800/80 shadow-2xl z-40 fixed md:relative top-0 left-0 h-full -translate-x-full md:translate-x-0 sidebar-panel">
+<aside id="sbP" class="no-print w-[330px] lg:w-[340px] bg-slate-900/95 backdrop-blur-xl text-slate-200 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto flex flex-col justify-between border-r border-slate-800/80 shadow-2xl z-40 fixed md:relative top-0 left-0 h-full -translate-x-full md:translate-x-0 sidebar-panel">
 <div>
     <!-- HEADER -->
     <div class="p-4 border-b border-slate-800/60 bg-gradient-to-br from-indigo-950/50 to-slate-950 relative overflow-hidden">
@@ -84,6 +99,21 @@
                 <p class="text-[10px] text-slate-400">Sistem Administrasi Guru Smart</p>
                 <div class="flex items-center gap-1.5 mt-0.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span><p class="text-[10px] text-emerald-400 font-bold" id="lblTA">T.A. 2026/2027</p></div>
             </div>
+        </div>
+    </div>
+
+    <!-- USER ID Display -->
+    <div class="px-4 py-2 border-b border-slate-800/40 bg-slate-950/40">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+                <span class="text-[9px] text-slate-500 font-semibold">🔑 ID Anda:</span>
+                <code class="text-[9px] text-indigo-400 font-bold bg-slate-800 px-1.5 py-0.5 rounded" id="dispUID">-</code>
+            </div>
+            <button onclick="copyUID()" class="text-[9px] text-slate-500 hover:text-indigo-400 transition" title="Salin ID">📋</button>
+        </div>
+        <div class="mt-1 flex gap-1">
+            <input type="text" id="loadUIDInput" placeholder="Masukkan ID untuk load data..." class="flex-1 bg-slate-900 border border-slate-700/60 text-slate-200 rounded-lg p-1 text-[9px] input-g">
+            <button onclick="loadOtherUID()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[9px] font-bold px-2 py-1 rounded-lg transition active:scale-95">Load</button>
         </div>
     </div>
 
@@ -111,7 +141,6 @@
                 <button onclick="dlTemplate()" class="flex-1 bg-slate-800/60 hover:bg-slate-700/60 text-slate-300 border border-slate-700/50 py-1.5 px-2 rounded-xl text-[10px] font-semibold transition">📥 Template</button>
                 <button onclick="clearAllTP()" class="flex-1 bg-rose-950/30 hover:bg-rose-900/40 text-rose-400 border border-rose-800/40 py-1.5 px-2 rounded-xl text-[10px] font-semibold transition">🗑️ Hapus TP</button>
             </div>
-            <!-- Manual Add -->
             <button onclick="toggleColl('pManual')" class="w-full text-left text-[9px] font-bold text-slate-500 hover:text-indigo-400 transition uppercase tracking-wider py-0.5">＋ Tambah Manual...</button>
             <div id="pManual" class="coll-content space-y-1.5">
                 <div class="grid grid-cols-3 gap-1.5">
@@ -119,19 +148,19 @@
                     <select id="mKelas" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></select>
                     <select id="mSmt" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option>Semester 1</option><option>Semester 2</option></select>
                 </div>
-                <input type="text" id="mElem" placeholder="Elemen" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-                <textarea id="mCP" placeholder="Capaian Pembelajaran (CP)" rows="2" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g resize-none"></textarea>
-                <textarea id="mTP" placeholder="Tujuan Pembelajaran (TP)*" rows="2" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g resize-none"></textarea>
+                <input type="text" id="mElem" placeholder="Elemen (cth: Akidah)" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
+                <textarea id="mCP" placeholder="Capaian Pembelajaran (CP)..." rows="2" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g resize-none"></textarea>
+                <textarea id="mTP" placeholder="Tujuan Pembelajaran (TP)* WAJIB" rows="2" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g resize-none"></textarea>
                 <div class="grid grid-cols-2 gap-1.5">
                     <input type="text" id="mDim" placeholder="Dimensi Profil" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-                    <input type="number" id="mPrt" placeholder="Pertemuan" min="1" value="2" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
+                    <input type="number" id="mPrt" placeholder="Jml Pertemuan" min="1" value="2" class="bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
                 </div>
                 <button onclick="addManual()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-1.5 rounded-xl text-[11px] transition active:scale-95">＋ Tambah TP</button>
             </div>
         </div>
     </div>
 
-    <!-- JADWAL MULTI-ROMBEL -->
+    <!-- JADWAL ROMBEL -->
     <div class="p-3 border-b border-slate-800/50">
         <button onclick="toggleColl('pJdw')" class="sect-div w-full text-violet-400 cursor-pointer hover:text-violet-300">📅 Jadwal Multi-Rombel</button>
         <div id="pJdw" class="coll-content open mt-2 space-y-2">
@@ -145,37 +174,30 @@
         <button onclick="toggleColl('pID')" class="sect-div w-full text-slate-400 cursor-pointer hover:text-slate-300">🏫 Identitas & Pengaturan</button>
         <div id="pID" class="coll-content mt-2 space-y-1.5">
             <div class="grid grid-cols-2 gap-1.5">
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tahun Ajaran</label><input id="iTA" value="2026/2027" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tahun Ajaran</label><input id="iTA" value="2026/2027" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
                 <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Jenjang</label>
-                    <select id="iJenjang" onchange="populateKelasOptions();saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
+                    <select id="iJenjang" onchange="populateKO();debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
                         <option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option><option>SMK</option>
                     </select>
                 </div>
             </div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Mata Pelajaran</label><input id="iMapel" value="Pendidikan Agama Islam dan Budi Pekerti" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Satuan Pendidikan</label><input id="iSekolah" value="SDN Nagreg 05" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Mata Pelajaran</label><input id="iMapel" value="Pendidikan Agama Islam dan Budi Pekerti" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Satuan Pendidikan</label><input id="iSekolah" value="SDN Nagreg 05" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
             <div class="grid grid-cols-2 gap-1.5">
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Kepala Sekolah</label><input id="iKepsek" value="Aep Sudrajat, S.Pd" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">NIP Kepsek</label><input id="iNipK" value="19750812 199803 1 002" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Kepala Sekolah</label><input id="iKepsek" value="Aep Sudrajat, S.Pd" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">NIP Kepsek</label><input id="iNipK" value="19750812 199803 1 002" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
             </div>
             <div class="grid grid-cols-2 gap-1.5">
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Nama Guru</label><input id="iGuru" value="Apipudin, S.Pd.I." oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">NIP Guru</label><input id="iNipG" value="19880520 201212 2 004" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Nama Guru</label><input id="iGuru" value="Apipudin, S.Pd.I." oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">NIP Guru</label><input id="iNipG" value="19880520 201212 2 004" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
             </div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Metode Utama</label><input id="iMetode" value="Talaqqi, Experiential Learning, & Peer Tutoring" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Kota & Tgl</label><input id="iKotaTgl" value="Bandung, 13 Juli 2026" oninput="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
-            <div>
-                <label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tgl Awal Semester 1</label>
-                <input type="date" id="iTglSmt1" value="2026-07-13" onchange="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
+            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Metode Utama</label><input id="iMetode" value="Talaqqi, Experiential Learning, & Peer Tutoring" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Kota & Tgl</label><input id="iKotaTgl" value="Bandung, 13 Juli 2026" oninput="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+            <div class="grid grid-cols-2 gap-1.5">
+                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tgl Awal Smt 1</label><input type="date" id="iTgl1" value="2026-07-13" onchange="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
+                <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tgl Awal Smt 2</label><input type="date" id="iTgl2" value="2027-01-11" onchange="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
             </div>
-            <div>
-                <label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tgl Awal Semester 2</label>
-                <input type="date" id="iTglSmt2" value="2027-01-11" onchange="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-            </div>
-            <div>
-                <label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Jumlah Minggu per Semester</label>
-                <input type="number" id="iJmlMinggu" value="24" min="16" max="30" onchange="saveAndRender()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g">
-            </div>
+            <div><label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Jumlah Minggu/Semester</label><input type="number" id="iMgg" value="24" min="16" max="30" onchange="debSave()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"></div>
         </div>
     </div>
 
@@ -191,7 +213,7 @@
             <select id="fRombel" onchange="renderAll()" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-100 rounded-lg p-1 text-[10px] input-g"><option value="">Semua Rombel</option></select>
         </div>
         <div class="sect-div text-slate-500 mb-2"><span>📑 Navigasi</span></div>
-        <nav class="space-y-1" id="navBtns">
+        <nav class="space-y-1">
             <button onclick="swTab('jadwal')" id="tJadwal" class="nav-btn nav-active w-full text-left py-2 px-3 rounded-xl text-[11px] font-bold flex items-center gap-2">📅 Jadwal Multi-Rombel</button>
             <button onclick="swTab('data')" id="tData" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">📊 Data CP/TP</button>
             <button onclick="swTab('atp')" id="tAtp" class="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2">🗺️ ATP / Silabus</button>
@@ -206,20 +228,18 @@
     <button onclick="genPrompt()" class="w-full bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 text-white font-bold py-2 rounded-xl shadow-lg transition active:scale-95 text-xs grad-anim relative overflow-hidden"><span class="relative z-10">✨ Prompt LKPD AI</span></button>
     <button onclick="resetAll()" class="w-full bg-rose-950/30 hover:bg-rose-900/50 text-rose-400 border border-rose-800/40 font-semibold py-1.5 rounded-xl text-[10px] transition">🔄 Reset Semua</button>
 </div>
-<div class="p-2 border-t border-slate-800/50 text-center text-[9px] text-slate-600 bg-slate-950/80">Si-Gumart &copy; <span id="footYr">2026</span> • Firebase Cloud</div>
+<div class="p-2 border-t border-slate-800/50 text-center text-[9px] text-slate-600 bg-slate-950/80">Si-Gumart © <span id="footYr">2026</span> • Cloud Firestore</div>
 </aside>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <main class="flex-1 overflow-y-auto container-print min-h-screen pt-12 md:pt-0">
 <div class="p-3 md:p-5 lg:p-7 pb-20 md:pb-6">
-    <!-- STATS -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-5 no-print">
         <div class="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl p-3 border border-indigo-200/50 hover-lift"><span class="text-[9px] text-indigo-600 font-bold uppercase">Total TP</span><p id="sTP" class="text-xl font-black text-indigo-900 mt-0.5">0</p><p id="sJP" class="text-[10px] text-indigo-600 font-semibold">0 JP</p></div>
         <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-3 border border-violet-200/50 hover-lift"><span class="text-[9px] text-violet-600 font-bold uppercase">Rombel</span><p id="sRB" class="text-xl font-black text-violet-900 mt-0.5">0</p><p id="sRBd" class="text-[10px] text-violet-600 font-semibold">-</p></div>
         <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-3 border border-emerald-200/50 hover-lift"><span class="text-[9px] text-emerald-600 font-bold uppercase">Elemen</span><p id="sEL" class="text-xl font-black text-emerald-900 mt-0.5">0</p><p id="sELd" class="text-[10px] text-emerald-600 font-semibold">-</p></div>
         <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-3 border border-amber-200/50 hover-lift"><span class="text-[9px] text-amber-600 font-bold uppercase">Filter</span><p id="sFT" class="text-base font-black text-amber-900 mt-0.5">Semua</p><p id="sFTd" class="text-[10px] text-amber-600 font-semibold">-</p></div>
     </div>
-    <!-- TABS -->
     <div id="cJadwal" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 tab-content"></div>
     <div id="cData" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
     <div id="cAtp" class="glass-card rounded-2xl shadow-xl p-3 md:p-5 lg:p-7 border border-slate-200/60 hidden tab-content"></div>
@@ -238,7 +258,7 @@
         <button onclick="swTab('data');closeMob()" class="mnav flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90" data-t="data"><span class="text-sm">📊</span><span class="text-[7px] font-bold">Data</span></button>
         <button onclick="swTab('promes');closeMob()" class="mnav flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90" data-t="promes"><span class="text-sm">🗓️</span><span class="text-[7px] font-bold">Promes</span></button>
         <button onclick="swTab('modul');closeMob()" class="mnav flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90" data-t="modul"><span class="text-sm">🧠</span><span class="text-[7px] font-bold">Modul</span></button>
-        <button onclick="toggleSidebar()" class="flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90"><span class="text-sm">⚙️</span><span class="text-[7px] font-bold">Menu</span></button>
+        <button onclick="toggleSB()" class="flex flex-col items-center px-1 py-0.5 text-slate-400 active:scale-90"><span class="text-sm">⚙️</span><span class="text-[7px] font-bold">Menu</span></button>
     </div>
 </div>
 </div>
@@ -252,710 +272,402 @@
 <div id="modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 hidden no-print">
 <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-4 border border-slate-200 flex flex-col max-h-[92vh] anim-fade">
     <div class="flex justify-between items-center border-b pb-2 mb-2">
-        <div class="flex items-center gap-2"><span class="p-2 bg-purple-100 rounded-xl text-lg">✨</span><div><h3 class="text-sm font-black text-slate-900">Prompt AI - Si-Gumart</h3></div></div>
-        <button onclick="modal.classList.add('hidden')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 text-lg">&times;</button>
+        <div class="flex items-center gap-2"><span class="p-2 bg-purple-100 rounded-xl text-lg">✨</span><h3 class="text-sm font-black text-slate-900">Prompt AI - Si-Gumart</h3></div>
+        <button onclick="document.getElementById('modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 text-lg">&times;</button>
     </div>
     <textarea id="promptTA" readonly class="flex-1 w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-800 focus:outline-none resize-none leading-relaxed min-h-[180px]"></textarea>
     <div class="flex justify-end items-center mt-2 pt-2 border-t gap-2">
         <span id="cpFB" class="text-xs text-emerald-600 font-bold hidden">✓ Disalin!</span>
-        <button onclick="modal.classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition">Tutup</button>
+        <button onclick="document.getElementById('modal').classList.add('hidden')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition">Tutup</button>
         <button onclick="cpPrompt()" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow active:scale-95 transition">📋 Salin</button>
     </div>
 </div>
 </div>
 
 <script>
-// ======================================
-// FIREBASE CONFIG & INIT
-// ======================================
+// ============================================
+// FIREBASE FIRESTORE INIT
+// ============================================
 const firebaseConfig = {
     apiKey: "AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",
     authDomain: "si-gumart.firebaseapp.com",
     projectId: "si-gumart",
-    storageBucket: "si-gumart.firebasestorage.app",
-    databaseURL: "https://si-gumart-default-rtdb.firebaseio.com"
+    storageBucket: "si-gumart.firebasestorage.app"
 };
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const fsDb = firebase.firestore();
 
-// Generate or get user ID
-let userId = localStorage.getItem('sigumart_uid');
-if (!userId) { userId = 'u_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('sigumart_uid', userId); }
-const userRef = db.ref('users/' + userId);
+// User ID
+let uid = localStorage.getItem('sg_uid');
+if (!uid) { uid = 'u' + Date.now().toString(36) + Math.random().toString(36).substr(2,6); localStorage.setItem('sg_uid', uid); }
 
-// ======================================
+function getUserDoc() { return fsDb.collection('users').doc(uid); }
+
+// ============================================
 // CORE DATA
-// ======================================
-let tpData = [];
-let rombelList = [];
-let rombelIdCtr = 0;
-let settings = {};
-let saveTimer = null;
-
+// ============================================
+let tpData = [], rombelList = [], rombelCtr = 0, saveTimer = null;
 const HARI = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
 const BULAN = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-const WARNA = [
-    {bg:'bg-indigo-600',hex:'#4f46e5',light:'bg-indigo-50',border:'border-indigo-200',text:'text-indigo-700'},
-    {bg:'bg-emerald-600',hex:'#059669',light:'bg-emerald-50',border:'border-emerald-200',text:'text-emerald-700'},
-    {bg:'bg-violet-600',hex:'#7c3aed',light:'bg-violet-50',border:'border-violet-200',text:'text-violet-700'},
-    {bg:'bg-amber-600',hex:'#d97706',light:'bg-amber-50',border:'border-amber-200',text:'text-amber-700'},
-    {bg:'bg-rose-600',hex:'#e11d48',light:'bg-rose-50',border:'border-rose-200',text:'text-rose-700'},
-    {bg:'bg-cyan-600',hex:'#0891b2',light:'bg-cyan-50',border:'border-cyan-200',text:'text-cyan-700'},
-    {bg:'bg-pink-600',hex:'#db2777',light:'bg-pink-50',border:'border-pink-200',text:'text-pink-700'},
-    {bg:'bg-teal-600',hex:'#0d9488',light:'bg-teal-50',border:'border-teal-200',text:'text-teal-700'},
+const W = [
+    {bg:'bg-indigo-600',hex:'#4f46e5',lt:'bg-indigo-50',bd:'border-indigo-200',tx:'text-indigo-700'},
+    {bg:'bg-emerald-600',hex:'#059669',lt:'bg-emerald-50',bd:'border-emerald-200',tx:'text-emerald-700'},
+    {bg:'bg-violet-600',hex:'#7c3aed',lt:'bg-violet-50',bd:'border-violet-200',tx:'text-violet-700'},
+    {bg:'bg-amber-600',hex:'#d97706',lt:'bg-amber-50',bd:'border-amber-200',tx:'text-amber-700'},
+    {bg:'bg-rose-600',hex:'#e11d48',lt:'bg-rose-50',bd:'border-rose-200',tx:'text-rose-700'},
+    {bg:'bg-cyan-600',hex:'#0891b2',lt:'bg-cyan-50',bd:'border-cyan-200',tx:'text-cyan-700'},
+    {bg:'bg-pink-600',hex:'#db2777',lt:'bg-pink-50',bd:'border-pink-200',tx:'text-pink-700'},
+    {bg:'bg-teal-600',hex:'#0d9488',lt:'bg-teal-50',bd:'border-teal-200',tx:'text-teal-700'},
 ];
-
 const liburNas = ["2026-08-17","2026-08-25","2026-12-25","2027-01-01","2027-02-06","2027-02-17","2027-03-09","2027-03-10","2027-03-11","2027-03-12","2027-03-26","2027-05-01","2027-05-06","2027-05-20","2027-06-01"];
 
-// ======================================
+// ============================================
 // SIDEBAR MOBILE
-// ======================================
+// ============================================
 let sbOpen = false;
-function toggleSidebar() {
-    sbOpen = !sbOpen;
-    const p = document.getElementById('sbPanel'), o = document.getElementById('sbOverlay');
-    if (sbOpen) { p.classList.replace('-translate-x-full','translate-x-0'); o.classList.remove('hidden'); document.getElementById('icClose').classList.remove('hidden'); document.getElementById('icOpen').classList.add('hidden'); document.body.style.overflow='hidden'; }
-    else { p.classList.replace('translate-x-0','-translate-x-full'); o.classList.add('hidden'); document.getElementById('icClose').classList.add('hidden'); document.getElementById('icOpen').classList.remove('hidden'); document.body.style.overflow=''; }
+function toggleSB() {
+    sbOpen=!sbOpen;
+    const p=document.getElementById('sbP'),o=document.getElementById('sbOv');
+    if(sbOpen){p.classList.replace('-translate-x-full','translate-x-0');o.classList.remove('hidden');document.getElementById('icC').classList.remove('hidden');document.getElementById('icO').classList.add('hidden');document.body.style.overflow='hidden';}
+    else{p.classList.replace('translate-x-0','-translate-x-full');o.classList.add('hidden');document.getElementById('icC').classList.add('hidden');document.getElementById('icO').classList.remove('hidden');document.body.style.overflow='';}
 }
-function closeMob() { if (sbOpen && window.innerWidth < 768) toggleSidebar(); }
-function toggleColl(id) { document.getElementById(id)?.classList.toggle('open'); }
+function closeMob(){if(sbOpen&&window.innerWidth<768)toggleSB();}
+function toggleColl(id){document.getElementById(id)?.classList.toggle('open');}
 
-// ======================================
-// SYNC INDICATOR
-// ======================================
-function showSync(type, text) {
-    const el = document.getElementById('syncIndicator');
-    el.className = 'sync-indicator no-print sync-' + type;
-    el.textContent = text;
-    if (type === 'saved') setTimeout(() => { el.className = 'sync-indicator no-print sync-saved'; el.textContent = '☁️ Tersimpan'; }, 100);
-}
+// ============================================
+// SYNC UI
+// ============================================
+function showSync(t,txt){const e=document.getElementById('syncInd');e.className='sync-ind no-print sync-'+t;e.textContent=txt;}
 
-// ======================================
-// FIREBASE SAVE & LOAD
-// ======================================
-function saveToFirebase() {
-    showSync('saving', '💾 Menyimpan...');
-    const data = {
-        tpData, rombelList, rombelIdCtr,
-        settings: gatherSettings(),
-        updatedAt: Date.now()
-    };
-    userRef.set(data).then(() => {
-        showSync('saved', '☁️ Tersimpan');
-    }).catch(err => {
-        console.error('Save error:', err);
-        showSync('error', '❌ Gagal simpan');
-        // Fallback to localStorage
-        localStorage.setItem('sigumart_backup', JSON.stringify(data));
+// ============================================
+// FIRESTORE SAVE / LOAD
+// ============================================
+function saveToFS(){
+    showSync('saving','💾 Menyimpan...');
+    const data={tpData,rombelList,rombelCtr,settings:gatherSet(),ts:firebase.firestore.FieldValue.serverTimestamp()};
+    getUserDoc().set(data,{merge:true}).then(()=>{showSync('saved','☁️ Tersimpan');}).catch(err=>{
+        console.error('Firestore save error:',err);showSync('err','❌ Gagal simpan');
+        localStorage.setItem('sg_backup',JSON.stringify({tpData,rombelList,rombelCtr,settings:gatherSet()}));
     });
 }
 
-function saveAndRender() {
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => { saveToFirebase(); renderAll(); }, 600);
-}
+function debSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{saveToFS();renderAll();},700);}
 
-function loadFromFirebase() {
-    return new Promise((resolve, reject) => {
-        document.getElementById('loadingStatus').textContent = 'Mengambil data dari cloud...';
-        userRef.once('value').then(snap => {
-            const d = snap.val();
-            if (d) {
-                tpData = d.tpData || [];
-                rombelList = d.rombelList || [];
-                rombelIdCtr = d.rombelIdCtr || 0;
-                if (d.settings) applySettings(d.settings);
-            }
-            resolve(d);
-        }).catch(err => {
-            console.error('Load error:', err);
-            // Try localStorage backup
-            try {
-                const backup = localStorage.getItem('sigumart_backup');
-                if (backup) {
-                    const d = JSON.parse(backup);
-                    tpData = d.tpData || [];
-                    rombelList = d.rombelList || [];
-                    rombelIdCtr = d.rombelIdCtr || 0;
-                    if (d.settings) applySettings(d.settings);
-                }
-            } catch(e) {}
-            showSync('offline', '📴 Mode Offline');
-            resolve(null);
-        });
-    });
-}
-
-function gatherSettings() {
-    const ids = ['iTA','iJenjang','iMapel','iSekolah','iKepsek','iNipK','iGuru','iNipG','iMetode','iKotaTgl','iTglSmt1','iTglSmt2','iJmlMinggu','fFase','fKelas','fSmt'];
-    const s = {};
-    ids.forEach(id => { const el = document.getElementById(id); if (el) s[id] = el.value; });
-    return s;
-}
-
-function applySettings(s) {
-    Object.keys(s).forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = s[id];
-    });
-}
-
-function getS() {
-    return {
-        ta: document.getElementById('iTA')?.value || '2026/2027',
-        jenjang: document.getElementById('iJenjang')?.value || 'SD',
-        mapel: document.getElementById('iMapel')?.value || 'PAI & BP',
-        sekolah: document.getElementById('iSekolah')?.value || '-',
-        kepsek: document.getElementById('iKepsek')?.value || '-',
-        nipK: document.getElementById('iNipK')?.value || '-',
-        guru: document.getElementById('iGuru')?.value || '-',
-        nipG: document.getElementById('iNipG')?.value || '-',
-        metode: document.getElementById('iMetode')?.value || '-',
-        kotaTgl: document.getElementById('iKotaTgl')?.value || '-',
-        tglSmt1: document.getElementById('iTglSmt1')?.value || '2026-07-13',
-        tglSmt2: document.getElementById('iTglSmt2')?.value || '2027-01-11',
-        jmlMinggu: parseInt(document.getElementById('iJmlMinggu')?.value) || 24,
-    };
-}
-
-// ======================================
-// KELAS OPTIONS (Universal Kelas 1-12)
-// ======================================
-function getMaxKelas() {
-    const j = document.getElementById('iJenjang')?.value || 'SD';
-    if (['SD','MI'].includes(j)) return 6;
-    if (['SMP','MTs'].includes(j)) return 9;
-    return 12;
-}
-
-function populateKelasOptions() {
-    const max = getMaxKelas();
-    const start = ['SMP','MTs'].includes(document.getElementById('iJenjang')?.value) ? 7 : (['SMA','MA','SMK'].includes(document.getElementById('iJenjang')?.value) ? 10 : 1);
-    // Filter kelas dropdown
-    const fk = document.getElementById('fKelas');
-    const prev = fk.value;
-    fk.innerHTML = '<option value="">Semua Kelas</option>';
-    for (let i = start; i <= max; i++) fk.innerHTML += `<option>Kelas ${i}</option>`;
-    fk.value = prev;
-    // Manual kelas dropdown
-    const mk = document.getElementById('mKelas');
-    mk.innerHTML = '';
-    for (let i = start; i <= max; i++) mk.innerHTML += `<option>Kelas ${i}</option>`;
-    // Fase dropdown
-    const ff = document.getElementById('fFase');
-    const prevF = ff.value;
-    ff.innerHTML = '<option value="">Semua Fase</option>';
-    ['A','B','C','D','E','F'].forEach(f => ff.innerHTML += `<option>Fase ${f}</option>`);
-    ff.value = prevF;
-}
-
-// ======================================
-// CSV
-// ======================================
-function parseLine(line) {
-    const r=[]; let c='',inQ=false;
-    for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){r.push(c.trim());c=''}else c+=ch;}
-    r.push(c.trim()); return r;
-}
-
-function handleCSV(e) {
-    const f = e.target.files[0]; if(!f) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        const lines = ev.target.result.split(/\r?\n/).filter(l=>l.trim());
-        if(lines.length<2){alert('CSV kosong/hanya header');return;}
-        let cnt=0;
-        for(let i=1;i<lines.length;i++){
-            const c=parseLine(lines[i]); if(c.length<8) continue;
-            const entry={fase:c[0],kelas:c[1],semester:c[2],elemen:c[3],cp:c[4],tp:c[5],dimensi:c[6],pertemuan:parseInt(c[7])||2};
-            if(entry.tp){tpData.push(entry);cnt++;}
+async function loadFromFS(loadUid){
+    const targetUid = loadUid || uid;
+    document.getElementById('loadSt').textContent='Mengambil data dari Firestore...';
+    try{
+        const doc = await fsDb.collection('users').doc(targetUid).get();
+        if(doc.exists){
+            const d=doc.data();
+            tpData=d.tpData||[];rombelList=d.rombelList||[];rombelCtr=d.rombelCtr||0;
+            if(d.settings)applySet(d.settings);
+            return true;
         }
+        return false;
+    }catch(err){
+        console.error('Firestore load error:',err);showSync('err','❌ Gagal load');
+        try{const bk=localStorage.getItem('sg_backup');if(bk){const d=JSON.parse(bk);tpData=d.tpData||[];rombelList=d.rombelList||[];rombelCtr=d.rombelCtr||0;if(d.settings)applySet(d.settings);}}catch(e){}
+        return false;
+    }
+}
+
+function copyUID(){
+    navigator.clipboard.writeText(uid).then(()=>{
+        const el=document.getElementById('dispUID');el.textContent='✓ Disalin!';setTimeout(()=>{el.textContent=uid.substring(0,16)+'...';},1500);
+    }).catch(()=>{prompt('Salin ID ini:',uid);});
+}
+
+async function loadOtherUID(){
+    const newUid=document.getElementById('loadUIDInput').value.trim();
+    if(!newUid){alert('Masukkan ID yang valid.');return;}
+    if(confirm(`Load data dari ID: ${newUid}?\nData lokal saat ini akan diganti.`)){
+        uid=newUid;localStorage.setItem('sg_uid',uid);
+        document.getElementById('dispUID').textContent=uid.substring(0,16)+'...';
+        await loadFromFS(uid);renderRombel();renderAll();showSync('saved','🔄 Data dimuat');
+    }
+}
+
+function gatherSet(){
+    const ids=['iTA','iJenjang','iMapel','iSekolah','iKepsek','iNipK','iGuru','iNipG','iMetode','iKotaTgl','iTgl1','iTgl2','iMgg'];
+    const s={};ids.forEach(id=>{const el=document.getElementById(id);if(el)s[id]=el.value;});return s;
+}
+function applySet(s){if(!s)return;Object.keys(s).forEach(id=>{const el=document.getElementById(id);if(el)el.value=s[id];});}
+
+function getS(){
+    return{ta:document.getElementById('iTA')?.value||'2026/2027',jenjang:document.getElementById('iJenjang')?.value||'SD',mapel:document.getElementById('iMapel')?.value||'PAI & BP',sekolah:document.getElementById('iSekolah')?.value||'-',kepsek:document.getElementById('iKepsek')?.value||'-',nipK:document.getElementById('iNipK')?.value||'-',guru:document.getElementById('iGuru')?.value||'-',nipG:document.getElementById('iNipG')?.value||'-',metode:document.getElementById('iMetode')?.value||'-',kotaTgl:document.getElementById('iKotaTgl')?.value||'-',tgl1:document.getElementById('iTgl1')?.value||'2026-07-13',tgl2:document.getElementById('iTgl2')?.value||'2027-01-11',mgg:parseInt(document.getElementById('iMgg')?.value)||24};
+}
+
+// ============================================
+// KELAS OPTIONS (Universal 1-12)
+// ============================================
+function getKRange(){
+    const j=document.getElementById('iJenjang')?.value||'SD';
+    if(['SD','MI'].includes(j))return[1,6];if(['SMP','MTs'].includes(j))return[7,9];return[10,12];
+}
+function populateKO(){
+    const[s,e]=getKRange();
+    ['fKelas','mKelas'].forEach(id=>{
+        const el=document.getElementById(id);if(!el)return;const pv=el.value;
+        el.innerHTML=id==='fKelas'?'<option value="">Semua Kelas</option>':'';
+        for(let i=s;i<=e;i++)el.innerHTML+=`<option>Kelas ${i}</option>`;
+        el.value=pv;
+    });
+    const ff=document.getElementById('fFase');const pfv=ff.value;
+    ff.innerHTML='<option value="">Semua Fase</option>';
+    'ABCDEF'.split('').forEach(f=>ff.innerHTML+=`<option>Fase ${f}</option>`);ff.value=pfv;
+}
+
+// ============================================
+// CSV HANDLING
+// ============================================
+function parseLine(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
+
+function handleCSV(e){
+    const f=e.target.files[0];if(!f)return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+        const lines=ev.target.result.split(/\r?\n/).filter(l=>l.trim());if(lines.length<2){alert('CSV kosong');return;}
+        let cnt=0;
+        for(let i=1;i<lines.length;i++){const c=parseLine(lines[i]);if(c.length<8)continue;const en={fase:c[0],kelas:c[1],semester:c[2],elemen:c[3],cp:c[4],tp:c[5],dimensi:c[6],pertemuan:parseInt(c[7])||2};if(en.tp){tpData.push(en);cnt++;}}
         document.getElementById('csvSt').classList.remove('hidden');
         document.getElementById('csvStT').textContent=`${cnt} TP dimuat! (Total: ${tpData.length})`;
-        saveToFirebase(); renderAll();
-    };
-    reader.readAsText(f); e.target.value='';
+        saveToFS();renderAll();
+    };reader.readAsText(f);e.target.value='';
 }
 
-function dlTemplate() {
+function dlTemplate(){
     const h='Fase,Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan';
-    const rows=[
-        'Fase A,Kelas 1,Semester 1,Al-Qur\'an Hadis,"Membaca dan membedakan huruf hijaiah berharakat","Membaca dan menulis huruf hijaiyah dengan makhrojul huruf yang tepat","keimanan dan ketakwaan; kreativitas; komunikasi",3',
-        'Fase A,Kelas 1,Semester 1,Akidah,"Mengenal rukun iman dan Rukun Islam","Menjelaskan dan meyakini 6 rukun iman","keimanan dan ketakwaan; penalaran kritis",2',
-    ];
+    const rows=['Fase A,Kelas 1,Semester 1,Al-Qur\'an Hadis,"Membaca dan membedakan huruf hijaiah berharakat","Membaca dan menulis huruf hijaiyah dengan makhrojul huruf yang tepat","keimanan dan ketakwaan; kreativitas; komunikasi",3','Fase A,Kelas 1,Semester 1,Akidah,"Mengenal rukun iman dan Rukun Islam","Menjelaskan dan meyakini 6 rukun iman","keimanan dan ketakwaan; penalaran kritis",2','Fase A,Kelas 1,Semester 1,Akhlak,"Mempraktikkan akhlak terpuji","Menerapkan Akhlak melalui Kalimat Basmallah","keimanan; kolaborasi",2','Fase A,Kelas 1,Semester 1,Fikih,"Mengenal dan mempraktikkan Rukun Islam","Menerapkan 5 Rukun Islam dan makna Syahadatain","keimanan; kemandirian",2','Fase A,Kelas 1,Semester 1,Sejarah,"Menceritakan kisah keteladanan Nabi","Menceritakan kisah dan keteladanan Nabi Adam AS","keimanan; kreativitas",2'];
     const blob=new Blob(['\uFEFF'+h+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='template_sigumart.csv';a.click();
 }
 
-function addManual() {
-    const entry={fase:document.getElementById('mFase').value,kelas:document.getElementById('mKelas').value,semester:document.getElementById('mSmt').value,elemen:document.getElementById('mElem').value||'Umum',cp:document.getElementById('mCP').value||'-',tp:document.getElementById('mTP').value,dimensi:document.getElementById('mDim').value||'-',pertemuan:parseInt(document.getElementById('mPrt').value)||2};
-    if(!entry.tp){alert('TP wajib diisi!');return;}
-    tpData.push(entry);
-    document.getElementById('mCP').value='';document.getElementById('mTP').value='';
-    saveToFirebase(); renderAll();
+function addManual(){
+    const en={fase:document.getElementById('mFase').value,kelas:document.getElementById('mKelas').value,semester:document.getElementById('mSmt').value,elemen:document.getElementById('mElem').value||'Umum',cp:document.getElementById('mCP').value||'-',tp:document.getElementById('mTP').value,dimensi:document.getElementById('mDim').value||'-',pertemuan:parseInt(document.getElementById('mPrt').value)||2};
+    if(!en.tp){alert('TP wajib diisi!');return;}tpData.push(en);document.getElementById('mCP').value='';document.getElementById('mTP').value='';saveToFS();renderAll();
 }
+function delTP(i){tpData.splice(i,1);saveToFS();renderAll();}
+function clearAllTP(){if(confirm('Hapus semua data TP?')){tpData=[];document.getElementById('csvSt').classList.add('hidden');saveToFS();renderAll();}}
 
-function delTP(i){tpData.splice(i,1);saveToFirebase();renderAll();}
-function clearAllTP(){if(confirm('Hapus semua data TP?')){tpData=[];document.getElementById('csvSt').classList.add('hidden');saveToFirebase();renderAll();}}
-
-// ======================================
+// ============================================
 // ROMBEL
-// ======================================
+// ============================================
 function addRombel(){
-    const id=++rombelIdCtr;
-    const startK = ['SMP','MTs'].includes(getS().jenjang)?7:(['SMA','MA','SMK'].includes(getS().jenjang)?10:1);
-    rombelList.push({id,nama:`${startK}A`,hari:4,jamMulai:1,jamAkhir:4,kelas:`Kelas ${startK}`,warna:rombelList.length%WARNA.length});
-    renderRombel();saveToFirebase();renderAll();
+    const id=++rombelCtr;const[sk]=getKRange();
+    rombelList.push({id,nama:`${sk}A`,hari:4,jamMulai:1,jamAkhir:4,kelas:`Kelas ${sk}`,warna:rombelList.length%W.length});
+    renderRombel();saveToFS();renderAll();
 }
-function rmRombel(id){rombelList=rombelList.filter(r=>r.id!==id);renderRombel();saveToFirebase();renderAll();}
-function updRombel(id,f,v){const r=rombelList.find(x=>x.id===id);if(!r)return;if(['hari','jamMulai','jamAkhir','warna'].includes(f))r[f]=parseInt(v);else r[f]=v;saveToFirebase();renderAll();}
+function rmRombel(id){rombelList=rombelList.filter(r=>r.id!==id);renderRombel();saveToFS();renderAll();}
+function updRombel(id,f,v){const r=rombelList.find(x=>x.id===id);if(!r)return;if(['hari','jamMulai','jamAkhir','warna'].includes(f))r[f]=parseInt(v);else r[f]=v;saveToFS();renderAll();}
 
 function renderRombel(){
-    const box=document.getElementById('rombelBox');
-    const startK=['SMP','MTs'].includes(getS().jenjang)?7:(['SMA','MA','SMK'].includes(getS().jenjang)?10:1);
-    const maxK=getMaxKelas();
-    if(!rombelList.length){box.innerHTML='<p class="text-center py-3 text-[10px] text-slate-500">Belum ada rombel.</p>';updateRombelFilter();return;}
+    const box=document.getElementById('rombelBox');const[sk,ek]=getKRange();
+    if(!rombelList.length){box.innerHTML='<p class="text-center py-3 text-[10px] text-slate-500">Belum ada rombel.</p>';updRombelFilter();return;}
     let h='';
     rombelList.forEach((r,idx)=>{
-        const w=WARNA[r.warna%WARNA.length];
-        let kelasOpts='';for(let i=startK;i<=maxK;i++)kelasOpts+=`<option ${r.kelas==='Kelas '+i?'selected':''}>Kelas ${i}</option>`;
+        const w=W[r.warna%W.length];let ko='';for(let i=sk;i<=ek;i++)ko+=`<option ${r.kelas==='Kelas '+i?'selected':''}>Kelas ${i}</option>`;
         h+=`<div class="p-2 bg-slate-800/50 border border-slate-700/40 rounded-xl space-y-1 anim-slide" style="animation-delay:${idx*40}ms;border-left:3px solid ${w.hex}">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5"><span class="badge-dot" style="background:${w.hex}"></span><input value="${r.nama}" onchange="updRombel(${r.id},'nama',this.value)" class="bg-transparent border-none text-white font-black text-xs w-14 focus:outline-none p-0"></div>
-                <button onclick="rmRombel(${r.id})" class="text-rose-400 hover:text-rose-300 text-[10px] px-1 rounded hover:bg-rose-900/30">✕</button>
-            </div>
-            <div class="grid grid-cols-3 gap-1">
-                <select onchange="updRombel(${r.id},'hari',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${HARI.map((h,i)=>`<option value="${i}" ${r.hari===i?'selected':''}>${h}</option>`).join('')}</select>
-                <select onchange="updRombel(${r.id},'jamMulai',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${[1,2,3,4,5,6,7,8,9,10].map(j=>`<option value="${j}" ${r.jamMulai===j?'selected':''}>JP${j}</option>`).join('')}</select>
-                <select onchange="updRombel(${r.id},'jamAkhir',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${[1,2,3,4,5,6,7,8,9,10].map(j=>`<option value="${j}" ${r.jamAkhir===j?'selected':''}>sd${j}</option>`).join('')}</select>
-            </div>
-            <select onchange="updRombel(${r.id},'kelas',this.value)" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${kelasOpts}</select>
+            <div class="flex items-center justify-between"><div class="flex items-center gap-1.5"><span class="badge-dot" style="background:${w.hex}"></span><input value="${r.nama}" onchange="updRombel(${r.id},'nama',this.value)" class="bg-transparent border-none text-white font-black text-xs w-14 focus:outline-none p-0"></div><button onclick="rmRombel(${r.id})" class="text-rose-400 hover:text-rose-300 text-[10px] px-1 rounded hover:bg-rose-900/30">✕</button></div>
+            <div class="grid grid-cols-3 gap-1"><select onchange="updRombel(${r.id},'hari',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${HARI.map((h,i)=>`<option value="${i}" ${r.hari===i?'selected':''}>${h}</option>`).join('')}</select><select onchange="updRombel(${r.id},'jamMulai',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jamMulai===j?'selected':''}>JP${j}</option>`).join('')}</select><select onchange="updRombel(${r.id},'jamAkhir',this.value)" class="bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jamAkhir===j?'selected':''}>sd${j}</option>`).join('')}</select></div>
+            <select onchange="updRombel(${r.id},'kelas',this.value)" class="w-full bg-slate-900/80 border border-slate-700/60 text-slate-200 rounded p-0.5 text-[9px] focus:outline-none">${ko}</select>
         </div>`;
-    });
-    box.innerHTML=h;
-    updateRombelFilter();
+    });box.innerHTML=h;updRombelFilter();
 }
+function updRombelFilter(){const f=document.getElementById('fRombel');f.innerHTML='<option value="">Semua Rombel</option>';rombelList.forEach(r=>{f.innerHTML+=`<option value="${r.id}">Rombel ${r.nama} (${HARI[r.hari]})</option>`;});}
 
-function updateRombelFilter(){
-    const f=document.getElementById('fRombel');f.innerHTML='<option value="">Semua Rombel</option>';
-    rombelList.forEach(r=>{f.innerHTML+=`<option value="${r.id}">Rombel ${r.nama} (${HARI[r.hari]})</option>`;});
-}
-
-// ======================================
-// PROMES: GENERATE REAL DATES
-// ======================================
+// ============================================
+// PROMES DATE GENERATOR
+// ============================================
 function fmtISO(d){let m=''+(d.getMonth()+1),dy=''+d.getDate(),y=d.getFullYear();if(m.length<2)m='0'+m;if(dy.length<2)dy='0'+dy;return[y,m,dy].join('-');}
 
-function generateWeekDates(semesterKey, dayIndex, totalWeeks) {
-    const s = getS();
-    const baseStr = semesterKey === 'Semester 1' ? s.tglSmt1 : s.tglSmt2;
-    const baseParts = baseStr.split('-');
-    const baseDate = new Date(parseInt(baseParts[0]), parseInt(baseParts[1])-1, parseInt(baseParts[2]));
-    
-    // Find first occurrence of dayIndex from baseDate
-    const baseDow = baseDate.getDay(); // 0=Sun
-    const targetDow = (dayIndex + 1) % 7; // Convert: 0=Mon -> 1, ... 5=Sat -> 6
-    let diff = targetDow - baseDow;
-    if (diff < 0) diff += 7;
-    
-    const firstDay = new Date(baseDate);
-    firstDay.setDate(baseDate.getDate() + diff);
-    
-    const weeks = [];
-    for (let w = 0; w < totalWeeks; w++) {
-        const d = new Date(firstDay);
-        d.setDate(firstDay.getDate() + w * 7);
-        const iso = fmtISO(d);
-        const isLibur = liburNas.includes(iso);
-        weeks.push({
-            weekNum: w + 1,
-            date: d,
-            dateNum: d.getDate(),
-            monthName: BULAN[d.getMonth()],
-            iso: iso,
-            isLibur: isLibur,
-            isEffective: !isLibur
-        });
-    }
+function genWeeks(semKey, dayIdx, total){
+    const s=getS();const bs=semKey==='Semester 1'?s.tgl1:s.tgl2;
+    const bp=bs.split('-');const bd=new Date(+bp[0],+bp[1]-1,+bp[2]);
+    const bDow=bd.getDay();const tDow=(dayIdx+1)%7;
+    let diff=tDow-bDow;if(diff<0)diff+=7;
+    const first=new Date(bd);first.setDate(bd.getDate()+diff);
+    const weeks=[];
+    for(let w=0;w<total;w++){const d=new Date(first);d.setDate(first.getDate()+w*7);const iso=fmtISO(d);const lib=liburNas.includes(iso);weeks.push({wn:w+1,date:d,dn:d.getDate(),mn:BULAN[d.getMonth()],iso,lib,eff:!lib});}
     return weeks;
 }
 
-// ======================================
-// FILTERS
-// ======================================
-function getFiltered(){
-    let list=[...tpData];
-    const ff=document.getElementById('fFase')?.value;
-    const fk=document.getElementById('fKelas')?.value;
-    const fs=document.getElementById('fSmt')?.value;
-    if(ff)list=list.filter(d=>d.fase===ff);
-    if(fk)list=list.filter(d=>d.kelas===fk);
-    if(fs)list=list.filter(d=>d.semester===fs);
-    return list;
-}
-function uniq(arr,k){return[...new Set(arr.map(d=>d[k]).filter(Boolean))];}
-
-// ======================================
-// TAB SWITCH
-// ======================================
-function swTab(t){
-    const tabs=['Jadwal','Data','Atp','Prota','Promes','Modul','Kktp'];
-    tabs.forEach(x=>{
-        const c=document.getElementById('c'+x);if(c)c.classList.add('hidden');
-        const b=document.getElementById('t'+x);if(b)b.className="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2";
-    });
-    const cap=t.charAt(0).toUpperCase()+t.slice(1);
-    document.getElementById('c'+cap)?.classList.remove('hidden');
-    const ab=document.getElementById('t'+cap);if(ab)ab.className="nav-btn nav-active w-full text-left py-2 px-3 rounded-xl text-[11px] font-bold flex items-center gap-2";
-    document.querySelectorAll('.mnav').forEach(b=>{b.classList.remove('text-indigo-400');b.classList.add('text-slate-400');if(b.dataset.t===t){b.classList.remove('text-slate-400');b.classList.add('text-indigo-400');}});
-}
-
-// ======================================
-// SIGNATURE
-// ======================================
+// ============================================
+// FILTERS & HELPERS
+// ============================================
+function getFL(){let l=[...tpData];const ff=document.getElementById('fFase')?.value,fk=document.getElementById('fKelas')?.value,fs=document.getElementById('fSmt')?.value;if(ff)l=l.filter(d=>d.fase===ff);if(fk)l=l.filter(d=>d.kelas===fk);if(fs)l=l.filter(d=>d.semester===fs);return l;}
+function uniq(a,k){return[...new Set(a.map(d=>d[k]).filter(Boolean))];}
+function swTab(t){const tabs=['Jadwal','Data','Atp','Prota','Promes','Modul','Kktp'];tabs.forEach(x=>{document.getElementById('c'+x)?.classList.add('hidden');const b=document.getElementById('t'+x);if(b)b.className="nav-btn w-full text-left py-2 px-3 rounded-xl text-[11px] font-semibold text-slate-400 hover:bg-slate-800/60 hover:text-white flex items-center gap-2";});const cap=t.charAt(0).toUpperCase()+t.slice(1);document.getElementById('c'+cap)?.classList.remove('hidden');const ab=document.getElementById('t'+cap);if(ab)ab.className="nav-btn nav-active w-full text-left py-2 px-3 rounded-xl text-[11px] font-bold flex items-center gap-2";document.querySelectorAll('.mnav').forEach(b=>{b.classList.remove('text-indigo-400');b.classList.add('text-slate-400');if(b.dataset.t===t){b.classList.remove('text-slate-400');b.classList.add('text-indigo-400');}});}
 function sig(){const s=getS();return`<div class="mt-6 pt-4 border-t-2 border-slate-300 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"><div class="text-center"><p class="font-bold">Mengetahui,</p><p class="font-bold mb-14">Kepala ${s.sekolah}</p><p class="font-extrabold underline">${s.kepsek}</p><p class="text-slate-500">NIP. ${s.nipK}</p></div><div class="text-center"><p>${s.kotaTgl}</p><p class="font-bold mb-14">Guru ${s.mapel}</p><p class="font-extrabold underline">${s.guru}</p><p class="text-slate-500">NIP. ${s.nipG}</p></div></div>`;}
 
-// ======================================
-// RENDER: JADWAL
-// ======================================
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
 function rJadwal(){
-    const s=getS();
-    const fRB=document.getElementById('fRombel')?.value;
-    let rbs=fRB?rombelList.filter(r=>r.id==fRB):[...rombelList];
-    const maxJP=10;
+    const s=getS(),fR=document.getElementById('fRombel')?.value;let rbs=fR?rombelList.filter(r=>r.id==fR):[...rombelList];
     const jadMap={};HARI.forEach((_,i)=>{jadMap[i]={};});
     rbs.forEach(r=>{for(let jp=r.jamMulai;jp<=r.jamAkhir;jp++){if(!jadMap[r.hari][jp])jadMap[r.hari][jp]=[];jadMap[r.hari][jp].push(r);}});
-
-    let chips='';
-    rbs.forEach(r=>{const w=WARNA[r.warna%WARNA.length];chips+=`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${w.light} ${w.text} ${w.border} border text-[9px] font-bold"><span class="badge-dot" style="background:${w.hex}"></span>${r.nama} (${HARI[r.hari]} JP${r.jamMulai}-${r.jamAkhir})</span> `;});
+    let chips='';rbs.forEach(r=>{const w=W[r.warna%W.length];chips+=`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${w.lt} ${w.tx} ${w.bd} border text-[9px] font-bold"><span class="badge-dot" style="background:${w.hex}"></span>${r.nama} (${HARI[r.hari]} JP${r.jamMulai}-${r.jamAkhir})</span> `;});
     if(!rbs.length)chips='<span class="text-xs text-slate-400">Tambahkan rombel di sidebar</span>';
-
+    const times=['07.00-07.35','07.35-08.10','08.10-08.45','08.45-09.20','09.20-09.50','09.50-10.25','10.25-11.00','11.00-11.35','11.35-12.10','12.10-12.45'];
     let rows='';
-    for(let jp=1;jp<=maxJP;jp++){
-        if(jp===5){rows+=`<tr class="bg-amber-50 font-bold text-amber-700 text-[10px]"><td class="p-1 border border-slate-300 text-center">IST</td><td class="p-1 border border-slate-300 text-center text-[9px]">09.20-09.50</td><td colspan="6" class="p-1 border border-slate-300 text-center uppercase tracking-widest">Istirahat</td></tr>`;}
-        const realJP=jp>=5?jp:jp;
-        const times=['07.00-07.35','07.35-08.10','08.10-08.45','08.45-09.20','09.50-10.25','10.25-11.00','11.00-11.35','11.35-12.10','12.10-12.45','12.45-13.20'];
-        let cells='';
-        HARI.forEach((_,hi)=>{
-            const rs=jadMap[hi][jp]||[];
-            if(!rs.length)cells+=`<td class="p-1 border border-slate-300 text-center text-slate-300 text-[9px]">-</td>`;
-            else if(rs.length===1){const w=WARNA[rs[0].warna%WARNA.length];cells+=`<td class="p-1 border border-slate-300 text-center ${w.bg} text-white font-bold text-[8px]">${rs[0].nama}</td>`;}
-            else{const tags=rs.map(r=>{const w=WARNA[r.warna%WARNA.length];return`<span class="inline-block px-0.5 py-0 ${w.bg} text-white rounded text-[7px] font-bold">${r.nama}</span>`;}).join(' ');cells+=`<td class="p-1 border border-slate-300 text-center bg-slate-100 text-[7px]">${tags}</td>`;}
-        });
-        rows+=`<tr class="border-b border-slate-200 text-xs"><td class="p-1 border border-slate-300 text-center font-bold bg-slate-50 text-[9px]">${jp}</td><td class="p-1 border border-slate-300 text-center text-[8px] text-slate-600 bg-slate-50">${times[jp-1]||'-'}</td>${cells}</tr>`;
+    for(let jp=1;jp<=10;jp++){
+        if(jp===5){rows+=`<tr class="bg-amber-50 font-bold text-amber-700 text-[10px]"><td class="p-1 border border-slate-300 text-center">IST</td><td class="p-1 border border-slate-300 text-center text-[9px]">${times[4]}</td><td colspan="6" class="p-1 border border-slate-300 text-center uppercase tracking-widest">Istirahat</td></tr>`;continue;}
+        let cells='';HARI.forEach((_,hi)=>{const rs=jadMap[hi][jp]||[];if(!rs.length)cells+=`<td class="p-1 border border-slate-300 text-center text-slate-300 text-[9px]">-</td>`;else if(rs.length===1){const w=W[rs[0].warna%W.length];cells+=`<td class="p-1 border border-slate-300 text-center ${w.bg} text-white font-bold text-[8px]">${rs[0].nama}</td>`;}else{const tags=rs.map(r=>{const w=W[r.warna%W.length];return`<span class="inline-block px-0.5 ${w.bg} text-white rounded text-[7px] font-bold">${r.nama}</span>`;}).join(' ');cells+=`<td class="p-1 border border-slate-300 text-center bg-slate-100 text-[7px]">${tags}</td>`;}});
+        rows+=`<tr class="border-b border-slate-200"><td class="p-1 border border-slate-300 text-center font-bold bg-slate-50 text-[9px]">${jp}</td><td class="p-1 border border-slate-300 text-center text-[8px] text-slate-600 bg-slate-50">${times[jp>5?jp-1:jp-1]||'-'}</td>${cells}</tr>`;
     }
-
-    document.getElementById('cJadwal').innerHTML=`
-        <div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">JADWAL PELAJARAN MULTI-ROMBEL</h2><p class="text-[10px] text-slate-600 font-bold uppercase">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div>
-        <div class="flex flex-wrap gap-1.5 mb-3">${chips}</div>
-        <div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-400 mb-4 min-w-[600px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[9px] font-bold"><th class="p-1.5 border border-slate-400 w-10">JP</th><th class="p-1.5 border border-slate-400 w-20">Waktu</th>${HARI.map(h=>`<th class="p-1.5 border border-slate-400">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${sig()}`;
+    document.getElementById('cJadwal').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">JADWAL PELAJARAN MULTI-ROMBEL</h2><p class="text-[10px] text-slate-600 font-bold uppercase">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="flex flex-wrap gap-1.5 mb-3">${chips}</div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-400 mb-4 min-w-[600px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[9px] font-bold"><th class="p-1.5 border border-slate-400 w-10">JP</th><th class="p-1.5 border border-slate-400 w-20">Waktu</th>${HARI.map(h=>`<th class="p-1.5 border border-slate-400">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${sig()}`;
 }
 
-// ======================================
-// RENDER: DATA TABLE
-// ======================================
 function rData(){
-    const s=getS(),fl=getFiltered();
-    let rows='';
-    fl.forEach((d,i)=>{const ri=tpData.indexOf(d);rows+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r border-slate-200 text-center font-semibold">${i+1}</td><td class="p-1.5 border-r border-slate-200 text-indigo-800 font-medium">${d.fase}</td><td class="p-1.5 border-r border-slate-200">${d.kelas}</td><td class="p-1.5 border-r border-slate-200">${d.semester}</td><td class="p-1.5 border-r border-slate-200 font-bold">${d.elemen}</td><td class="p-1.5 border-r border-slate-200 text-slate-600 max-w-[160px] truncate">${d.cp}</td><td class="p-1.5 border-r border-slate-200 font-medium text-emerald-900">${d.tp}</td><td class="p-1.5 border-r border-slate-200 text-slate-600">${d.dimensi}</td><td class="p-1.5 border-r border-slate-200 text-center font-bold">${d.pertemuan}</td><td class="p-1.5 text-center no-print"><button onclick="delTP(${ri})" class="text-rose-500 hover:text-rose-400 text-[10px]">🗑️</button></td></tr>`;});
-    if(!fl.length)rows=`<tr><td colspan="10" class="p-6 text-center text-slate-400 text-sm">📂 Belum ada data TP</td></tr>`;
-    document.getElementById('cData').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">DATA CP / TP</h2><p class="text-[9px] text-slate-500">${s.sekolah} • Total: ${fl.length}/${tpData.length} TP</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-300 mb-4 min-w-[950px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[9px] font-bold"><th class="p-1.5 border border-slate-400 w-6">No</th><th class="p-1.5 border border-slate-400 w-14">Fase</th><th class="p-1.5 border border-slate-400 w-14">Kelas</th><th class="p-1.5 border border-slate-400 w-16">Smt</th><th class="p-1.5 border border-slate-400 w-24">Elemen</th><th class="p-1.5 border border-slate-400">CP</th><th class="p-1.5 border border-slate-400">TP</th><th class="p-1.5 border border-slate-400 w-28">Dimensi</th><th class="p-1.5 border border-slate-400 w-8">Prt</th><th class="p-1.5 border border-slate-400 w-8 no-print">⚙️</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const s=getS(),fl=getFL();let rows='';
+    fl.forEach((d,i)=>{const ri=tpData.indexOf(d);rows+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r text-center font-semibold">${i+1}</td><td class="p-1.5 border-r text-indigo-800 font-medium">${d.fase}</td><td class="p-1.5 border-r">${d.kelas}</td><td class="p-1.5 border-r">${d.semester}</td><td class="p-1.5 border-r font-bold">${d.elemen}</td><td class="p-1.5 border-r text-slate-600 max-w-[150px] truncate" title="${d.cp}">${d.cp}</td><td class="p-1.5 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1.5 border-r text-slate-600">${d.dimensi}</td><td class="p-1.5 border-r text-center font-bold">${d.pertemuan}</td><td class="p-1.5 text-center no-print"><button onclick="delTP(${ri})" class="text-rose-500 text-[10px]">🗑️</button></td></tr>`;});
+    if(!fl.length)rows=`<tr><td colspan="10" class="p-6 text-center text-slate-400">📂 Belum ada data TP. Import CSV atau tambah manual.</td></tr>`;
+    document.getElementById('cData').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">DATA CP / TP</h2><p class="text-[9px] text-slate-500">${s.sekolah} • ${fl.length}/${tpData.length} TP</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-300 mb-4 min-w-[950px]"><thead><tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[9px] font-bold"><th class="p-1.5 border w-6">No</th><th class="p-1.5 border w-14">Fase</th><th class="p-1.5 border w-14">Kelas</th><th class="p-1.5 border w-16">Smt</th><th class="p-1.5 border w-24">Elemen</th><th class="p-1.5 border">CP</th><th class="p-1.5 border">TP</th><th class="p-1.5 border w-28">Dimensi</th><th class="p-1.5 border w-8">Prt</th><th class="p-1.5 border w-8 no-print">⚙️</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-// ======================================
-// RENDER: ATP
-// ======================================
 function rAtp(){
-    const s=getS(),fl=getFiltered();
-    let rows=fl.map((d,i)=>`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r border-slate-200 text-center font-semibold">${i+1}</td><td class="p-1.5 border-r border-slate-200 font-bold">${d.elemen}</td><td class="p-1.5 border-r border-slate-200 font-medium text-emerald-900">${d.tp}</td><td class="p-1.5 border-r border-slate-200 text-slate-600">${d.cp.substring(0,100)}${d.cp.length>100?'...':''}</td><td class="p-1.5 border-r border-slate-200 text-center font-bold">${d.pertemuan*4} JP</td><td class="p-1.5 border-r border-slate-200 text-slate-600">${s.metode}</td><td class="p-1.5 text-slate-600">${d.dimensi}</td></tr>`).join('');
-    document.getElementById('cAtp').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">ATP / SILABUS</h2><p class="text-[10px] text-slate-600 font-bold uppercase">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-300 mb-4 min-w-[850px]"><thead><tr class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white text-[9px] font-bold"><th class="p-1.5 border border-slate-400 w-6">No</th><th class="p-1.5 border border-slate-400 w-24">Elemen</th><th class="p-1.5 border border-slate-400">TP</th><th class="p-1.5 border border-slate-400 w-40">CP</th><th class="p-1.5 border border-slate-400 w-16">Alokasi</th><th class="p-1.5 border border-slate-400 w-32">Metode</th><th class="p-1.5 border border-slate-400 w-28">Dimensi</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="p-6 text-center text-slate-400">Belum ada data</td></tr>'}</tbody></table></div>${sig()}`;
+    const s=getS(),fl=getFL();let rows=fl.map((d,i)=>`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r text-center font-semibold">${i+1}</td><td class="p-1.5 border-r font-bold">${d.elemen}</td><td class="p-1.5 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1.5 border-r text-slate-600">${d.cp.substring(0,100)}${d.cp.length>100?'...':''}</td><td class="p-1.5 border-r text-center font-bold">${d.pertemuan*4} JP</td><td class="p-1.5 border-r text-slate-600">${s.metode}</td><td class="p-1.5 text-slate-600">${d.dimensi}</td></tr>`).join('');
+    document.getElementById('cAtp').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">ATP / SILABUS</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-300 mb-4 min-w-[850px]"><thead><tr class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white text-[9px] font-bold"><th class="p-1.5 border w-6">No</th><th class="p-1.5 border w-24">Elemen</th><th class="p-1.5 border">TP</th><th class="p-1.5 border w-40">CP</th><th class="p-1.5 border w-16">Alokasi</th><th class="p-1.5 border w-32">Metode</th><th class="p-1.5 border w-28">Dimensi</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="p-6 text-center text-slate-400">Belum ada data</td></tr>'}</tbody></table></div>${sig()}`;
 }
 
-// ======================================
-// RENDER: PROTA
-// ======================================
 function rProta(){
-    const s=getS();
-    const semesters=['Semester 1','Semester 2'];
-    let body='';let gt=0;
-    semesters.forEach(sem=>{
-        let list=tpData.filter(d=>d.semester===sem);
-        const ff=document.getElementById('fFase')?.value;const fk=document.getElementById('fKelas')?.value;
+    const s=getS();let body='',gt=0;
+    ['Semester 1','Semester 2'].forEach(sem=>{
+        let list=tpData.filter(d=>d.semester===sem);const ff=document.getElementById('fFase')?.value,fk=document.getElementById('fKelas')?.value;
         if(ff)list=list.filter(d=>d.fase===ff);if(fk)list=list.filter(d=>d.kelas===fk);
         let st=0;list.forEach(d=>st+=d.pertemuan*4);gt+=st;
         body+=`<tr class="bg-indigo-100 font-bold text-indigo-900"><td colspan="5" class="p-1.5 uppercase text-[10px]">${sem.toUpperCase()} — ${st} JP</td></tr>`;
-        list.forEach((d,i)=>{body+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r border-slate-200 text-center font-semibold">${i+1}</td><td class="p-1.5 border-r border-slate-200 font-bold">${d.elemen}</td><td class="p-1.5 border-r border-slate-200">${d.tp}</td><td class="p-1.5 border-r border-slate-200 text-center">${sem}</td><td class="p-1.5 text-center font-bold">${d.pertemuan*4} JP</td></tr>`;});
+        list.forEach((d,i)=>{body+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="p-1.5 border-r text-center font-semibold">${i+1}</td><td class="p-1.5 border-r font-bold">${d.elemen}</td><td class="p-1.5 border-r">${d.tp}</td><td class="p-1.5 border-r text-center">${sem}</td><td class="p-1.5 text-center font-bold">${d.pertemuan*4} JP</td></tr>`;});
     });
-    body+=`<tr class="bg-gradient-to-r from-indigo-800 to-violet-800 text-white font-black text-xs"><td colspan="4" class="p-2 text-right border-r border-slate-400 uppercase">Total 1 Tahun:</td><td class="p-2 text-center">${gt} JP</td></tr>`;
-    document.getElementById('cProta').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">PROGRAM TAHUNAN (PROTA)</h2><p class="text-[10px] text-slate-600 font-bold uppercase">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-400 mb-4 min-w-[650px]"><thead><tr class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white text-[9px] font-bold"><th class="p-1.5 border border-slate-400 w-6">No</th><th class="p-1.5 border border-slate-400 w-24">Elemen</th><th class="p-1.5 border border-slate-400">TP</th><th class="p-1.5 border border-slate-400 w-20">Smt</th><th class="p-1.5 border border-slate-400 w-16">Alokasi</th></tr></thead><tbody>${body}</tbody></table></div>${sig()}`;
+    body+=`<tr class="bg-gradient-to-r from-indigo-800 to-violet-800 text-white font-black text-xs"><td colspan="4" class="p-2 text-right border-r uppercase">Total 1 Tahun:</td><td class="p-2 text-center">${gt} JP</td></tr>`;
+    document.getElementById('cProta').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">PROGRAM TAHUNAN (PROTA)</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="table-responsive"><table class="w-full text-xs border-collapse border border-slate-400 mb-4 min-w-[650px]"><thead><tr class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white text-[9px] font-bold"><th class="p-1.5 border w-6">No</th><th class="p-1.5 border w-24">Elemen</th><th class="p-1.5 border">TP</th><th class="p-1.5 border w-20">Smt</th><th class="p-1.5 border w-16">Alokasi</th></tr></thead><tbody>${body}</tbody></table></div>${sig()}`;
 }
 
-// ======================================
-// RENDER: PROMES (REAL DATES!)
-// ======================================
+// PROMES WITH REAL DATES
 function rPromes(){
-    const s=getS();
-    const fSem=document.getElementById('fSmt')?.value||'Semester 1';
-    const sem=fSem||'Semester 1';
+    const s=getS(),fSem=document.getElementById('fSmt')?.value,sem=fSem||'Semester 1';
     let fl=tpData.filter(d=>d.semester===sem);
-    const ff=document.getElementById('fFase')?.value;const fk=document.getElementById('fKelas')?.value;
+    const ff=document.getElementById('fFase')?.value,fk=document.getElementById('fKelas')?.value;
     if(ff)fl=fl.filter(d=>d.fase===ff);if(fk)fl=fl.filter(d=>d.kelas===fk);
-
-    // Find the rombel for this filter to get the day
-    const fRB=document.getElementById('fRombel')?.value;
-    let activeRombel = fRB ? rombelList.find(r=>r.id==fRB) : rombelList[0];
-    const dayIdx = activeRombel ? activeRombel.hari : 4; // default Jumat
-
-    const totalWeeks = s.jmlMinggu;
-    const weeks = generateWeekDates(sem, dayIdx, totalWeeks);
-
-    // Group by month
-    const monthsGroup = [];
-    let curMonth = null;
-    weeks.forEach(w => {
-        if (!curMonth || curMonth.name !== w.monthName) {
-            curMonth = { name: w.monthName, weeks: [] };
-            monthsGroup.push(curMonth);
-        }
-        curMonth.weeks.push(w);
-    });
-
-    // Header row 1: months
-    let th1 = `<tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white font-bold text-[8px]">
-        <th rowspan="2" class="border border-slate-400 px-1 py-1.5 w-6">No</th>
-        <th rowspan="2" class="border border-slate-400 px-1 py-1.5 text-left min-w-[180px]">Tujuan Pembelajaran</th>
-        <th rowspan="2" class="border border-slate-400 px-0.5 py-1.5 w-8">JP</th>
-        <th rowspan="2" class="border border-slate-400 px-0.5 py-1.5 w-8">Mgg</th>`;
-    monthsGroup.forEach(m => { th1 += `<th colspan="${m.weeks.length}" class="border border-slate-400 px-0.5 py-1 uppercase text-center">${m.name.substring(0,3)}</th>`; });
-    th1 += `</tr>`;
-
-    // Header row 2: week numbers
-    let th2 = `<tr class="bg-indigo-600 text-white font-semibold text-[7px]">`;
-    monthsGroup.forEach(m => { m.weeks.forEach((w,i) => { th2 += `<th class="border border-slate-400 px-0.5 py-0.5 w-6">${i+1}</th>`; }); });
-    th2 += `</tr>`;
-
-    // Identify effective weeks
-    const effWeeks = [];
-    weeks.forEach((w,gi) => { if (w.isEffective) effWeeks.push(gi); });
-
-    // Body rows
-    let tbody = '';
-    let effPtr = 0;
-
-    fl.forEach((d, di) => {
-        const mggReq = d.pertemuan;
-        const activeIdxs = [];
-        for (let k = 0; k < mggReq; k++) {
-            if (effPtr < effWeeks.length) {
-                activeIdxs.push(effWeeks[effPtr]);
-                effPtr++;
-            }
-        }
-
-        tbody += `<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50">
-            <td class="border border-slate-300 py-1 text-center font-semibold">${di+1}</td>
-            <td class="border border-slate-300 px-1.5 py-1 text-left font-medium text-[9px]">${d.tp}</td>
-            <td class="border border-slate-300 py-1 text-center font-bold">${d.pertemuan*4}</td>
-            <td class="border border-slate-300 py-1 text-center font-semibold">${d.pertemuan}</td>`;
-
-        weeks.forEach((w, gi) => {
-            if (activeIdxs.includes(gi)) {
-                // ACTIVE: show REAL DATE NUMBER
-                tbody += `<td class="border border-slate-300 py-0.5 text-center font-bold bg-indigo-200 text-indigo-950 text-[9px]">${w.dateNum}</td>`;
-            } else if (w.isLibur) {
-                tbody += `<td class="border border-slate-300 py-0.5 text-center bg-red-100 text-red-800 font-bold text-[7px]">LBR</td>`;
-            } else if (w.isEffective) {
-                tbody += `<td class="border border-slate-300 py-0.5 text-center text-slate-300 text-[8px]">·</td>`;
-            } else {
-                tbody += `<td class="border border-slate-300 py-0.5 text-center text-slate-200 text-[8px]">·</td>`;
-            }
+    const fR=document.getElementById('fRombel')?.value;
+    let aR=fR?rombelList.find(r=>r.id==fR):rombelList[0];
+    const dayIdx=aR?aR.hari:4;
+    const weeks=genWeeks(sem,dayIdx,s.mgg);
+    // Group months
+    const mg=[];let cm=null;
+    weeks.forEach(w=>{if(!cm||cm.n!==w.mn){cm={n:w.mn,w:[]};mg.push(cm);}cm.w.push(w);});
+    let th1=`<tr class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white font-bold text-[8px]"><th rowspan="2" class="border border-slate-400 px-1 py-1 w-6">No</th><th rowspan="2" class="border border-slate-400 px-1 py-1 text-left min-w-[160px]">Tujuan Pembelajaran</th><th rowspan="2" class="border border-slate-400 px-0.5 py-1 w-8">JP</th><th rowspan="2" class="border border-slate-400 px-0.5 py-1 w-8">Mgg</th>`;
+    mg.forEach(m=>{th1+=`<th colspan="${m.w.length}" class="border border-slate-400 px-0.5 py-0.5 uppercase text-center">${m.n.substring(0,3)}</th>`;});
+    th1+=`</tr>`;
+    let th2=`<tr class="bg-indigo-600 text-white font-semibold text-[7px]">`;mg.forEach(m=>{m.w.forEach((_,i)=>{th2+=`<th class="border border-slate-400 px-0.5 py-0.5 w-6">${i+1}</th>`;});});th2+=`</tr>`;
+    const effW=[];weeks.forEach((w,gi)=>{if(w.eff)effW.push(gi);});
+    let tbody='',effPtr=0;
+    fl.forEach((d,di)=>{
+        const mR=d.pertemuan,actIdx=[];
+        for(let k=0;k<mR;k++){if(effPtr<effW.length){actIdx.push(effW[effPtr]);effPtr++;}}
+        tbody+=`<tr class="border-b border-slate-200 text-[10px] hover:bg-slate-50"><td class="border border-slate-300 py-0.5 text-center font-semibold">${di+1}</td><td class="border border-slate-300 px-1 py-0.5 text-left font-medium text-[9px]">${d.tp}</td><td class="border border-slate-300 py-0.5 text-center font-bold">${d.pertemuan*4}</td><td class="border border-slate-300 py-0.5 text-center font-semibold">${d.pertemuan}</td>`;
+        weeks.forEach((w,gi)=>{
+            if(actIdx.includes(gi))tbody+=`<td class="border border-slate-300 py-0.5 text-center font-bold bg-indigo-200 text-indigo-950 text-[9px]">${w.dn}</td>`;
+            else if(w.lib)tbody+=`<td class="border border-slate-300 py-0.5 text-center bg-red-100 text-red-800 font-bold text-[7px]">LBR</td>`;
+            else tbody+=`<td class="border border-slate-300 py-0.5 text-center text-slate-300 text-[8px]">·</td>`;
         });
-        tbody += `</tr>`;
+        tbody+=`</tr>`;
     });
-
-    // Footer row: all real dates
-    tbody += `<tr class="bg-slate-100 font-bold border-t-2 border-slate-400 text-[9px]">
-        <td colspan="4" class="border border-slate-400 px-1 py-1 text-right uppercase text-slate-600 text-[8px]">Tgl ${HARI[dayIdx]}:</td>`;
-    weeks.forEach(w => {
-        if (w.isLibur) {
-            tbody += `<td class="border border-slate-400 py-0.5 text-center bg-red-200 text-red-900 font-bold text-[7px]">LBR</td>`;
-        } else {
-            tbody += `<td class="border border-slate-400 py-0.5 text-center text-indigo-900 font-extrabold text-[9px]">${w.dateNum}</td>`;
-        }
-    });
-    tbody += `</tr>`;
-
-    document.getElementById('cPromes').innerHTML=`
-        <div class="text-center mb-4 pb-3 border-b-2 border-slate-800 min-w-[900px]">
-            <h2 class="text-base md:text-lg font-black uppercase text-slate-900">PROGRAM SEMESTER (PROMES)</h2>
-            <p class="text-[10px] text-slate-600 font-bold uppercase">${s.mapel} • ${sem.toUpperCase()}</p>
-            <p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta} • Hari: ${HARI[dayIdx]}${activeRombel?' • Rombel: '+activeRombel.nama:''}</p>
-            <p class="text-[9px] text-indigo-700 font-bold mt-0.5">* Angka = Tanggal real pertemuan hari ${HARI[dayIdx]} setiap minggu</p>
-        </div>
-        <table class="w-full border-collapse border border-slate-400 mb-4 table-matrix min-w-[900px]">
-            <thead>${th1}${th2}</thead>
-            <tbody>${tbody}</tbody>
-        </table>
-        ${sig()}`;
+    // Footer dates row
+    tbody+=`<tr class="bg-slate-100 font-bold border-t-2 border-slate-400 text-[9px]"><td colspan="4" class="border border-slate-400 px-1 py-1 text-right uppercase text-slate-600 text-[8px]">Tgl ${HARI[dayIdx]}:</td>`;
+    weeks.forEach(w=>{if(w.lib)tbody+=`<td class="border border-slate-400 py-0.5 text-center bg-red-200 text-red-900 font-bold text-[7px]">LBR</td>`;else tbody+=`<td class="border border-slate-400 py-0.5 text-center text-indigo-900 font-extrabold text-[9px]">${w.dn}</td>`;});
+    tbody+=`</tr>`;
+    document.getElementById('cPromes').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800 min-w-[900px]"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">PROGRAM SEMESTER (PROMES)</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel} • ${sem.toUpperCase()}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta} • Hari: ${HARI[dayIdx]}${aR?' • Rombel: '+aR.nama:''}</p><p class="text-[9px] text-indigo-700 font-bold mt-0.5">* Angka = Tanggal real pertemuan hari ${HARI[dayIdx]} setiap minggu</p></div><table class="w-full border-collapse border border-slate-400 mb-4 table-matrix min-w-[900px]"><thead>${th1}${th2}</thead><tbody>${tbody}</tbody></table>${sig()}`;
 }
 
-// ======================================
-// RENDER: MODUL AJAR
-// ======================================
 function rModul(){
-    const s=getS(),fl=getFiltered();
+    const s=getS(),fl=getFL();
     if(!fl.length){document.getElementById('cModul').innerHTML=`<div class="text-center py-10 text-slate-400"><div class="text-3xl mb-2">🧠</div><p class="font-bold">Belum ada data TP</p></div>`;return;}
-    const d=fl[0];
-    let opts=fl.map((t,i)=>`<option value="${i}">[${t.elemen}] ${t.tp}</option>`).join('');
-    let pHtml='';
-    for(let i=1;i<=d.pertemuan;i++){
-        pHtml+=`<div class="mb-3 border border-slate-200 rounded-xl p-3 bg-slate-50/70">
-            <h5 class="font-bold text-indigo-900 text-[11px] uppercase border-b border-slate-200 pb-1.5 mb-2">🧠 Pertemuan ${i} (4 JP)</h5>
-            <div class="text-[11px] space-y-2">
-                <div class="p-2 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-900 text-[10px] uppercase block mb-0.5">🧘 Pendahuluan - Mindful (15 mnt)</strong><ul class="list-disc pl-4 text-slate-700 space-y-0.5"><li>Sapa, tadarus, doa, apersepsi</li><li>Pertanyaan pemantik: "${d.tp}"</li></ul></div>
-                <div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg"><strong class="text-emerald-900 text-[10px] uppercase block mb-0.5">💡 Inti - Meaningful (110 mnt)</strong><div class="bg-white p-2 border border-slate-200 rounded text-[10px]"><p>1. Memahami — eksplorasi konsep</p><p>2. Mengalami — ${s.metode}</p><p>3. Mengaplikasikan — LKPD & presentasi</p></div></div>
-                <div class="p-2 bg-amber-50 border border-amber-200 rounded-lg"><strong class="text-amber-900 text-[10px] uppercase block mb-0.5">🎉 Penutup - Joyful (15 mnt)</strong><ul class="list-disc pl-4 text-slate-700 space-y-0.5"><li>Refleksi, apresiasi, doa penutup</li></ul></div>
-            </div>
-        </div>`;
-    }
-    document.getElementById('cModul').innerHTML=`
-        <div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">MODUL AJAR</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div>
-        <div class="mb-4"><h3 class="text-xs font-extrabold uppercase bg-gradient-to-r from-indigo-700 to-violet-700 text-white px-3 py-1.5 rounded-xl mb-2">I. Informasi Umum</h3>
-            <table class="w-full text-[10px] border-collapse border border-slate-300"><tr class="border-b"><td class="w-1/3 p-1.5 font-bold bg-slate-50 border-r">Guru</td><td class="p-1.5">${s.guru}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Sekolah</td><td class="p-1.5">${s.sekolah}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Fase/Kelas/Smt</td><td class="p-1.5">${d.fase}/${d.kelas}/${d.semester}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Elemen</td><td class="p-1.5 font-bold text-indigo-800">${d.elemen}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">TP</td><td class="p-1.5 font-bold text-emerald-900">${d.tp}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Alokasi</td><td class="p-1.5 font-bold">${d.pertemuan} Pertemuan (${d.pertemuan*4} JP)</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Metode</td><td class="p-1.5">${s.metode}</td></tr><tr><td class="p-1.5 font-bold bg-slate-50 border-r">Dimensi</td><td class="p-1.5">${d.dimensi}</td></tr></table>
-        </div>
-        <div class="mb-4"><h3 class="text-xs font-extrabold uppercase bg-gradient-to-r from-indigo-700 to-violet-700 text-white px-3 py-1.5 rounded-xl mb-2">II. Langkah Pembelajaran</h3>
-            <select id="modSel" onchange="rModulTP()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-1.5 text-[10px] mb-3 focus:outline-none no-print">${opts}</select>
-            <div id="modBox">${pHtml}</div>
-        </div>${sig()}`;
+    const d=fl[0];let opts=fl.map((t,i)=>`<option value="${i}">[${t.elemen}] ${t.tp}</option>`).join('');
+    let pH='';for(let i=1;i<=d.pertemuan;i++){pH+=`<div class="mb-3 border border-slate-200 rounded-xl p-3 bg-slate-50/70"><h5 class="font-bold text-indigo-900 text-[11px] uppercase border-b pb-1.5 mb-2">🧠 Pertemuan ${i} (4 JP)</h5><div class="text-[11px] space-y-2"><div class="p-2 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-900 text-[10px] uppercase block mb-0.5">🧘 Pendahuluan (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Sapa, tadarus, doa, apersepsi</li><li>Pemantik: "${d.tp}"</li></ul></div><div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg"><strong class="text-emerald-900 text-[10px] uppercase block mb-0.5">💡 Inti (110m)</strong><div class="bg-white p-2 border border-slate-200 rounded text-[10px]"><p>1. Memahami — eksplorasi</p><p>2. Mengalami — ${s.metode}</p><p>3. Mengaplikasikan — LKPD</p></div></div><div class="p-2 bg-amber-50 border border-amber-200 rounded-lg"><strong class="text-amber-900 text-[10px] uppercase block mb-0.5">🎉 Penutup (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Refleksi, apresiasi, doa</li></ul></div></div></div>`;}
+    document.getElementById('cModul').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">MODUL AJAR</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div><div class="mb-4"><h3 class="text-xs font-extrabold uppercase bg-gradient-to-r from-indigo-700 to-violet-700 text-white px-3 py-1.5 rounded-xl mb-2">I. Informasi Umum</h3><table class="w-full text-[10px] border-collapse border border-slate-300"><tr class="border-b"><td class="w-1/3 p-1.5 font-bold bg-slate-50 border-r">Guru</td><td class="p-1.5">${s.guru}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Sekolah</td><td class="p-1.5">${s.sekolah}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Fase/Kelas/Smt</td><td class="p-1.5">${d.fase}/${d.kelas}/${d.semester}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Elemen</td><td class="p-1.5 font-bold text-indigo-800">${d.elemen}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">TP</td><td class="p-1.5 font-bold text-emerald-900">${d.tp}</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Alokasi</td><td class="p-1.5 font-bold">${d.pertemuan} Pertemuan (${d.pertemuan*4} JP)</td></tr><tr class="border-b"><td class="p-1.5 font-bold bg-slate-50 border-r">Metode</td><td class="p-1.5">${s.metode}</td></tr><tr><td class="p-1.5 font-bold bg-slate-50 border-r">Dimensi</td><td class="p-1.5">${d.dimensi}</td></tr></table></div><div class="mb-4"><h3 class="text-xs font-extrabold uppercase bg-gradient-to-r from-indigo-700 to-violet-700 text-white px-3 py-1.5 rounded-xl mb-2">II. Langkah Pembelajaran</h3><select id="modSel" onchange="rModTP()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-1.5 text-[10px] mb-3 focus:outline-none no-print">${opts}</select><div id="modBox">${pH}</div></div>${sig()}`;
 }
 
-function rModulTP(){
-    const fl=getFiltered();const idx=parseInt(document.getElementById('modSel')?.value)||0;const d=fl[idx];if(!d)return;const s=getS();
-    let h='';for(let i=1;i<=d.pertemuan;i++){h+=`<div class="mb-3 border border-slate-200 rounded-xl p-3 bg-slate-50/70"><h5 class="font-bold text-indigo-900 text-[11px] uppercase border-b pb-1.5 mb-2">🧠 Pertemuan ${i} — ${d.tp}</h5><div class="text-[11px] space-y-2"><div class="p-2 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-900 text-[10px] uppercase block mb-0.5">🧘 Pendahuluan (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Apersepsi: "${d.tp}"</li></ul></div><div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg"><strong class="text-emerald-900 text-[10px] uppercase block mb-0.5">💡 Inti (110m)</strong><div class="bg-white p-2 border border-slate-200 rounded text-[10px]"><p>1. Memahami ${d.elemen}</p><p>2. Praktik ${s.metode}</p><p>3. LKPD & presentasi</p></div></div><div class="p-2 bg-amber-50 border border-amber-200 rounded-lg"><strong class="text-amber-900 text-[10px] uppercase block mb-0.5">🎉 Penutup (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Refleksi & doa</li></ul></div></div></div>`;}
+function rModTP(){
+    const fl=getFL(),idx=parseInt(document.getElementById('modSel')?.value)||0,d=fl[idx];if(!d)return;const s=getS();
+    let h='';for(let i=1;i<=d.pertemuan;i++){h+=`<div class="mb-3 border border-slate-200 rounded-xl p-3 bg-slate-50/70"><h5 class="font-bold text-indigo-900 text-[11px] uppercase border-b pb-1.5 mb-2">🧠 Pertemuan ${i} — ${d.tp}</h5><div class="text-[11px] space-y-2"><div class="p-2 bg-blue-50 border border-blue-200 rounded-lg"><strong class="text-blue-900 text-[10px] uppercase block mb-0.5">🧘 Pendahuluan (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Apersepsi: "${d.tp}"</li></ul></div><div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg"><strong class="text-emerald-900 text-[10px] uppercase block mb-0.5">💡 Inti (110m)</strong><div class="bg-white p-2 border border-slate-200 rounded text-[10px]"><p>1. Memahami ${d.elemen}</p><p>2. ${s.metode}</p><p>3. LKPD & presentasi</p></div></div><div class="p-2 bg-amber-50 border border-amber-200 rounded-lg"><strong class="text-amber-900 text-[10px] uppercase block mb-0.5">🎉 Penutup (15m)</strong><ul class="list-disc pl-4 text-slate-700"><li>Refleksi & doa</li></ul></div></div></div>`;}
     document.getElementById('modBox').innerHTML=h;
 }
 
-// ======================================
-// RENDER: KKTP
-// ======================================
 function rKktp(){
-    const s=getS(),fl=getFiltered();
-    let cards=fl.map((d,i)=>`<div class="mb-4 border border-slate-200 rounded-xl p-3 bg-slate-50/60 hover:shadow-md transition"><div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-2 mb-2 gap-1"><div><span class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[8px] font-black px-2 py-0.5 rounded-lg uppercase">${d.elemen} • TP ${i+1}</span><h4 class="font-bold text-slate-900 text-xs mt-1">${d.tp}</h4></div><span class="text-[10px] bg-indigo-100 text-indigo-900 font-bold px-2 py-0.5 rounded">${d.pertemuan*4} JP</span></div><div class="table-responsive"><table class="w-full text-[10px] border-collapse border border-slate-300 bg-white min-w-[500px]"><thead><tr class="bg-slate-100 text-slate-700 font-bold text-[9px]"><th class="p-1 border border-slate-300 text-left w-1/5">Aspek</th><th class="p-1 border border-slate-300 bg-rose-50 text-rose-800">Perlu Bimbingan<br>(0-60%)</th><th class="p-1 border border-slate-300 bg-amber-50 text-amber-800">Cukup<br>(61-70%)</th><th class="p-1 border border-slate-300 bg-emerald-50 text-emerald-800">Baik<br>(71-85%)</th><th class="p-1 border border-slate-300 bg-blue-50 text-blue-800">Sangat Baik<br>(86-100%)</th></tr></thead><tbody><tr class="border-b text-[9px]"><td class="p-1 font-bold bg-slate-50 border">Penguasaan Konsep</td><td class="p-1 border text-slate-500">Belum mampu</td><td class="p-1 border text-slate-600">Dengan bimbingan</td><td class="p-1 border text-slate-700 font-medium">Mandiri</td><td class="p-1 border text-slate-800 font-bold">Fasih & membimbing</td></tr><tr class="text-[9px]"><td class="p-1 font-bold bg-slate-50 border">Penerapan Perilaku</td><td class="p-1 border text-slate-500">Belum sesuai</td><td class="p-1 border text-slate-600">Diingatkan</td><td class="p-1 border text-slate-700 font-medium">Konsisten</td><td class="p-1 border text-slate-800 font-bold">Teladan</td></tr></tbody></table></div></div>`).join('');
+    const s=getS(),fl=getFL();
+    let cards=fl.map((d,i)=>`<div class="mb-4 border border-slate-200 rounded-xl p-3 bg-slate-50/60 hover:shadow-md transition"><div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-2 mb-2 gap-1"><div><span class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white text-[8px] font-black px-2 py-0.5 rounded-lg uppercase">${d.elemen} • TP ${i+1}</span><h4 class="font-bold text-slate-900 text-xs mt-1">${d.tp}</h4></div><span class="text-[10px] bg-indigo-100 text-indigo-900 font-bold px-2 py-0.5 rounded">${d.pertemuan*4} JP</span></div><div class="table-responsive"><table class="w-full text-[10px] border-collapse border border-slate-300 bg-white min-w-[500px]"><thead><tr class="bg-slate-100 text-slate-700 font-bold text-[9px]"><th class="p-1 border text-left w-1/5">Aspek</th><th class="p-1 border bg-rose-50 text-rose-800">Perlu Bimbingan (0-60%)</th><th class="p-1 border bg-amber-50 text-amber-800">Cukup (61-70%)</th><th class="p-1 border bg-emerald-50 text-emerald-800">Baik (71-85%)</th><th class="p-1 border bg-blue-50 text-blue-800">Sangat Baik (86-100%)</th></tr></thead><tbody><tr class="border-b text-[9px]"><td class="p-1 font-bold bg-slate-50 border">Konsep</td><td class="p-1 border text-slate-500">Belum mampu</td><td class="p-1 border text-slate-600">Bimbingan</td><td class="p-1 border text-slate-700 font-medium">Mandiri</td><td class="p-1 border text-slate-800 font-bold">Fasih</td></tr><tr class="text-[9px]"><td class="p-1 font-bold bg-slate-50 border">Perilaku</td><td class="p-1 border text-slate-500">Belum</td><td class="p-1 border text-slate-600">Diingatkan</td><td class="p-1 border text-slate-700 font-medium">Konsisten</td><td class="p-1 border text-slate-800 font-bold">Teladan</td></tr></tbody></table></div></div>`).join('');
     document.getElementById('cKktp').innerHTML=`<div class="text-center mb-4 pb-3 border-b-2 border-slate-800"><h2 class="text-base md:text-lg font-black uppercase text-slate-900">KKTP</h2><p class="text-[10px] text-slate-600 font-bold">${s.mapel}</p><p class="text-[9px] text-slate-500">${s.sekolah} • T.A. ${s.ta}</p></div>${cards||'<div class="text-center py-8 text-slate-400">Belum ada data</div>'}${sig()}`;
 }
 
-// ======================================
-// PROMPT AI
-// ======================================
+// PROMPT
 function genPrompt(){
-    const s=getS(),fl=getFiltered(),d=fl[0];
-    if(!d){alert('Belum ada data TP.');return;}
+    const s=getS(),fl=getFL(),d=fl[0];if(!d){alert('Belum ada data TP.');return;}
     document.getElementById('promptTA').value=`Buatkan LKPD interaktif siap cetak A4:\n\n📋 Si-Gumart\n- Sekolah: ${s.sekolah}\n- Mapel: ${s.mapel}\n- ${d.fase} / ${d.kelas} / ${d.semester}\n- Elemen: ${d.elemen}\n- CP: ${d.cp}\n- TP: "${d.tp}"\n- Dimensi: ${d.dimensi}\n- Metode: ${s.metode}\n- Guru: ${s.guru}\n\n🎨 Spesifikasi:\n1. Header identitas siswa\n2. Pertanyaan pemantik\n3. Aktivitas: Menjodohkan, Isian, Analisis Kasus\n4. Jurnal Kebaikan & Refleksi\n5. Rubrik penilaian\n\nGunakan bahasa hangat & ramah anak!`;
-    document.getElementById('cpFB').classList.add('hidden');
-    document.getElementById('modal').classList.remove('hidden');
+    document.getElementById('cpFB').classList.add('hidden');document.getElementById('modal').classList.remove('hidden');
 }
 function cpPrompt(){const ta=document.getElementById('promptTA');ta.select();document.execCommand('copy');const fb=document.getElementById('cpFB');fb.classList.remove('hidden');setTimeout(()=>fb.classList.add('hidden'),3000);}
 
-// ======================================
-// RENDER ALL & STATS
-// ======================================
+// RENDER ALL + STATS
 function renderAll(){
-    const fl=getFiltered();
-    const elems=uniq(fl,'elemen');
-    let tj=0;fl.forEach(d=>tj+=d.pertemuan*4);
-
-    document.getElementById('sTP').textContent=fl.length;
-    document.getElementById('sJP').textContent=tj+' JP';
-    document.getElementById('sRB').textContent=rombelList.length;
-    document.getElementById('sRBd').textContent=rombelList.map(r=>r.nama).join(', ')||'-';
-    document.getElementById('sEL').textContent=elems.length;
-    document.getElementById('sELd').textContent=elems.slice(0,3).join(', ')||'-';
-
+    const fl=getFL(),elems=uniq(fl,'elemen');let tj=0;fl.forEach(d=>tj+=d.pertemuan*4);
+    document.getElementById('sTP').textContent=fl.length;document.getElementById('sJP').textContent=tj+' JP';
+    document.getElementById('sRB').textContent=rombelList.length;document.getElementById('sRBd').textContent=rombelList.map(r=>r.nama).join(', ')||'-';
+    document.getElementById('sEL').textContent=elems.length;document.getElementById('sELd').textContent=elems.slice(0,3).join(', ')||'-';
     const af=[document.getElementById('fFase')?.value,document.getElementById('fKelas')?.value,document.getElementById('fSmt')?.value].filter(Boolean);
-    document.getElementById('sFT').textContent=af.length?af.join(' · '):'Semua';
-    document.getElementById('sFTd').textContent=`${fl.length}/${tpData.length} TP`;
-
-    const ta=document.getElementById('iTA')?.value||'';
-    document.getElementById('lblTA').textContent=`T.A. ${ta} • ${document.getElementById('iJenjang')?.value||'SD'}`;
-    document.getElementById('footYr').textContent=ta.split('/')[0]||'2026';
-
+    document.getElementById('sFT').textContent=af.length?af.join(' · '):'Semua';document.getElementById('sFTd').textContent=`${fl.length}/${tpData.length} TP`;
+    const ta=document.getElementById('iTA')?.value||'';document.getElementById('lblTA').textContent=`T.A. ${ta} • ${document.getElementById('iJenjang')?.value||'SD'}`;document.getElementById('footYr').textContent=ta.split('/')[0]||'2026';
     rJadwal();rData();rAtp();rProta();rPromes();rModul();rKktp();
 }
 
-function resetAll(){
-    if(confirm('Reset SEMUA data Si-Gumart (TP, Rombel, Pengaturan) dari cloud?')){
-        tpData=[];rombelList=[];rombelIdCtr=0;
-        userRef.remove().then(()=>{localStorage.removeItem('sigumart_uid');location.reload();}).catch(()=>location.reload());
-    }
-}
+function resetAll(){if(confirm('Reset SEMUA data dari cloud?')){getUserDoc().delete().then(()=>{localStorage.removeItem('sg_uid');location.reload();}).catch(()=>location.reload());}}
 
-// ======================================
-// DRAG & DROP CSV
-// ======================================
+// DRAG DROP CSV
 document.addEventListener('DOMContentLoaded',()=>{
     const dz=document.getElementById('csvDZ');
-    if(dz){
-        dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
-        dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
-        dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.csv')){const dt=new DataTransfer();dt.items.add(f);document.getElementById('csvF').files=dt.files;handleCSV({target:document.getElementById('csvF')});}});
-    }
+    if(dz){dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.csv')){const dt=new DataTransfer();dt.items.add(f);document.getElementById('csvF').files=dt.files;handleCSV({target:document.getElementById('csvF')});}});}
 });
 
-// ======================================
-// INITIALIZATION
-// ======================================
-window.addEventListener('DOMContentLoaded', async () => {
-    populateKelasOptions();
+// ============================================
+// INIT
+// ============================================
+window.addEventListener('DOMContentLoaded', async()=>{
+    populateKO();
+    document.getElementById('dispUID').textContent=uid.substring(0,16)+'...';
     
-    // Load from Firebase
-    await loadFromFirebase();
+    const loaded = await loadFromFS();
     
-    // If no rombels, add defaults
-    if (!rombelList.length) {
-        rombelIdCtr = 2;
-        rombelList = [
-            {id:1,nama:'1A',hari:4,jamMulai:1,jamAkhir:4,kelas:'Kelas 1',warna:0},
-            {id:2,nama:'1B',hari:4,jamMulai:5,jamAkhir:8,kelas:'Kelas 1',warna:1},
-        ];
+    if(!rombelList.length){
+        rombelCtr=2;
+        const[sk]=getKRange();
+        rombelList=[{id:1,nama:`${sk}A`,hari:4,jamMulai:1,jamAkhir:4,kelas:`Kelas ${sk}`,warna:0},{id:2,nama:`${sk}B`,hari:4,jamMulai:5,jamAkhir:8,kelas:`Kelas ${sk}`,warna:1}];
     }
     
-    renderRombel();
-    renderAll();
-    showSync('saved', '☁️ Tersimpan');
+    renderRombel();renderAll();
+    showSync('saved','☁️ Terhubung');
     
     // Hide loading
-    setTimeout(() => {
-        document.getElementById('loadingOverlay').style.opacity = '0';
-        setTimeout(() => document.getElementById('loadingOverlay').style.display = 'none', 400);
-    }, 800);
+    setTimeout(()=>{const ov=document.getElementById('loadOv');ov.style.opacity='0';setTimeout(()=>ov.style.display='none',400);},600);
     
-    // Listen for realtime updates from other devices
-    userRef.on('value', snap => {
-        const d = snap.val();
-        if (d && d.updatedAt) {
-            // Only update if data is newer than last save (prevents loops)
-            if (!window._lastSaveTime || d.updatedAt > window._lastSaveTime + 2000) {
-                tpData = d.tpData || [];
-                rombelList = d.rombelList || [];
-                rombelIdCtr = d.rombelIdCtr || 0;
-                if (d.settings) applySettings(d.settings);
-                renderRombel();
-                renderAll();
-                showSync('saved', '🔄 Tersinkronisasi');
-            }
+    // Realtime listener for cross-device sync
+    getUserDoc().onSnapshot(snap=>{
+        if(!snap.exists)return;
+        const d=snap.data();
+        if(d&&d.ts){
+            // Prevent save loop
+            if(window._skipNext){window._skipNext=false;return;}
+            tpData=d.tpData||[];rombelList=d.rombelList||[];rombelCtr=d.rombelCtr||0;
+            if(d.settings)applySet(d.settings);
+            renderRombel();renderAll();
         }
-    });
+    },{includeMetadataChanges:false});
     
-    // Track save time
-    const origSave = saveToFirebase;
-    saveToFirebase = function() {
-        window._lastSaveTime = Date.now();
-        origSave();
-    };
+    // Patch saveToFS to prevent sync loop
+    const origSave=saveToFS;
+    saveToFS=function(){window._skipNext=true;origSave();};
     
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 768 && sbOpen) toggleSidebar();
-    });
+    window.addEventListener('resize',()=>{if(window.innerWidth>=768&&sbOpen)toggleSB();});
 });
 </script>
 </body>
