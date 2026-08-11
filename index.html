@@ -3,578 +3,908 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Si-Gumart v2 - Sistem Administrasi Guru Smart</title>
+<title>Si-Gumart - Sistem Administrasi Guru Smart</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui']}}}}</script>
 <style>
-@media print{.np{display:none!important}body{background:#fff!important;font-size:7pt;color:#000!important}table{page-break-inside:auto;width:100%!important}tr{page-break-inside:avoid}th,td{padding:2px 1px!important;font-size:6.5pt!important;border-color:#000!important}@page{margin:7mm}}
+@media print{.np{display:none!important}body{background:#fff!important;font-size:7pt;color:#000!important}table{page-break-inside:auto;width:100%!important}tr{page-break-inside:avoid}th,td{padding:2px!important;font-size:6.5pt!important;border-color:#000!important}@page{margin:7mm}}
 *{scrollbar-width:thin;scrollbar-color:#334155 transparent}
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sp{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 @keyframes gl{0%,100%{box-shadow:0 0 5px rgba(99,102,241,.3)}50%{box-shadow:0 0 15px rgba(99,102,241,.5)}}
 .af{animation:fu .3s ease-out}.ag{animation:gl 2s ease-in-out infinite}
-.gl{background:rgba(15,23,42,.93);backdrop-filter:blur(16px)}
+.gls{background:rgba(15,23,42,.93);backdrop-filter:blur(16px)}
 .gc{background:rgba(255,255,255,.96)}
 .na{background:linear-gradient(135deg,#4f46e5,#6366f1)!important;color:#fff!important;box-shadow:0 3px 10px rgba(79,70,229,.3)}
 .is{background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.5);color:#e2e8f0;border-radius:6px;padding:3px 6px;font-size:9px}.is:focus{outline:none;box-shadow:0 0 0 2px rgba(99,102,241,.25)}
 .iw{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:4px 8px;font-size:10px;color:#1e293b}.iw:focus{outline:none;box-shadow:0 0 0 2px rgba(99,102,241,.2)}
-.sb{transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sb-p{transition:transform .3s cubic-bezier(.4,0,.2,1)}
 .cl{max-height:0;overflow:hidden;transition:max-height .35s ease}.cl.op{max-height:9999px}
 .sd{display:flex;align-items:center;gap:6px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;cursor:pointer}.sd::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
 .dz{border:2px dashed #4f46e5;border-radius:10px;transition:all .2s;cursor:pointer}.dz.dv{border-color:#22c55e;background:rgba(34,197,94,.04)}
 .bd{width:5px;height:5px;border-radius:50%;display:inline-block}
 .si{position:fixed;top:3px;right:3px;z-index:60;padding:2px 8px;border-radius:8px;font-size:8px;font-weight:700;transition:all .3s}.ss{background:#d1fae5;color:#065f46}.sv{background:#fef3c7;color:#92400e}.se{background:#fecaca;color:#991b1b}
-.lo{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.95);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;transition:opacity .3s}
-.sn{width:32px;height:32px;border:3px solid rgba(99,102,241,.2);border-top-color:#6366f1;border-radius:50%;animation:sp .7s linear infinite}
+.lo{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.97);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.sn{width:36px;height:36px;border:3px solid rgba(99,102,241,.2);border-top-color:#6366f1;border-radius:50%;animation:sp .7s linear infinite}
 .hl{transition:transform .15s,box-shadow .15s}.hl:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.06)}
 aside::-webkit-scrollbar{width:3px}aside::-webkit-scrollbar-thumb{background:#334155;border-radius:8px}
 .tr{overflow-x:auto;-webkit-overflow-scrolling:touch}.tr::-webkit-scrollbar{height:4px}.tr::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:8px}
 .nb{transition:all .15s}
-.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;cursor:pointer;transition:all .15s}
-.chip:hover{transform:scale(1.05)}
-.chip.active{ring:2px;ring-offset:1px}
-.share-card{background:linear-gradient(135deg,rgba(99,102,241,.05),rgba(168,85,247,.05));border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:12px}
-.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:70;padding:8px 16px;border-radius:10px;font-size:11px;font-weight:700;transition:all .3s;opacity:0;pointer-events:none}
-.toast.show{opacity:1}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;cursor:pointer;transition:all .15s}.chip:hover{transform:scale(1.03)}
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:70;padding:8px 16px;border-radius:10px;font-size:11px;font-weight:700;transition:all .3s;opacity:0;pointer-events:none}.toast.show{opacity:1}
+.login-card{background:rgba(255,255,255,.98);border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.15);max-width:420px;width:100%;padding:32px}
 </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
 
-<div id="lo" class="lo np"><div class="sn"></div><p class="text-white font-bold text-sm">Si-Gumart v2</p><p class="text-slate-400 text-xs" id="lst">Menghubungkan...</p></div>
+<!-- LOADING -->
+<div id="lo" class="lo"><div class="sn"></div><p class="text-white font-bold text-sm">Si-Gumart</p><p class="text-slate-400 text-xs" id="lst">Menginisialisasi...</p></div>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="fixed inset-0 z-[200] bg-gradient-to-br from-indigo-900 via-slate-900 to-violet-900 flex items-center justify-center p-4 hidden">
+<div class="login-card af">
+    <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-3 ag"><span class="text-white font-black text-2xl">SG</span></div>
+        <h1 class="text-2xl font-black text-slate-900">Si-Gumart</h1>
+        <p class="text-sm text-slate-500 mt-1">Sistem Administrasi Guru Smart</p>
+    </div>
+    <button onclick="loginGoogle()" class="w-full bg-white border-2 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-3 text-sm active:scale-[0.98]">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Masuk dengan Google
+    </button>
+    <p class="text-[10px] text-slate-400 text-center mt-4">Akun Anda harus disetujui admin terlebih dahulu</p>
+    <p class="text-[10px] text-slate-400 text-center">Admin: kkgpainagreg@gmail.com</p>
+</div>
+</div>
+
+<!-- PENDING APPROVAL -->
+<div id="pendingScreen" class="fixed inset-0 z-[200] bg-gradient-to-br from-amber-900 via-slate-900 to-orange-900 flex items-center justify-center p-4 hidden">
+<div class="login-card af text-center">
+    <div class="text-5xl mb-4">⏳</div>
+    <h2 class="text-xl font-black text-slate-900 mb-2">Menunggu Persetujuan Admin</h2>
+    <p class="text-sm text-slate-600 mb-4">Akun Anda (<span id="pendingEmail" class="font-bold text-indigo-600">-</span>) sedang menunggu persetujuan dari administrator.</p>
+    <p class="text-xs text-slate-500 mb-4">Admin akan menerima notifikasi WhatsApp dan segera memproses permintaan Anda.</p>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+        <p class="text-xs text-amber-800 font-bold">📱 Hubungi Admin:</p>
+        <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Si-Gumart%2C%20saya%20ingin%20mendaftar" target="_blank" class="text-sm text-emerald-600 font-bold underline">WhatsApp Admin</a>
+    </div>
+    <button onclick="logoutUser()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-6 rounded-xl text-sm transition">Logout</button>
+</div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="fixed inset-0 z-[200] bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 hidden np">
+<div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-5 max-h-[90vh] overflow-y-auto af">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-black text-slate-900">👑 Panel Admin - Si-Gumart</h2>
+        <button onclick="$('adminPanel').classList.add('hidden')" class="text-slate-400 text-xl">&times;</button>
+    </div>
+    <div class="mb-4">
+        <h3 class="text-sm font-bold text-amber-800 mb-2">⏳ Menunggu Persetujuan</h3>
+        <div id="pendingUsers" class="space-y-2"></div>
+    </div>
+    <div>
+        <h3 class="text-sm font-bold text-emerald-800 mb-2">✅ User Terverifikasi</h3>
+        <div id="approvedUsers" class="space-y-2"></div>
+    </div>
+    <div class="mt-4 pt-3 border-t">
+        <h3 class="text-sm font-bold text-slate-700 mb-2">📱 Pengaturan WhatsApp Admin</h3>
+        <div class="flex gap-2">
+            <input id="adminWA" placeholder="No WA Admin (628xxx)" class="flex-1 iw" value="6281234567890">
+            <button onclick="saveAdminWA()" class="bg-emerald-600 text-white px-4 py-1 rounded-lg text-xs font-bold">💾 Simpan</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- SYNC -->
 <div id="si" class="si np sv">⏳</div>
-<div id="toast" class="toast bg-emerald-600 text-white"></div>
+<div id="toast" class="toast bg-emerald-600 text-white np"></div>
+
+<!-- APP (hidden until authenticated) -->
+<div id="appContainer" class="hidden min-h-screen flex flex-col md:flex-row">
 
 <!-- Mobile Header -->
-<header class="md:hidden fixed top-0 left-0 right-0 z-50 gl border-b border-slate-700/50 np">
+<header class="md:hidden fixed top-0 left-0 right-0 z-50 gls border-b border-slate-700/50 np">
 <div class="flex items-center justify-between px-3 py-2">
-<div class="flex items-center gap-2"><div class="w-7 h-7 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center"><span class="text-white font-black text-[9px]">SG</span></div><h1 class="font-black text-xs text-white">Si-Gumart</h1></div>
-<button onclick="tsb()" class="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300"><svg id="io" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg><svg id="ic" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <div class="flex items-center gap-2">
+        <div class="w-7 h-7 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center"><span class="text-white font-black text-[9px]">SG</span></div>
+        <h1 class="font-black text-xs text-white">Si-Gumart</h1>
+    </div>
+    <div class="flex items-center gap-2">
+        <img id="mobAvatar" src="" class="w-6 h-6 rounded-full border border-white/30 hidden" onclick="showUserMenu()">
+        <button onclick="tsb()" class="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+            <svg id="io" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg id="ic" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
 </div>
 </header>
 <div id="so" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden np" onclick="tsb()"></div>
 
-<!-- ======== SIDEBAR ======== -->
-<aside id="sbp" class="np w-[310px] bg-slate-900/95 backdrop-blur-xl text-slate-200 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto flex flex-col justify-between border-r border-slate-800 shadow-2xl z-40 fixed md:relative top-0 left-0 h-full -translate-x-full md:translate-x-0 sb">
+<!-- SIDEBAR -->
+<aside id="sbp" class="np w-[310px] bg-slate-900/95 backdrop-blur-xl text-slate-200 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto flex flex-col justify-between border-r border-slate-800 shadow-2xl z-40 fixed md:relative top-0 left-0 h-full -translate-x-full md:translate-x-0 sb-p">
 <div>
-
 <!-- Header -->
 <div class="p-3 border-b border-slate-800/60 bg-gradient-to-br from-indigo-950/50 to-slate-950">
-<div class="flex items-center gap-2"><div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg ag"><span class="text-white font-black text-sm">SG</span></div><div><h1 class="font-black text-sm bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">Si-Gumart <sup class="text-[7px] text-violet-400">v2</sup></h1><p class="text-[8px] text-slate-400">Sistem Administrasi Guru Smart</p><p class="text-[8px] text-emerald-400 font-bold" id="lta">-</p></div></div>
+    <div class="flex items-center gap-2">
+        <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg ag"><span class="text-white font-black text-sm">SG</span></div>
+        <div class="flex-1">
+            <h1 class="font-black text-sm bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">Si-Gumart</h1>
+            <p class="text-[8px] text-emerald-400 font-bold" id="lta">-</p>
+        </div>
+    </div>
 </div>
 
-<!-- User & Share -->
-<div class="px-3 py-1.5 border-b border-slate-800/40 bg-slate-950/40 space-y-1">
-<div class="flex items-center justify-between"><span class="text-[7px] text-slate-500">🔑 ID:</span><code class="text-[7px] text-indigo-400 font-bold bg-slate-800 px-1 rounded cursor-pointer" id="du" onclick="cuid()">-</code></div>
-<button onclick="openSharePanel()" class="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 py-1 rounded-lg text-[9px] font-bold transition">🔗 Ambil Data / Berbagi</button>
+<!-- User Info -->
+<div class="px-3 py-2 border-b border-slate-800/40 bg-slate-950/40">
+    <div class="flex items-center gap-2">
+        <img id="userAvatar" src="" class="w-7 h-7 rounded-full border border-indigo-500/50">
+        <div class="flex-1 min-w-0">
+            <p class="text-[10px] font-bold text-white truncate" id="userName">-</p>
+            <p class="text-[8px] text-slate-400 truncate" id="userEmail">-</p>
+        </div>
+        <div class="flex gap-1">
+            <button id="adminBtn" onclick="openAdminPanel()" class="hidden text-[8px] bg-amber-600/30 text-amber-300 px-1.5 py-0.5 rounded font-bold">👑</button>
+            <button onclick="logoutUser()" class="text-[8px] text-rose-400 hover:text-rose-300 px-1 py-0.5 rounded hover:bg-rose-900/30" title="Logout">🚪</button>
+        </div>
+    </div>
 </div>
 
-<!-- MAPEL SELECTOR -->
+<!-- MAPEL -->
 <div class="p-2 border-b border-slate-800/50">
-<div class="sd text-violet-400" onclick="tc('pMapel')">📚 Mata Pelajaran Aktif</div>
-<div id="pMapel" class="cl op mt-1.5 space-y-1">
-<div id="mapelChips" class="flex flex-wrap gap-1 mb-1"></div>
-<div class="flex gap-1">
-<input id="newMapel" placeholder="Tambah Mapel baru..." class="flex-1 is text-[8px]">
-<button onclick="addMapel()" class="bg-violet-600 text-white px-2 py-0.5 rounded text-[8px] font-bold active:scale-95">＋</button>
-</div>
-</div>
+    <div class="sd text-violet-400" onclick="tc('pMapel')">📚 Mata Pelajaran</div>
+    <div id="pMapel" class="cl op mt-1.5 space-y-1">
+        <div id="mapelChips" class="flex flex-wrap gap-1 mb-1"></div>
+        <div class="flex gap-1"><input id="newMapel" placeholder="Tambah mapel..." class="flex-1 is text-[8px]"><button onclick="addMapel()" class="bg-violet-600 text-white px-2 py-0.5 rounded text-[8px] font-bold active:scale-95">＋</button></div>
+    </div>
 </div>
 
 <!-- Quick Actions -->
 <div class="p-2 border-b border-slate-800/50 flex gap-1">
-<button onclick="window.print()" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold py-1 rounded-lg text-[9px] active:scale-95">🖨️ Cetak</button>
-<button onclick="promptAI('soal')" class="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-1 rounded-lg text-[9px] active:scale-95">📝 Soal AI</button>
-<button onclick="promptAI('lkpd')" class="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-1 rounded-lg text-[9px] active:scale-95">✨ LKPD</button>
+    <button onclick="window.print()" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold py-1 rounded-lg text-[9px] active:scale-95">🖨️</button>
+    <button onclick="promptAI('soal')" class="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-1 rounded-lg text-[9px] active:scale-95">📝 Soal</button>
+    <button onclick="promptAI('lkpd')" class="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-1 rounded-lg text-[9px] active:scale-95">✨ LKPD</button>
+    <button onclick="openSharePanel()" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-1 rounded-lg text-[9px] active:scale-95">🔗</button>
 </div>
 
-<!-- IMPORT DATA -->
+<!-- INPUT TP -->
 <div class="p-2 border-b border-slate-800/50">
-<div class="sd text-indigo-400" onclick="tc('pImport')">📂 Import / Input Data</div>
-<div id="pImport" class="cl op mt-1.5 space-y-1.5">
-
-<!-- Quick TP Input -->
-<div class="bg-slate-800/40 rounded-lg p-2 space-y-1">
-<p class="text-[8px] text-emerald-400 font-bold uppercase">⚡ Input TP Cepat (Mapel Aktif)</p>
-<div class="grid grid-cols-2 gap-1">
-<select id="qKls" class="is text-[8px]"></select>
-<select id="qSmt" class="is text-[8px]"><option>Semester 1</option><option>Semester 2</option></select>
-</div>
-<input id="qElem" placeholder="Elemen" class="w-full is text-[8px]">
-<textarea id="qCP" placeholder="Capaian Pembelajaran (CP)" rows="2" class="w-full is text-[8px] resize-none"></textarea>
-<textarea id="qTP" placeholder="Tujuan Pembelajaran (TP)* — WAJIB" rows="2" class="w-full is text-[8px] resize-none"></textarea>
-<div class="grid grid-cols-2 gap-1">
-<input id="qDim" placeholder="Dimensi Profil" class="is text-[8px]">
-<input type="number" id="qPrt" value="2" min="1" class="is text-[8px]" placeholder="Jml Pertemuan">
-</div>
-<button onclick="quickAddTP()" class="w-full bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-[10px] active:scale-95">＋ Tambah TP ke Mapel Aktif</button>
-</div>
-
-<!-- CSV & Sheets -->
-<div class="bg-slate-800/40 rounded-lg p-2 space-y-1">
-<p class="text-[8px] text-indigo-400 font-bold uppercase">📄 Import CSV / Google Sheets</p>
-<div class="grid grid-cols-2 gap-1">
-<div class="dz p-1.5 text-center" onclick="$('cf').click()" id="cdz"><input type="file" id="cf" accept=".csv" class="hidden" onchange="hcsv(event,'tp')"><p class="text-[8px] text-indigo-300 font-bold">📄 CSV TP</p></div>
-<div class="dz p-1.5 text-center" onclick="$('csf').click()"><input type="file" id="csf" accept=".csv" class="hidden" onchange="hcsv(event,'siswa')"><p class="text-[8px] text-violet-300 font-bold">👨‍🎓 CSV Siswa</p></div>
-</div>
-<input id="gsUrl" placeholder="URL Google Sheet (Published CSV)..." class="w-full is text-[7px]">
-<div class="flex gap-1"><button onclick="loadGS('tp')" class="flex-1 bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 py-0.5 rounded text-[7px] font-bold">📥 TP</button><button onclick="loadGS('siswa')" class="flex-1 bg-violet-600/30 text-violet-300 border border-violet-500/30 py-0.5 rounded text-[7px] font-bold">📥 Siswa</button></div>
-<div class="flex gap-1"><button onclick="dlTpl('tp')" class="flex-1 bg-slate-700/40 text-slate-300 py-0.5 rounded text-[7px]">📥 Tpl TP</button><button onclick="dlTpl('siswa')" class="flex-1 bg-slate-700/40 text-slate-300 py-0.5 rounded text-[7px]">📥 Tpl Siswa</button></div>
-</div>
-<div id="csvSt" class="hidden p-1 bg-emerald-950/40 border border-emerald-500/30 rounded text-[8px] text-emerald-300 font-bold">✅ <span id="csvStT">0</span></div>
-<div class="flex gap-1"><button onclick="clearTP()" class="flex-1 bg-rose-950/20 text-rose-400 border border-rose-800/30 py-0.5 rounded text-[7px]">🗑️ TP</button><button onclick="clearSW()" class="flex-1 bg-rose-950/20 text-rose-400 border border-rose-800/30 py-0.5 rounded text-[7px]">🗑️ Siswa</button></div>
-
-<!-- Prompt AI generators for CSV -->
-<div class="flex gap-1"><button onclick="promptAI('csv_tp')" class="flex-1 bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 py-0.5 rounded text-[7px] font-bold">✨ AI CSV TP</button><button onclick="promptAI('csv_siswa')" class="flex-1 bg-violet-600/20 text-violet-300 border border-violet-500/30 py-0.5 rounded text-[7px] font-bold">✨ AI CSV Siswa</button></div>
-</div>
+    <div class="sd text-indigo-400" onclick="tc('pImp')">📂 Input & Import Data</div>
+    <div id="pImp" class="cl op mt-1.5 space-y-1.5">
+        <div class="bg-slate-800/40 rounded-lg p-2 space-y-1">
+            <p class="text-[8px] text-emerald-400 font-bold uppercase">⚡ Input TP Cepat</p>
+            <div class="grid grid-cols-2 gap-1"><select id="qKls" class="is text-[8px]"></select><select id="qSmt" class="is text-[8px]"><option>Semester 1</option><option>Semester 2</option></select></div>
+            <input id="qElem" placeholder="Elemen" class="w-full is text-[8px]">
+            <textarea id="qCP" placeholder="CP" rows="2" class="w-full is text-[8px] resize-none"></textarea>
+            <textarea id="qTP" placeholder="TP* (wajib)" rows="2" class="w-full is text-[8px] resize-none"></textarea>
+            <div class="grid grid-cols-2 gap-1"><input id="qDim" placeholder="Dimensi" class="is text-[8px]"><input type="number" id="qPrt" value="2" min="1" class="is text-[8px]"></div>
+            <button onclick="quickAddTP()" class="w-full bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-[10px] active:scale-95">＋ Tambah TP</button>
+        </div>
+        <div class="bg-slate-800/40 rounded-lg p-2 space-y-1">
+            <p class="text-[8px] text-indigo-400 font-bold uppercase">📄 CSV / Google Sheets</p>
+            <div class="grid grid-cols-2 gap-1">
+                <div class="dz p-1.5 text-center" onclick="$('cf').click()" id="cdz"><input type="file" id="cf" accept=".csv" class="hidden" onchange="hcsv(event,'tp')"><p class="text-[8px] text-indigo-300 font-bold">📄 CSV TP</p></div>
+                <div class="dz p-1.5 text-center" onclick="$('csf').click()"><input type="file" id="csf" accept=".csv" class="hidden" onchange="hcsv(event,'siswa')"><p class="text-[8px] text-violet-300 font-bold">👨‍🎓 CSV Siswa</p></div>
+            </div>
+            <input id="gsUrl" placeholder="URL Google Sheet..." class="w-full is text-[7px]">
+            <div class="flex gap-1"><button onclick="loadGS('tp')" class="flex-1 bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 py-0.5 rounded text-[7px] font-bold">📥 TP</button><button onclick="loadGS('siswa')" class="flex-1 bg-violet-600/30 text-violet-300 border border-violet-500/30 py-0.5 rounded text-[7px] font-bold">📥 Siswa</button></div>
+            <div class="flex gap-1"><button onclick="dlTpl('tp')" class="flex-1 bg-slate-700/40 text-slate-300 py-0.5 rounded text-[7px]">📥 Tpl TP</button><button onclick="dlTpl('siswa')" class="flex-1 bg-slate-700/40 text-slate-300 py-0.5 rounded text-[7px]">📥 Tpl Siswa</button></div>
+        </div>
+        <div id="csvSt" class="hidden p-1 bg-emerald-950/40 border border-emerald-500/30 rounded text-[8px] text-emerald-300 font-bold">✅ <span id="csvStT">0</span></div>
+        <div class="flex gap-1"><button onclick="promptAI('csv_tp')" class="flex-1 bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 py-0.5 rounded text-[7px] font-bold">✨ AI TP</button><button onclick="promptAI('csv_siswa')" class="flex-1 bg-violet-600/20 text-violet-300 border border-violet-500/30 py-0.5 rounded text-[7px] font-bold">✨ AI Siswa</button></div>
+    </div>
 </div>
 
-<!-- JADWAL & ROMBEL -->
+<!-- JADWAL -->
 <div class="p-2 border-b border-slate-800/50">
-<div class="sd text-violet-400" onclick="tc('pJdw')">📅 Jadwal & Rombel</div>
-<div id="pJdw" class="cl op mt-1.5 space-y-1">
-<div class="grid grid-cols-2 gap-1">
-<select id="iHari" onchange="debS()" class="is text-[8px]"><option value="5">Sen-Jum</option><option value="6">Sen-Sab</option></select>
-<select id="iIst" onchange="debS()" class="is text-[8px]"><option value="1">1 Ist</option><option value="2">2 Ist</option></select>
-</div>
-<div class="grid grid-cols-2 gap-1">
-<div><label class="text-[6px] text-slate-500 font-bold">Ist1 stlh JP</label><input type="number" id="iIst1" value="4" min="1" max="10" onchange="debS()" class="w-full is text-[8px]"></div>
-<div><label class="text-[6px] text-slate-500 font-bold">Ist2 stlh JP</label><input type="number" id="iIst2" value="6" min="1" max="10" onchange="debS()" class="w-full is text-[8px]"></div>
-</div>
-<div id="rb" class="space-y-1 max-h-32 overflow-y-auto"></div>
-<button onclick="addR()" class="w-full bg-violet-600/20 text-violet-300 border border-violet-500/30 font-bold py-1 rounded text-[9px] active:scale-95">＋ Rombel</button>
-</div>
+    <div class="sd text-violet-400" onclick="tc('pJdw')">📅 Jadwal & Rombel</div>
+    <div id="pJdw" class="cl op mt-1.5 space-y-1">
+        <div class="grid grid-cols-4 gap-1">
+            <select id="iHari" onchange="debS()" class="is text-[7px]"><option value="5">5hr</option><option value="6">6hr</option></select>
+            <select id="iIst" onchange="debS()" class="is text-[7px]"><option value="1">1ist</option><option value="2">2ist</option></select>
+            <div><input type="number" id="iIst1" value="4" min="1" max="10" onchange="debS()" class="w-full is text-[7px]" title="Ist1 stlh JP"></div>
+            <div><input type="number" id="iIst2" value="6" min="1" max="10" onchange="debS()" class="w-full is text-[7px]" title="Ist2 stlh JP"></div>
+        </div>
+        <div id="rb" class="space-y-1 max-h-32 overflow-y-auto"></div>
+        <button onclick="addR()" class="w-full bg-violet-600/20 text-violet-300 border border-violet-500/30 font-bold py-1 rounded text-[9px] active:scale-95">＋ Rombel</button>
+    </div>
 </div>
 
 <!-- IDENTITAS -->
 <div class="p-2 border-b border-slate-800/50">
-<div class="sd text-slate-400" onclick="tc('pID')">🏫 Identitas Sekolah & Guru</div>
-<div id="pID" class="cl mt-1.5 space-y-1">
-<div class="bg-indigo-950/30 border border-indigo-500/20 rounded-lg p-1.5 space-y-1">
-<p class="text-[7px] text-indigo-400 font-bold uppercase">Data Sekolah (Shared via NPSN)</p>
-<div class="grid grid-cols-3 gap-1">
-<div class="col-span-2"><label class="text-[6px] text-slate-500 font-bold">Nama Sekolah</label><input id="sek" value="SDN Nagreg 05" oninput="debS()" class="w-full is text-[8px]"></div>
-<div><label class="text-[6px] text-slate-500 font-bold">NPSN</label><input id="npsn" value="20254321" oninput="debS()" class="w-full is text-[8px]"></div>
-</div>
-<div class="grid grid-cols-2 gap-1">
-<div><label class="text-[6px] text-slate-500 font-bold">Kepala Sekolah</label><input id="kep" value="Aep Sudrajat, S.Pd" oninput="debS()" class="w-full is text-[8px]"></div>
-<div><label class="text-[6px] text-slate-500 font-bold">NIP Kepsek</label><input id="nkep" value="197508121998031002" oninput="debS()" class="w-full is text-[8px]"></div>
-</div>
-<div class="grid grid-cols-2 gap-1">
-<div><label class="text-[6px] text-slate-500 font-bold">Jenjang</label><select id="jnj" onchange="popK();debS()" class="w-full is text-[8px]"><option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option><option>SMK</option></select></div>
-<div><label class="text-[6px] text-slate-500 font-bold">Tahun Ajaran</label><input id="ta" value="2026/2027" oninput="debS()" class="w-full is text-[8px]"></div>
-</div>
-</div>
-<div class="bg-emerald-950/30 border border-emerald-500/20 rounded-lg p-1.5 space-y-1">
-<p class="text-[7px] text-emerald-400 font-bold uppercase">Data Guru (Pribadi)</p>
-<div class="grid grid-cols-2 gap-1">
-<div><label class="text-[6px] text-slate-500 font-bold">Nama Guru</label><input id="guru" value="Apipudin, S.Pd.I." oninput="debS()" class="w-full is text-[8px]"></div>
-<div><label class="text-[6px] text-slate-500 font-bold">NIP Guru</label><input id="ng" value="198805202012122004" oninput="debS()" class="w-full is text-[8px]"></div>
-</div>
-<div><label class="text-[6px] text-slate-500 font-bold">Metode Utama</label><input id="metode" value="Talaqqi, Experiential Learning" oninput="debS()" class="w-full is text-[8px]"></div>
-</div>
-<div class="grid grid-cols-2 gap-1">
-<div><label class="text-[6px] text-slate-500 font-bold">Kota & Tgl Penetapan</label><input id="ktgl" value="Bandung, 13 Juli 2026" oninput="debS()" class="w-full is text-[8px]"></div>
-</div>
-<div class="grid grid-cols-3 gap-1">
-<div><label class="text-[6px] text-slate-500 font-bold">Awal Smt1</label><input type="date" id="t1" value="2026-07-13" onchange="debS()" class="w-full is text-[7px]"></div>
-<div><label class="text-[6px] text-slate-500 font-bold">Awal Smt2</label><input type="date" id="t2" value="2027-01-11" onchange="debS()" class="w-full is text-[7px]"></div>
-<div><label class="text-[6px] text-slate-500 font-bold">Mgg/Smt</label><input type="number" id="mgg" value="24" min="16" max="30" onchange="debS()" class="w-full is text-[7px]"></div>
-</div>
-</div>
+    <div class="sd text-slate-400" onclick="tc('pID')">🏫 Identitas</div>
+    <div id="pID" class="cl mt-1.5 space-y-1">
+        <div class="grid grid-cols-3 gap-1">
+            <input id="sek" value="SDN Nagreg 05" oninput="debS()" class="col-span-2 is text-[8px]" placeholder="Nama Sekolah">
+            <input id="npsn" value="20254321" oninput="debS()" class="is text-[8px]" placeholder="NPSN">
+        </div>
+        <div class="grid grid-cols-2 gap-1">
+            <input id="kep" value="Aep Sudrajat, S.Pd" oninput="debS()" class="is text-[8px]" placeholder="Kepsek">
+            <input id="nkep" value="197508121998031002" oninput="debS()" class="is text-[8px]" placeholder="NIP Kepsek">
+        </div>
+        <div class="grid grid-cols-2 gap-1">
+            <select id="jnj" onchange="popK();debS()" class="is text-[8px]"><option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option><option>SMK</option></select>
+            <input id="ta" value="2026/2027" oninput="debS()" class="is text-[8px]" placeholder="TA">
+        </div>
+        <input id="metode" value="Talaqqi, Experiential Learning" oninput="debS()" class="w-full is text-[8px]" placeholder="Metode">
+        <input id="ktgl" value="Bandung, 13 Juli 2026" oninput="debS()" class="w-full is text-[8px]" placeholder="Kota & Tgl">
+        <div class="grid grid-cols-3 gap-1">
+            <input type="date" id="t1" value="2026-07-13" onchange="debS()" class="is text-[7px]">
+            <input type="date" id="t2" value="2027-01-11" onchange="debS()" class="is text-[7px]">
+            <input type="number" id="mgg" value="24" min="16" max="30" onchange="debS()" class="is text-[7px]">
+        </div>
+    </div>
 </div>
 
-<!-- PENGATURAN NILAI -->
+<!-- NILAI SETTINGS -->
 <div class="p-2 border-b border-slate-800/50">
-<div class="sd text-amber-400" onclick="tc('pNilai')">📊 Pengaturan Nilai</div>
-<div id="pNilai" class="cl mt-1.5 space-y-1">
-<div id="kritBox"></div>
-<button onclick="addKrit()" class="w-full bg-amber-600/20 text-amber-300 border border-amber-500/30 py-0.5 rounded text-[8px] active:scale-95">＋ Kriteria</button>
-</div>
+    <div class="sd text-amber-400" onclick="tc('pNilai')">📊 Pengaturan Nilai</div>
+    <div id="pNilai" class="cl mt-1.5 space-y-1"><div id="kritBox"></div><button onclick="addKrit()" class="w-full bg-amber-600/20 text-amber-300 border border-amber-500/30 py-0.5 rounded text-[8px]">＋</button></div>
 </div>
 
 <!-- FILTER & NAV -->
 <div class="p-2">
-<div class="sd text-emerald-400 mb-1"><span>🎯 Filter</span></div>
-<div class="grid grid-cols-3 gap-1 mb-2">
-<select id="fk" onchange="ra()" class="is text-[8px]"><option value="">Kelas</option></select>
-<select id="fs" onchange="ra()" class="is text-[8px]"><option value="">Smt</option><option>Semester 1</option><option>Semester 2</option></select>
-<select id="fr" onchange="ra()" class="is text-[8px]"><option value="">Rombel</option></select>
+    <div class="sd text-emerald-400 mb-1"><span>🎯 Filter</span></div>
+    <div class="grid grid-cols-3 gap-1 mb-2">
+        <select id="fk" onchange="ra()" class="is text-[8px]"><option value="">Kelas</option></select>
+        <select id="fs" onchange="ra()" class="is text-[8px]"><option value="">Smt</option><option>Semester 1</option><option>Semester 2</option></select>
+        <select id="fr" onchange="ra()" class="is text-[8px]"><option value="">Rombel</option></select>
+    </div>
+    <div class="sd text-slate-500 mb-1"><span>📑 Menu</span></div>
+    <nav class="space-y-0.5" id="navBox"></nav>
 </div>
-<div class="sd text-slate-500 mb-1"><span>📑 Menu</span></div>
-<nav class="space-y-0.5" id="navBox"></nav>
 </div>
-</div>
-
-<div class="p-2 bg-gradient-to-t from-slate-950 to-transparent border-t border-slate-800/50 space-y-1">
-<button onclick="resetAll()" class="w-full bg-rose-950/30 text-rose-400 border border-rose-800/40 py-1 rounded text-[8px]">🔄 Reset Semua</button>
-</div>
+<div class="p-2 border-t border-slate-800/50"><button onclick="resetAll()" class="w-full bg-rose-950/30 text-rose-400 border border-rose-800/40 py-1 rounded text-[8px]">🔄 Reset</button></div>
 </aside>
 
-<!-- ======== MAIN ======== -->
+<!-- MAIN -->
 <main class="flex-1 overflow-y-auto min-h-screen pt-10 md:pt-0">
-<div class="p-2 md:p-4 pb-14 md:pb-4" id="mainContent"></div>
+<div class="p-2 md:p-4 pb-14 md:pb-4" id="mc"></div>
 </main>
 
-<!-- Mobile Bottom -->
+<!-- Mobile Bottom Nav -->
 <div class="md:hidden fixed bottom-0 left-0 right-0 z-45 np">
-<div class="gl border-t border-slate-700/50 px-1 py-0.5">
+<div class="gls border-t border-slate-700/50 px-1 py-0.5">
 <div class="flex items-center justify-around">
-<button onclick="sw('jadwal');cm()" class="mn flex flex-col items-center text-indigo-400" data-t="jadwal"><span class="text-sm">📅</span><span class="text-[5px] font-bold">Jadwal</span></button>
-<button onclick="sw('data');cm()" class="mn flex flex-col items-center text-slate-400" data-t="data"><span class="text-sm">📊</span><span class="text-[5px] font-bold">CP/TP</span></button>
-<button onclick="sw('nilai');cm()" class="mn flex flex-col items-center text-slate-400" data-t="nilai"><span class="text-sm">📝</span><span class="text-[5px] font-bold">Nilai</span></button>
-<button onclick="sw('jurnal');cm()" class="mn flex flex-col items-center text-slate-400" data-t="jurnal"><span class="text-sm">📔</span><span class="text-[5px] font-bold">Jurnal</span></button>
-<button onclick="tsb()" class="flex flex-col items-center text-slate-400"><span class="text-sm">⚙️</span><span class="text-[5px] font-bold">Menu</span></button>
+    <button onclick="sw('jadwal');cm()" class="mn flex flex-col items-center text-indigo-400" data-t="jadwal"><span class="text-sm">📅</span><span class="text-[5px] font-bold">Jadwal</span></button>
+    <button onclick="sw('nilai');cm()" class="mn flex flex-col items-center text-slate-400" data-t="nilai"><span class="text-sm">📝</span><span class="text-[5px] font-bold">Nilai</span></button>
+    <button onclick="sw('absen');cm()" class="mn flex flex-col items-center text-slate-400" data-t="absen"><span class="text-sm">📋</span><span class="text-[5px] font-bold">Absen</span></button>
+    <button onclick="sw('jurnal');cm()" class="mn flex flex-col items-center text-slate-400" data-t="jurnal"><span class="text-sm">📔</span><span class="text-[5px] font-bold">Jurnal</span></button>
+    <button onclick="tsb()" class="flex flex-col items-center text-slate-400"><span class="text-sm">⚙️</span><span class="text-[5px] font-bold">Menu</span></button>
 </div>
 </div>
 </div>
 
-<!-- SHARE PANEL MODAL -->
+</div><!-- end appContainer -->
+
+<!-- SHARE MODAL -->
 <div id="shareModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 hidden np">
-<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 border flex flex-col max-h-[90vh] overflow-y-auto af">
-<div class="flex justify-between items-center mb-4"><h3 class="text-base font-black text-slate-900">🔗 Pusat Berbagi Data</h3><button onclick="$('shareModal').classList.add('hidden')" class="text-slate-400 text-xl">&times;</button></div>
-
-<!-- Cari Sekolah by NPSN -->
-<div class="share-card mb-3">
-<h4 class="text-xs font-bold text-indigo-800 mb-2">🏫 Ambil Data Sekolah (via NPSN)</h4>
-<p class="text-[10px] text-slate-600 mb-2">Jika sekolah Anda sudah terdaftar, data identitas sekolah akan otomatis terisi.</p>
-<div class="flex gap-2">
-<input id="searchNPSN" placeholder="Masukkan NPSN sekolah..." class="flex-1 iw">
-<button onclick="searchByNPSN()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold active:scale-95">🔍 Cari</button>
-</div>
-<div id="npsnResult" class="mt-2 hidden"></div>
-</div>
-
-<!-- Cari CP/TP by Mapel + Jenjang -->
-<div class="share-card mb-3">
-<h4 class="text-xs font-bold text-violet-800 mb-2">📚 Ambil Data CP/TP (via Mapel & Jenjang)</h4>
-<p class="text-[10px] text-slate-600 mb-2">Cari guru lain yang sudah menginput CP/TP untuk mapel dan jenjang yang sama.</p>
-<div class="flex gap-2 mb-2">
-<input id="searchMapel" placeholder="Nama Mapel..." class="flex-1 iw" value="">
-<select id="searchJnj" class="iw w-20"><option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option><option>SMK</option></select>
-</div>
-<button onclick="searchByMapel()" class="w-full bg-violet-600 text-white py-1.5 rounded-lg text-xs font-bold active:scale-95">🔍 Cari Data CP/TP</button>
-<div id="mapelResult" class="mt-2 hidden"></div>
-</div>
-
-<!-- Share your data -->
-<div class="share-card bg-emerald-50 border-emerald-200">
-<h4 class="text-xs font-bold text-emerald-800 mb-2">📤 Bagikan Data Anda</h4>
-<p class="text-[10px] text-slate-600 mb-1">Data sekolah & CP/TP Anda otomatis tersedia untuk guru lain yang mencari berdasarkan NPSN atau Mapel+Jenjang yang sama.</p>
-<p class="text-[10px] text-emerald-700 font-bold">✓ Data Anda sudah di-share secara otomatis di cloud</p>
-</div>
+<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-4 max-h-[90vh] overflow-y-auto af">
+    <div class="flex justify-between items-center mb-3"><h3 class="text-base font-black">🔗 Pusat Berbagi Data</h3><button onclick="$('shareModal').classList.add('hidden')" class="text-slate-400 text-xl">&times;</button></div>
+    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 mb-3">
+        <h4 class="text-xs font-bold text-indigo-800 mb-2">🏫 Ambil Data Sekolah (NPSN)</h4>
+        <div class="flex gap-2"><input id="searchNPSN" placeholder="NPSN..." class="flex-1 iw"><button onclick="searchByNPSN()" class="bg-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-bold active:scale-95">🔍</button></div>
+        <div id="npsnResult" class="mt-2 hidden"></div>
+    </div>
+    <div class="bg-violet-50 border border-violet-200 rounded-xl p-3 mb-3">
+        <h4 class="text-xs font-bold text-violet-800 mb-2">📚 Ambil CP/TP (Mapel+Jenjang)</h4>
+        <div class="flex gap-2 mb-2"><input id="searchMapel" class="flex-1 iw" placeholder="Mapel..."><select id="searchJnj" class="iw w-20"><option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option></select></div>
+        <button onclick="searchByMapel()" class="w-full bg-violet-600 text-white py-1 rounded-lg text-xs font-bold active:scale-95">🔍 Cari</button>
+        <div id="mapelResult" class="mt-2 hidden"></div>
+    </div>
 </div>
 </div>
 
 <!-- PROMPT MODAL -->
 <div id="mdl" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-2 hidden np">
 <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-3 border flex flex-col max-h-[94vh] af">
-<div class="flex justify-between items-center border-b pb-2 mb-2"><h3 class="text-sm font-black" id="mdlT">Prompt AI</h3><button onclick="$('mdl').classList.add('hidden')" class="text-slate-400 text-lg">&times;</button></div>
-<div id="mdlX" class="mb-2 np"></div>
-<textarea id="pta" readonly class="flex-1 w-full bg-slate-50 border rounded-lg p-2 text-[10px] font-mono focus:outline-none resize-none min-h-[140px] leading-relaxed"></textarea>
-<div class="flex justify-end mt-2 pt-2 border-t gap-2"><span id="cfb" class="text-[10px] text-emerald-600 font-bold hidden">✓ Disalin!</span><button onclick="$('mdl').classList.add('hidden')" class="px-3 py-1 bg-slate-100 text-xs font-bold rounded-lg">Tutup</button><button onclick="cpx()" class="px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-lg shadow active:scale-95">📋 Salin</button></div>
+    <div class="flex justify-between items-center border-b pb-2 mb-2"><h3 class="text-sm font-black" id="mdlT">Prompt AI</h3><button onclick="$('mdl').classList.add('hidden')" class="text-slate-400 text-lg">&times;</button></div>
+    <div id="mdlX" class="mb-2 np"></div>
+    <textarea id="pta" readonly class="flex-1 w-full bg-slate-50 border rounded-lg p-2 text-[10px] font-mono focus:outline-none resize-none min-h-[140px]"></textarea>
+    <div class="flex justify-end mt-2 pt-2 border-t gap-2"><span id="cfb" class="text-[10px] text-emerald-600 font-bold hidden">✓</span><button onclick="$('mdl').classList.add('hidden')" class="px-3 py-1 bg-slate-100 text-xs font-bold rounded-lg">Tutup</button><button onclick="cpx()" class="px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-lg shadow active:scale-95">📋 Salin</button></div>
 </div>
 </div>
 
 <script>
-// ======== FIREBASE ========
-firebase.initializeApp({apiKey:"AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",authDomain:"si-gumart.firebaseapp.com",projectId:"si-gumart",storageBucket:"si-gumart.firebasestorage.app"});
-const db=firebase.firestore();
-let uid=localStorage.getItem('sg_uid');if(!uid){uid='u'+Date.now().toString(36)+Math.random().toString(36).substr(2,6);localStorage.setItem('sg_uid',uid);}
-const $=id=>document.getElementById(id);
-
-// ======== DATA STORE ========
-let D={
-    mapelList:['Pendidikan Agama Islam dan Budi Pekerti'],
-    activeMapel:'Pendidikan Agama Islam dan Budi Pekerti',
-    tp:{},       // {mapelName: [{kelas,semester,elemen,cp,tp,dimensi,pertemuan}]}
-    rombel:[],siswa:[],nilai:{},absen:{},jurnal:[],
-    krit:[{n:'NH1',b:15},{n:'NH2',b:15},{n:'NH3',b:15},{n:'ATS',b:20},{n:'ASSAS',b:35}],
-    rc:0,sc:0,hpm:5,ist:1,ist1:4,ist2:6
+// ================================================================
+// FIREBASE INIT
+// ================================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",
+    authDomain: "si-gumart.firebaseapp.com",
+    projectId: "si-gumart",
+    storageBucket: "si-gumart.firebasestorage.app"
 };
-let sT=null;
-const HR=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-const BL=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-const WR=[{bg:'bg-indigo-600',hx:'#4f46e5',lt:'bg-indigo-50',bd:'border-indigo-200',tx:'text-indigo-700'},{bg:'bg-emerald-600',hx:'#059669',lt:'bg-emerald-50',bd:'border-emerald-200',tx:'text-emerald-700'},{bg:'bg-violet-600',hx:'#7c3aed',lt:'bg-violet-50',bd:'border-violet-200',tx:'text-violet-700'},{bg:'bg-amber-600',hx:'#d97706',lt:'bg-amber-50',bd:'border-amber-200',tx:'text-amber-700'},{bg:'bg-rose-600',hx:'#e11d48',lt:'bg-rose-50',bd:'border-rose-200',tx:'text-rose-700'},{bg:'bg-cyan-600',hx:'#0891b2',lt:'bg-cyan-50',bd:'border-cyan-200',tx:'text-cyan-700'},{bg:'bg-teal-600',hx:'#0d9488',lt:'bg-teal-50',bd:'border-teal-200',tx:'text-teal-700'},{bg:'bg-pink-600',hx:'#db2777',lt:'bg-pink-50',bd:'border-pink-200',tx:'text-pink-700'}];
-const libNas=["2026-08-17","2026-08-25","2026-12-25","2027-01-01","2027-02-06","2027-02-17","2027-03-09","2027-03-10","2027-03-11","2027-03-12","2027-03-26","2027-05-01","2027-05-06","2027-05-20","2027-06-01"];
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
 
-function fase(k){const n=parseInt(k.replace(/\D/g,''));return n<=2?'A':n<=4?'B':n<=6?'C':n<=8?'D':n<=10?'E':'F';}
-function durJP(){const j=$('jnj')?.value||'SD';return['SMP','MTs'].includes(j)?40:['SMA','MA','SMK'].includes(j)?45:35;}
-function getHL(){return HR.slice(0,D.hpm||5);}
-function activeTP(){return D.tp[D.activeMapel]||[];}
-function setActiveTP(arr){D.tp[D.activeMapel]=arr;}
+const $ = id => document.getElementById(id);
+const ADMIN_EMAIL = 'kkgpainagreg@gmail.com';
+let ADMIN_WA = '6281234567890'; // Default, loaded from DB
+let currentUser = null;
+let isAdmin = false;
+let isApproved = false;
 
-// ======== SIDEBAR ========
-let sbO=false;
-function tsb(){sbO=!sbO;const p=$('sbp'),o=$('so');if(sbO){p.classList.replace('-translate-x-full','translate-x-0');o.classList.remove('hidden');$('ic').classList.remove('hidden');$('io').classList.add('hidden');document.body.style.overflow='hidden';}else{p.classList.replace('translate-x-0','-translate-x-full');o.classList.add('hidden');$('ic').classList.add('hidden');$('io').classList.remove('hidden');document.body.style.overflow='';}}
-function cm(){if(sbO&&window.innerWidth<768)tsb();}
-function tc(id){$(id)?.classList.toggle('op');}
-function sync(t,x){const e=$('si');e.className='si np '+t;e.textContent=x;}
-function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+// ================================================================
+// AUTH FUNCTIONS
+// ================================================================
+async function loginGoogle() {
+    try {
+        const result = await auth.signInWithPopup(provider);
+        $('lst').textContent = 'Memverifikasi akun...';
+    } catch (e) {
+        console.error('Login error:', e);
+        alert('Gagal login: ' + e.message);
+    }
+}
 
-// ======== FIREBASE SAVE/LOAD ========
-function uDoc(){return db.collection('users').doc(uid);}
-function sfs(){
+function logoutUser() {
+    auth.signOut().then(() => location.reload());
+}
+
+async function checkUserStatus(user) {
+    currentUser = user;
+    isAdmin = user.email === ADMIN_EMAIL;
+    
+    // Check if user exists in approved_users
+    const userDoc = await db.collection('approved_users').doc(user.uid).get();
+    
+    if (isAdmin) {
+        // Admin auto-approved
+        isApproved = true;
+        await db.collection('approved_users').doc(user.uid).set({
+            email: user.email, name: user.displayName, photo: user.photoURL,
+            status: 'approved', role: 'admin', ts: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        return 'approved';
+    }
+    
+    if (userDoc.exists) {
+        const data = userDoc.data();
+        if (data.status === 'approved') {
+            isApproved = true;
+            return 'approved';
+        }
+        return 'pending';
+    }
+    
+    // New user - register as pending
+    await db.collection('approved_users').doc(user.uid).set({
+        email: user.email, name: user.displayName, photo: user.photoURL,
+        status: 'pending', role: 'user', ts: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Send WhatsApp notification to admin
+    sendWANotification(user);
+    
+    return 'pending';
+}
+
+function sendWANotification(user) {
+    const msg = encodeURIComponent(
+        `🔔 *Si-Gumart - Pendaftaran Baru*\n\n` +
+        `👤 Nama: ${user.displayName}\n` +
+        `📧 Email: ${user.email}\n` +
+        `🕐 Waktu: ${new Date().toLocaleString('id-ID')}\n\n` +
+        `Silakan buka Si-Gumart untuk menyetujui atau menolak pendaftaran ini.`
+    );
+    // Open WhatsApp in new tab (won't block if popup blocked)
+    window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank');
+}
+
+async function approveUser(uid) {
+    await db.collection('approved_users').doc(uid).update({ status: 'approved' });
+    toast('User disetujui ✅');
+    loadAdminPanel();
+}
+
+async function rejectUser(uid) {
+    if (!confirm('Tolak user ini?')) return;
+    await db.collection('approved_users').doc(uid).delete();
+    toast('User ditolak');
+    loadAdminPanel();
+}
+
+async function openAdminPanel() {
+    if (!isAdmin) return;
+    $('adminPanel').classList.remove('hidden');
+    // Load admin WA
+    const cfg = await db.collection('config').doc('admin').get();
+    if (cfg.exists && cfg.data().wa) {
+        ADMIN_WA = cfg.data().wa;
+        $('adminWA').value = ADMIN_WA;
+    }
+    loadAdminPanel();
+}
+
+async function loadAdminPanel() {
+    const snap = await db.collection('approved_users').get();
+    let pending = '', approved = '';
+    snap.forEach(doc => {
+        const d = doc.data();
+        if (d.status === 'pending') {
+            pending += `<div class="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg p-2">
+                <div class="flex items-center gap-2"><img src="${d.photo||''}" class="w-8 h-8 rounded-full"><div><p class="text-xs font-bold">${d.name}</p><p class="text-[10px] text-slate-500">${d.email}</p></div></div>
+                <div class="flex gap-1"><button onclick="approveUser('${doc.id}')" class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">✅</button><button onclick="rejectUser('${doc.id}')" class="bg-rose-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">❌</button></div>
+            </div>`;
+        } else if (d.status === 'approved') {
+            approved += `<div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-2">
+                <div class="flex items-center gap-2"><img src="${d.photo||''}" class="w-8 h-8 rounded-full"><div><p class="text-xs font-bold">${d.name}${d.role==='admin'?' 👑':''}</p><p class="text-[10px] text-slate-500">${d.email}</p></div></div>
+            </div>`;
+        }
+    });
+    $('pendingUsers').innerHTML = pending || '<p class="text-xs text-slate-400">Tidak ada pendaftaran baru</p>';
+    $('approvedUsers').innerHTML = approved || '<p class="text-xs text-slate-400">-</p>';
+}
+
+async function saveAdminWA() {
+    ADMIN_WA = $('adminWA').value.trim();
+    await db.collection('config').doc('admin').set({ wa: ADMIN_WA }, { merge: true });
+    toast('No WA Admin tersimpan');
+}
+
+// Auth state observer
+auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+        // Not logged in - show login screen
+        $('lo').style.display = 'none';
+        $('loginScreen').classList.remove('hidden');
+        return;
+    }
+    
+    $('lst').textContent = 'Memeriksa status akun...';
+    
+    // Load admin config
+    try {
+        const cfg = await db.collection('config').doc('admin').get();
+        if (cfg.exists && cfg.data().wa) ADMIN_WA = cfg.data().wa;
+    } catch(e) {}
+    
+    const status = await checkUserStatus(user);
+    
+    if (status === 'approved') {
+        $('loginScreen').classList.add('hidden');
+        $('pendingScreen').classList.add('hidden');
+        $('appContainer').classList.remove('hidden');
+        
+        // Set user info in sidebar
+        if ($('userName')) $('userName').textContent = user.displayName || user.email;
+        if ($('userEmail')) $('userEmail').textContent = user.email;
+        if ($('userAvatar')) { $('userAvatar').src = user.photoURL || ''; }
+        if ($('mobAvatar')) { $('mobAvatar').src = user.photoURL || ''; $('mobAvatar').classList.remove('hidden'); }
+        if (isAdmin && $('adminBtn')) $('adminBtn').classList.remove('hidden');
+        
+        // Initialize app
+        await initApp(user);
+    } else {
+        $('lo').style.display = 'none';
+        $('loginScreen').classList.add('hidden');
+        $('pendingScreen').classList.remove('hidden');
+        if ($('pendingEmail')) $('pendingEmail').textContent = user.email;
+    }
+});
+
+// ================================================================
+// APP DATA & LOGIC (uses user.uid as document ID)
+// ================================================================
+let D = {
+    mapelList: ['Pendidikan Agama Islam dan Budi Pekerti'],
+    activeMapel: 'Pendidikan Agama Islam dan Budi Pekerti',
+    tp: {}, rombel: [], siswa: [], nilai: {}, absen: {}, jurnal: [],
+    krit: [{n:'NH1',b:15},{n:'NH2',b:15},{n:'NH3',b:15},{n:'ATS',b:20},{n:'ASSAS',b:35}],
+    rc: 0, sc: 0, hpm: 5, ist: 1, ist1: 4, ist2: 6
+};
+let sT = null;
+const HR = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const BL = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const WR = [{bg:'bg-indigo-600',hx:'#4f46e5',lt:'bg-indigo-50',bd:'border-indigo-200',tx:'text-indigo-700'},{bg:'bg-emerald-600',hx:'#059669',lt:'bg-emerald-50',bd:'border-emerald-200',tx:'text-emerald-700'},{bg:'bg-violet-600',hx:'#7c3aed',lt:'bg-violet-50',bd:'border-violet-200',tx:'text-violet-700'},{bg:'bg-amber-600',hx:'#d97706',lt:'bg-amber-50',bd:'border-amber-200',tx:'text-amber-700'},{bg:'bg-rose-600',hx:'#e11d48',lt:'bg-rose-50',bd:'border-rose-200',tx:'text-rose-700'},{bg:'bg-cyan-600',hx:'#0891b2',lt:'bg-cyan-50',bd:'border-cyan-200',tx:'text-cyan-700'},{bg:'bg-teal-600',hx:'#0d9488',lt:'bg-teal-50',bd:'border-teal-200',tx:'text-teal-700'},{bg:'bg-pink-600',hx:'#db2777',lt:'bg-pink-50',bd:'border-pink-200',tx:'text-pink-700'}];
+const libNas = ["2026-08-17","2026-08-25","2026-12-25","2027-01-01","2027-02-06","2027-02-17","2027-03-09","2027-03-10","2027-03-11","2027-03-12","2027-03-26","2027-05-01","2027-05-06","2027-05-20","2027-06-01"];
+
+function uDoc() { return db.collection('users').doc(currentUser.uid); }
+function fase(k) { const n=parseInt(k.replace(/\D/g,'')); return n<=2?'A':n<=4?'B':n<=6?'C':n<=8?'D':n<=10?'E':'F'; }
+function durJP() { const j=$('jnj')?.value||'SD'; return['SMP','MTs'].includes(j)?40:['SMA','MA','SMK'].includes(j)?45:35; }
+function getHL() { return HR.slice(0, D.hpm || 5); }
+function activeTP() { return D.tp[D.activeMapel] || []; }
+function setActiveTP(arr) { D.tp[D.activeMapel] = arr; }
+function toast(msg) { const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+function sync(t,x) { const e=$('si'); if(e) { e.className='si np '+t; e.textContent=x; } }
+
+async function initApp(user) {
+    popK();
+    buildNav();
+    
+    $('lst').textContent = 'Memuat data...';
+    
+    // Load user data from Firestore
+    try {
+        const doc = await uDoc().get();
+        if (doc.exists) {
+            const d = doc.data();
+            D.mapelList = d.mapelList || D.mapelList;
+            D.activeMapel = d.activeMapel || D.activeMapel;
+            D.tp = d.tp || {};
+            D.rombel = d.rombel || [];
+            D.siswa = d.siswa || [];
+            D.nilai = d.nilai || {};
+            D.absen = d.absen || {};
+            D.jurnal = d.jurnal || [];
+            D.krit = d.krit || D.krit;
+            D.rc = d.rc || 0;
+            D.sc = d.sc || 0;
+            D.hpm = d.hpm || 5;
+            D.ist = d.ist || 1;
+            D.ist1 = d.ist1 || 4;
+            D.ist2 = d.ist2 || 6;
+            if (d.set) aS(d.set);
+        }
+    } catch(e) {
+        console.error('Load error:', e);
+    }
+    
+    if (!D.rombel.length) {
+        D.rc = 2;
+        D.rombel = [{id:1,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:0},{id:2,nama:'1B',hari:4,jp1:5,jp2:8,kelas:'Kelas 1',warna:1}];
+    }
+    if (!D.tp[D.activeMapel]) D.tp[D.activeMapel] = [];
+    
+    if ($('iHari')) $('iHari').value = D.hpm || 5;
+    if ($('iIst')) $('iIst').value = D.ist || 1;
+    if ($('iIst1')) $('iIst1').value = D.ist1 || 4;
+    if ($('iIst2')) $('iIst2').value = D.ist2 || 6;
+    
+    renderMapelChips();
+    rR();
+    rK();
+    buildContent();
+    ra();
+    sync('ss', '☁️');
+    
+    // Hide loading
+    $('lo').style.opacity = '0';
+    setTimeout(() => { $('lo').style.display = 'none'; }, 300);
+    
+    // Realtime listener
+    uDoc().onSnapshot(snap => {
+        if (!snap.exists || window._sk) return;
+        const d = snap.data();
+        if (d) {
+            D.mapelList = d.mapelList || D.mapelList;
+            D.activeMapel = d.activeMapel || D.activeMapel;
+            D.tp = d.tp || {};
+            D.rombel = d.rombel || [];
+            D.siswa = d.siswa || [];
+            D.nilai = d.nilai || {};
+            D.absen = d.absen || {};
+            D.jurnal = d.jurnal || [];
+            D.krit = d.krit || D.krit;
+            D.rc = d.rc || 0;
+            D.sc = d.sc || 0;
+            if (d.set) aS(d.set);
+            renderMapelChips();
+            rR();
+            rK();
+            ra();
+        }
+    });
+}
+
+// ================================================================
+// SAVE
+// ================================================================
+function sfs() {
+    if (!currentUser) return;
     sync('sv','💾');
-    const data={...D,set:gS(),ts:firebase.firestore.FieldValue.serverTimestamp()};
-    // Also save to shared collections for search
-    const s=gs();
-    uDoc().set(data,{merge:true}).then(()=>{
+    const s = gs();
+    const data = {...D, set: gS(), ts: firebase.firestore.FieldValue.serverTimestamp()};
+    window._sk = true;
+    uDoc().set(data, {merge:true}).then(() => {
         sync('ss','☁️');
-        // Save school data for NPSN sharing
-        if(s.npsn)db.collection('schools').doc(s.npsn).set({npsn:s.npsn,nama:s.sek,kep:s.kep,nipK:s.nipK,jnj:s.jnj,ta:s.ta,uid,guru:s.guru},{merge:true});
-        // Save mapel index for CP/TP sharing
-        D.mapelList.forEach(mapel=>{
-            if(D.tp[mapel]?.length){
-                db.collection('shared_tp').doc(uid+'_'+mapel.replace(/\s+/g,'_').substring(0,30)).set({
-                    uid,mapel,jnj:s.jnj,guru:s.guru,sek:s.sek,npsn:s.npsn,
-                    count:D.tp[mapel].length,updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-                },{merge:true});
+        setTimeout(() => { window._sk = false; }, 1500);
+        // Share school data
+        if (s.npsn) {
+            db.collection('schools').doc(s.npsn).set({
+                npsn:s.npsn, nama:s.sek, kep:s.kep, nipK:s.nipK, jnj:s.jnj, ta:s.ta,
+                uid:currentUser.uid, guru:s.guru
+            }, {merge:true}).catch(()=>{});
+        }
+        // Share TP index
+        D.mapelList.forEach(mapel => {
+            if (D.tp[mapel]?.length) {
+                db.collection('shared_tp').doc(currentUser.uid+'_'+mapel.replace(/[^a-zA-Z0-9]/g,'').substring(0,20)).set({
+                    uid:currentUser.uid, mapel, jnj:s.jnj, guru:s.guru, sek:s.sek, npsn:s.npsn,
+                    count:D.tp[mapel].length, updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+                }, {merge:true}).catch(()=>{});
             }
         });
-    }).catch(e=>{console.error(e);sync('se','❌');localStorage.setItem('sg_bk',JSON.stringify(data));});
-}
-function debS(){clearTimeout(sT);sT=setTimeout(()=>{sfs();ra();},500);}
-
-async function lfs(){
-    try{$('lst').textContent='Loading...';const doc=await uDoc().get();
-    if(doc.exists){const d=doc.data();D.mapelList=d.mapelList||D.mapelList;D.activeMapel=d.activeMapel||D.activeMapel;D.tp=d.tp||{};D.rombel=d.rombel||[];D.siswa=d.siswa||[];D.nilai=d.nilai||{};D.absen=d.absen||{};D.jurnal=d.jurnal||[];D.krit=d.krit||D.krit;D.rc=d.rc||0;D.sc=d.sc||0;D.hpm=d.hpm||5;D.ist=d.ist||1;D.ist1=d.ist1||4;D.ist2=d.ist2||6;if(d.set)aS(d.set);return true;}return false;
-    }catch(e){console.error(e);try{const b=localStorage.getItem('sg_bk');if(b)Object.assign(D,JSON.parse(b));}catch(x){}return false;}}
-
-function gS(){return['ta','jnj','sek','npsn','kep','nkep','guru','ng','metode','ktgl','t1','t2','mgg','iHari','iIst','iIst1','iIst2'].reduce((o,id)=>{const el=$(id);if(el)o[id]=el.value;return o;},{});}
-function aS(s){if(!s)return;Object.keys(s).forEach(id=>{const el=$(id);if(el)el.value=s[id];});D.hpm=parseInt(s.iHari)||5;D.ist=parseInt(s.iIst)||1;D.ist1=parseInt(s.iIst1)||4;D.ist2=parseInt(s.iIst2)||6;}
-function gs(){return{ta:$('ta')?.value||'',jnj:$('jnj')?.value||'SD',sek:$('sek')?.value||'',npsn:$('npsn')?.value||'',kep:$('kep')?.value||'',nipK:$('nkep')?.value||'',guru:$('guru')?.value||'',nipG:$('ng')?.value||'',metode:$('metode')?.value||'',ktgl:$('ktgl')?.value||'',tgl1:$('t1')?.value||'2026-07-13',tgl2:$('t2')?.value||'2027-01-11',mgg:parseInt($('mgg')?.value)||24};}
-function cuid(){navigator.clipboard?.writeText(uid);toast('ID disalin: '+uid);}
-function popK(){['fk','qKls'].forEach(id=>{const e=$(id);if(!e)return;const p=e.value;e.innerHTML=id==='fk'?'<option value="">Kelas</option>':'';for(let k=1;k<=12;k++)e.innerHTML+=`<option>Kelas ${k}</option>`;e.value=p;});}
-
-// ======== MAPEL MANAGEMENT ========
-function renderMapelChips(){
-    $('mapelChips').innerHTML=D.mapelList.map(m=>`<span class="chip ${m===D.activeMapel?'bg-indigo-600 text-white':'bg-slate-800 text-slate-300 border border-slate-700'}" onclick="setActiveMapelUI('${m.replace(/'/g,"\\'")}')">${m.length>25?m.substring(0,25)+'...':m}${D.mapelList.length>1?`<button onclick="event.stopPropagation();rmMapel('${m.replace(/'/g,"\\'")}')" class="ml-1 text-[8px] opacity-60 hover:opacity-100">✕</button>`:''}</span>`).join('');
-}
-function setActiveMapelUI(m){D.activeMapel=m;renderMapelChips();sfs();ra();}
-function addMapel(){const n=$('newMapel').value.trim();if(!n)return;if(D.mapelList.includes(n)){toast('Mapel sudah ada');return;}D.mapelList.push(n);D.activeMapel=n;if(!D.tp[n])D.tp[n]=[];$('newMapel').value='';renderMapelChips();sfs();ra();toast('Mapel "'+n+'" ditambahkan');}
-function rmMapel(m){if(D.mapelList.length<=1){toast('Minimal 1 mapel');return;}if(!confirm(`Hapus mapel "${m}" dan semua datanya?`))return;D.mapelList=D.mapelList.filter(x=>x!==m);delete D.tp[m];if(D.activeMapel===m)D.activeMapel=D.mapelList[0];renderMapelChips();sfs();ra();}
-
-// ======== SHARE / SEARCH ========
-function openSharePanel(){$('shareModal').classList.remove('hidden');$('searchMapel').value=D.activeMapel;}
-
-async function searchByNPSN(){
-    const npsn=$('searchNPSN').value.trim();if(!npsn){toast('Masukkan NPSN');return;}
-    const r=$('npsnResult');r.classList.remove('hidden');r.innerHTML='<p class="text-xs text-slate-500">🔍 Mencari...</p>';
-    try{const doc=await db.collection('schools').doc(npsn).get();
-    if(doc.exists){const d=doc.data();r.innerHTML=`<div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mt-2"><p class="text-xs font-bold text-emerald-800">✅ Ditemukan!</p><p class="text-[11px] mt-1"><strong>${d.nama}</strong> (NPSN: ${d.npsn})</p><p class="text-[10px] text-slate-600">Kepsek: ${d.kep} • Jenjang: ${d.jnj}</p><p class="text-[10px] text-slate-500">Diinput oleh: ${d.guru}</p><button onclick="applySchoolData('${npsn}')" class="mt-2 bg-emerald-600 text-white px-4 py-1 rounded-lg text-xs font-bold active:scale-95">✓ Gunakan Data Sekolah Ini</button></div>`;}
-    else r.innerHTML='<p class="text-xs text-rose-500 mt-2">❌ NPSN tidak ditemukan. Pastikan ada guru lain dari sekolah tersebut yang sudah terdaftar.</p>';
-    }catch(e){r.innerHTML='<p class="text-xs text-rose-500 mt-2">❌ Error: '+e.message+'</p>';}
+    }).catch(e => {
+        console.error(e);
+        sync('se','❌');
+        window._sk = false;
+    });
 }
 
-async function applySchoolData(npsn){
-    const doc=await db.collection('schools').doc(npsn).get();
-    if(!doc.exists)return;const d=doc.data();
-    $('sek').value=d.nama||'';$('npsn').value=d.npsn||'';$('kep').value=d.kep||'';$('nkep').value=d.nipK||'';$('jnj').value=d.jnj||'SD';$('ta').value=d.ta||'';
-    popK();sfs();ra();toast('Data sekolah diterapkan!');$('shareModal').classList.add('hidden');
+function debS() { clearTimeout(sT); sT = setTimeout(() => { sfs(); ra(); }, 600); }
+
+function gS() {
+    const ids = ['ta','jnj','sek','npsn','kep','nkep','metode','ktgl','t1','t2','mgg','iHari','iIst','iIst1','iIst2'];
+    const s = {};
+    ids.forEach(id => { const el=$(id); if(el) s[id]=el.value; });
+    // Also save guru info from auth
+    if (currentUser) { s.guru = currentUser.displayName || ''; s.ng = ''; }
+    return s;
 }
 
-async function searchByMapel(){
-    const mapel=$('searchMapel').value.trim();const jnj=$('searchJnj').value;
-    if(!mapel){toast('Masukkan nama mapel');return;}
-    const r=$('mapelResult');r.classList.remove('hidden');r.innerHTML='<p class="text-xs text-slate-500">🔍 Mencari...</p>';
-    try{
-        const snap=await db.collection('shared_tp').where('jnj','==',jnj).get();
-        const results=[];snap.forEach(doc=>{const d=doc.data();if(d.mapel.toLowerCase().includes(mapel.toLowerCase())&&d.uid!==uid)results.push(d);});
-        if(!results.length){r.innerHTML='<p class="text-xs text-amber-600 mt-2">⚠️ Belum ada guru lain yang menginput CP/TP untuk mapel & jenjang ini.</p>';return;}
-        r.innerHTML=`<p class="text-xs font-bold text-violet-800 mt-2">📚 Ditemukan ${results.length} sumber:</p>`+results.map(d=>`<div class="bg-violet-50 border border-violet-200 rounded-lg p-2 mt-1"><p class="text-[11px] font-bold">${d.mapel} (${d.jnj})</p><p class="text-[10px] text-slate-600">${d.guru} — ${d.sek}</p><p class="text-[10px] text-slate-500">${d.count} TP tersedia</p><button onclick="importTPFrom('${d.uid}','${d.mapel.replace(/'/g,"\\'")}')" class="mt-1 bg-violet-600 text-white px-3 py-0.5 rounded text-[10px] font-bold active:scale-95">📥 Ambil Data CP/TP</button></div>`).join('');
-    }catch(e){r.innerHTML='<p class="text-xs text-rose-500">❌ Error: '+e.message+'</p>';}
+function aS(s) {
+    if (!s) return;
+    Object.keys(s).forEach(id => { const el=$(id); if(el && s[id]!==undefined) el.value = s[id]; });
+    D.hpm = parseInt(s.iHari) || 5;
+    D.ist = parseInt(s.iIst) || 1;
+    D.ist1 = parseInt(s.iIst1) || 4;
+    D.ist2 = parseInt(s.iIst2) || 6;
 }
 
-async function importTPFrom(fromUid,mapelName){
-    try{const doc=await db.collection('users').doc(fromUid).get();
-    if(!doc.exists){toast('Data tidak ditemukan');return;}
-    const d=doc.data();const tpList=d.tp?.[mapelName]||[];
-    if(!tpList.length){toast('Tidak ada TP');return;}
-    // Add to active mapel or create new
-    if(!D.mapelList.includes(mapelName)){D.mapelList.push(mapelName);}
-    if(!D.tp[mapelName])D.tp[mapelName]=[];
-    D.tp[mapelName]=[...D.tp[mapelName],...tpList];
-    D.activeMapel=mapelName;
-    renderMapelChips();sfs();ra();
-    toast(`${tpList.length} TP berhasil diambil!`);$('shareModal').classList.add('hidden');
-    }catch(e){toast('Error: '+e.message);}
+function gs() {
+    return {
+        ta: $('ta')?.value||'', jnj: $('jnj')?.value||'SD', sek: $('sek')?.value||'',
+        npsn: $('npsn')?.value||'', kep: $('kep')?.value||'', nipK: $('nkep')?.value||'',
+        guru: currentUser?.displayName||'', nipG: '',
+        metode: $('metode')?.value||'', ktgl: $('ktgl')?.value||'',
+        tgl1: $('t1')?.value||'2026-07-13', tgl2: $('t2')?.value||'2027-01-11',
+        mgg: parseInt($('mgg')?.value)||24
+    };
 }
 
-// ======== CSV ========
+// ================================================================
+// SIDEBAR UI
+// ================================================================
+let sbO = false;
+function tsb() {
+    sbO = !sbO;
+    const p=$('sbp'), o=$('so');
+    if (sbO) { p.classList.replace('-translate-x-full','translate-x-0'); o?.classList.remove('hidden'); $('ic')?.classList.remove('hidden'); $('io')?.classList.add('hidden'); document.body.style.overflow='hidden'; }
+    else { p.classList.replace('translate-x-0','-translate-x-full'); o?.classList.add('hidden'); $('ic')?.classList.add('hidden'); $('io')?.classList.remove('hidden'); document.body.style.overflow=''; }
+}
+function cm() { if (sbO && window.innerWidth < 768) tsb(); }
+function tc(id) { $(id)?.classList.toggle('op'); }
+function popK() { ['fk','qKls'].forEach(id => { const e=$(id); if(!e)return; const p=e.value; e.innerHTML=id==='fk'?'<option value="">Kelas</option>':''; for(let k=1;k<=12;k++) e.innerHTML+=`<option>Kelas ${k}</option>`; e.value=p; }); }
+
+// ================================================================
+// MAPEL
+// ================================================================
+function renderMapelChips() {
+    const el = $('mapelChips');
+    if (!el) return;
+    el.innerHTML = D.mapelList.map(m => `<span class="chip ${m===D.activeMapel?'bg-indigo-600 text-white':'bg-slate-800 text-slate-300 border border-slate-700'}" onclick="setAM('${m.replace(/'/g,"\\'")}')">${m.length>20?m.substring(0,20)+'…':m}${D.mapelList.length>1?`<button onclick="event.stopPropagation();rmM('${m.replace(/'/g,"\\'")}')" class="ml-1 text-[7px] opacity-60 hover:opacity-100">✕</button>`:''}</span>`).join('');
+}
+function setAM(m) { D.activeMapel=m; renderMapelChips(); sfs(); ra(); }
+function addMapel() { const n=$('newMapel')?.value?.trim(); if(!n)return; if(D.mapelList.includes(n)){toast('Sudah ada');return;} D.mapelList.push(n); D.activeMapel=n; if(!D.tp[n])D.tp[n]=[]; $('newMapel').value=''; renderMapelChips(); sfs(); ra(); toast('Mapel ditambahkan'); }
+function rmM(m) { if(D.mapelList.length<=1){toast('Min 1 mapel');return;} if(!confirm('Hapus "'+m+'"?'))return; D.mapelList=D.mapelList.filter(x=>x!==m); delete D.tp[m]; if(D.activeMapel===m)D.activeMapel=D.mapelList[0]; renderMapelChips(); sfs(); ra(); }
+
+// ================================================================
+// SHARE
+// ================================================================
+function openSharePanel() { $('shareModal')?.classList.remove('hidden'); if($('searchMapel')) $('searchMapel').value=D.activeMapel; }
+async function searchByNPSN() { const npsn=$('searchNPSN')?.value?.trim(); if(!npsn){toast('Masukkan NPSN');return;} const r=$('npsnResult'); r.classList.remove('hidden'); r.innerHTML='🔍 Mencari...'; try{ const doc=await db.collection('schools').doc(npsn).get(); if(doc.exists){const d=doc.data();r.innerHTML=`<div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 mt-1"><p class="text-xs font-bold text-emerald-800">✅ ${d.nama} (${d.npsn})</p><p class="text-[10px]">Kepsek: ${d.kep} • ${d.jnj}</p><button onclick="applySchool('${npsn}')" class="mt-1 bg-emerald-600 text-white px-3 py-0.5 rounded text-[10px] font-bold active:scale-95">✓ Gunakan</button></div>`;}else r.innerHTML='<p class="text-xs text-rose-500 mt-1">Tidak ditemukan</p>';}catch(e){r.innerHTML='Error';} }
+async function applySchool(npsn) { const doc=await db.collection('schools').doc(npsn).get(); if(!doc.exists)return; const d=doc.data(); if($('sek'))$('sek').value=d.nama||''; if($('npsn'))$('npsn').value=d.npsn||''; if($('kep'))$('kep').value=d.kep||''; if($('nkep'))$('nkep').value=d.nipK||''; if($('jnj'))$('jnj').value=d.jnj||'SD'; if($('ta'))$('ta').value=d.ta||''; popK(); sfs(); ra(); toast('Data sekolah diterapkan!'); $('shareModal').classList.add('hidden'); }
+async function searchByMapel() { const mapel=$('searchMapel')?.value?.trim(); const jnj=$('searchJnj')?.value; if(!mapel){toast('Masukkan mapel');return;} const r=$('mapelResult'); r.classList.remove('hidden'); r.innerHTML='🔍...'; try{const snap=await db.collection('shared_tp').where('jnj','==',jnj).get(); const res=[];snap.forEach(doc=>{const d=doc.data();if(d.mapel.toLowerCase().includes(mapel.toLowerCase())&&d.uid!==currentUser?.uid)res.push(d);}); if(!res.length){r.innerHTML='<p class="text-xs text-amber-600 mt-1">Belum ada data</p>';return;} r.innerHTML=res.map(d=>`<div class="bg-violet-50 border border-violet-200 rounded-lg p-2 mt-1"><p class="text-[11px] font-bold">${d.mapel} (${d.jnj})</p><p class="text-[10px] text-slate-500">${d.guru}—${d.sek} (${d.count} TP)</p><button onclick="importTP('${d.uid}','${d.mapel.replace(/'/g,"\\'")}')" class="mt-1 bg-violet-600 text-white px-3 py-0.5 rounded text-[10px] font-bold active:scale-95">📥 Ambil</button></div>`).join('');}catch(e){r.innerHTML='Error';} }
+async function importTP(fromUid,mapelName) { try{const doc=await db.collection('users').doc(fromUid).get();if(!doc.exists)return;const d=doc.data();const list=d.tp?.[mapelName]||[];if(!list.length){toast('Tidak ada TP');return;}if(!D.mapelList.includes(mapelName))D.mapelList.push(mapelName);if(!D.tp[mapelName])D.tp[mapelName]=[];D.tp[mapelName]=[...D.tp[mapelName],...list];D.activeMapel=mapelName;renderMapelChips();sfs();ra();toast(`${list.length} TP diambil!`);$('shareModal').classList.add('hidden');}catch(e){toast('Error');} }
+
+// ================================================================
+// CSV
+// ================================================================
 function pl(l){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;}
 function hcsv(e,type){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=ev=>{processCSV(ev.target.result,type);};reader.readAsText(f);e.target.value='';}
-function processCSV(text,type){
-    const lines=text.split(/\r?\n/).filter(l=>l.trim());let cnt=0;
-    if(type==='tp'){const list=activeTP();for(let i=1;i<lines.length;i++){const c=pl(lines[i]);if(c.length<7)continue;list.push({kelas:c[0],semester:c[1],elemen:c[2],cp:c[3],tp:c[4],dimensi:c[5],pertemuan:parseInt(c[6])||2});cnt++;}setActiveTP(list);}
-    else{for(let i=1;i<lines.length;i++){const c=pl(lines[i]);if(c.length<4)continue;const rbl=D.rombel.find(r=>r.nama===c[2]);D.siswa.push({id:++D.sc,nama:c[0],nis:c[1],rombel_id:rbl?rbl.id:(D.rombel[0]?.id||0),jk:c[3]||'L'});cnt++;}}
-    $('csvSt').classList.remove('hidden');$('csvStT').textContent=`${cnt} ${type} dimuat`;sfs();ra();toast(`${cnt} data ${type} berhasil diimport!`);
-}
-async function loadGS(type){let url=$('gsUrl')?.value?.trim();if(!url){toast('Masukkan URL Google Sheet');return;}if(!url.includes('/pub'))url=url.replace(/\/edit.*/,'/pub?output=csv');if(!url.includes('output=csv'))url+=(url.includes('?')?'&':'?')+'output=csv';try{sync('sv','📥');const res=await fetch(url);processCSV(await res.text(),type);}catch(e){toast('Gagal load sheet');}}
-function dlTpl(type){let csv=type==='tp'?'Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan\nKelas 1,Semester 1,Elemen 1,"CP text","TP text","dimensi1; dimensi2",3':'Nama,NIS,Rombel,JK\nAhmad,12345,1A,L';const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`template_${type}.csv`;a.click();}
-
-function quickAddTP(){const en={kelas:$('qKls').value,semester:$('qSmt').value,elemen:$('qElem').value||'Umum',cp:$('qCP').value||'-',tp:$('qTP').value,dimensi:$('qDim').value||'-',pertemuan:parseInt($('qPrt').value)||2};if(!en.tp){toast('TP wajib diisi!');return;}const list=activeTP();list.push(en);setActiveTP(list);$('qCP').value='';$('qTP').value='';sfs();ra();toast('TP ditambahkan ke '+D.activeMapel);}
-function delTP(i){const list=activeTP();list.splice(i,1);setActiveTP(list);sfs();ra();}
+function processCSV(text,type){const lines=text.split(/\r?\n/).filter(l=>l.trim());let cnt=0;if(type==='tp'){const list=activeTP();for(let i=1;i<lines.length;i++){const c=pl(lines[i]);if(c.length<7)continue;list.push({kelas:c[0],semester:c[1],elemen:c[2],cp:c[3],tp:c[4],dimensi:c[5],pertemuan:parseInt(c[6])||2});cnt++;}setActiveTP(list);}else{for(let i=1;i<lines.length;i++){const c=pl(lines[i]);if(c.length<4)continue;const rbl=D.rombel.find(r=>r.nama===c[2]);D.siswa.push({id:++D.sc,nama:c[0],nis:c[1],rombel_id:rbl?rbl.id:(D.rombel[0]?.id||0),jk:c[3]||'L'});cnt++;}}if($('csvSt'))$('csvSt').classList.remove('hidden');if($('csvStT'))$('csvStT').textContent=`${cnt} ${type} dimuat`;sfs();ra();toast(`${cnt} data diimport!`);}
+async function loadGS(type){let url=$('gsUrl')?.value?.trim();if(!url){toast('Masukkan URL');return;}if(!url.includes('/pub'))url=url.replace(/\/edit.*/,'/pub?output=csv');if(!url.includes('output=csv'))url+=(url.includes('?')?'&':'?')+'output=csv';try{sync('sv','📥');const res=await fetch(url);processCSV(await res.text(),type);}catch(e){toast('Gagal load');}}
+function dlTpl(type){let csv=type==='tp'?'Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan\nKelas 1,Semester 1,Elemen,"CP...","TP...","dimensi",3':'Nama,NIS,Rombel,JK\nAhmad,12345,1A,L';const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`template_${type}.csv`;a.click();}
+function quickAddTP(){const en={kelas:$('qKls')?.value,semester:$('qSmt')?.value,elemen:$('qElem')?.value||'Umum',cp:$('qCP')?.value||'-',tp:$('qTP')?.value,dimensi:$('qDim')?.value||'-',pertemuan:parseInt($('qPrt')?.value)||2};if(!en.tp){toast('TP wajib!');return;}activeTP().push(en);$('qCP').value='';$('qTP').value='';sfs();ra();toast('TP ditambahkan');}
+function delTP(i){activeTP().splice(i,1);sfs();ra();}
 function clearTP(){if(confirm('Hapus semua TP mapel aktif?')){setActiveTP([]);sfs();ra();}}
 function clearSW(){if(confirm('Hapus semua siswa?')){D.siswa=[];sfs();ra();}}
 
-// ======== ROMBEL ========
+// ================================================================
+// ROMBEL & SISWA
+// ================================================================
 function addR(){const id=++D.rc;D.rombel.push({id,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:D.rombel.length%WR.length});rR();sfs();ra();}
 function rmR(id){D.rombel=D.rombel.filter(r=>r.id!==id);D.siswa=D.siswa.filter(s=>s.rombel_id!==id);rR();sfs();ra();}
 function uR(id,f,v){const r=D.rombel.find(x=>x.id===id);if(!r)return;r[f]=['hari','jp1','jp2','warna'].includes(f)?parseInt(v):v;sfs();ra();}
-function rR(){const box=$('rb');const hl=getHL();if(!D.rombel.length){box.innerHTML='<p class="text-center py-1 text-[8px] text-slate-500">No rombel</p>';uRF();return;}
+function rR(){const box=$('rb');if(!box)return;const hl=getHL();if(!D.rombel.length){box.innerHTML='<p class="text-center py-1 text-[8px] text-slate-500">No rombel</p>';uRF();return;}
 box.innerHTML=D.rombel.map(r=>{const w=WR[r.warna%WR.length];let ko='';for(let k=1;k<=12;k++)ko+=`<option ${r.kelas==='Kelas '+k?'selected':''}>Kelas ${k}</option>`;
 return`<div class="p-1 bg-slate-800/50 rounded-lg" style="border-left:3px solid ${w.hx}"><div class="flex items-center justify-between"><div class="flex items-center gap-1"><span class="bd" style="background:${w.hx}"></span><input value="${r.nama}" onchange="uR(${r.id},'nama',this.value)" class="bg-transparent text-white font-black text-[10px] w-10 focus:outline-none"></div><button onclick="rmR(${r.id})" class="text-rose-400 text-[8px]">✕</button></div><div class="grid grid-cols-4 gap-0.5 mt-0.5"><select onchange="uR(${r.id},'hari',this.value)" class="is text-[7px] p-0.5">${hl.map((h,i)=>`<option value="${i}" ${r.hari===i?'selected':''}>${h.substr(0,3)}</option>`).join('')}</select><select onchange="uR(${r.id},'jp1',this.value)" class="is text-[7px] p-0.5">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jp1===j?'selected':''}>${j}</option>`).join('')}</select><select onchange="uR(${r.id},'jp2',this.value)" class="is text-[7px] p-0.5">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jp2===j?'selected':''}>-${j}</option>`).join('')}</select><select onchange="uR(${r.id},'kelas',this.value)" class="is text-[7px] p-0.5">${ko}</select></div></div>`;}).join('');uRF();}
-function uRF(){const f=$('fr');f.innerHTML='<option value="">Rombel</option>';D.rombel.forEach(r=>{f.innerHTML+=`<option value="${r.id}">${r.nama}</option>`;});}
-
-// ======== SISWA ========
+function uRF(){const f=$('fr');if(!f)return;f.innerHTML='<option value="">Rombel</option>';D.rombel.forEach(r=>{f.innerHTML+=`<option value="${r.id}">${r.nama}</option>`;});}
 function addSW(rid){D.siswa.push({id:++D.sc,nama:'',nis:'',rombel_id:rid,jk:'L'});sfs();ra();}
 function rmSW(id){D.siswa=D.siswa.filter(s=>s.id!==id);sfs();ra();}
 function uSW(id,f,v){const s=D.siswa.find(x=>x.id===id);if(s){s[f]=v;debS();}}
 function swByR(rid){return D.siswa.filter(s=>s.rombel_id===rid).sort((a,b)=>(a.nama||'').localeCompare(b.nama||''));}
 
-// ======== KRITERIA NILAI ========
-function rK(){$('kritBox').innerHTML=D.krit.map((k,i)=>`<div class="flex gap-1 items-center"><input value="${k.n}" onchange="D.krit[${i}].n=this.value;debS()" class="flex-1 is text-[8px]"><input type="number" value="${k.b}" min="0" max="100" onchange="D.krit[${i}].b=parseInt(this.value);debS()" class="w-10 is text-[8px]"><span class="text-[6px] text-slate-500">%</span><button onclick="D.krit.splice(${i},1);rK();debS()" class="text-rose-400 text-[7px]">✕</button></div>`).join('')+`<p class="text-[7px] ${D.krit.reduce((s,k)=>s+k.b,0)===100?'text-emerald-400':'text-rose-400'} font-bold">Total: ${D.krit.reduce((s,k)=>s+k.b,0)}%</p>`;}
+// Kriteria
+function rK(){const box=$('kritBox');if(!box)return;box.innerHTML=D.krit.map((k,i)=>`<div class="flex gap-1 items-center"><input value="${k.n}" onchange="D.krit[${i}].n=this.value;debS()" class="flex-1 is text-[8px]"><input type="number" value="${k.b}" min="0" max="100" onchange="D.krit[${i}].b=parseInt(this.value);debS()" class="w-10 is text-[8px]"><span class="text-[6px] text-slate-500">%</span><button onclick="D.krit.splice(${i},1);rK();debS()" class="text-rose-400 text-[7px]">✕</button></div>`).join('')+`<p class="text-[7px] ${D.krit.reduce((s,k)=>s+k.b,0)===100?'text-emerald-400':'text-rose-400'} font-bold">Total: ${D.krit.reduce((s,k)=>s+k.b,0)}%</p>`;}
 function addKrit(){D.krit.push({n:'Baru',b:0});rK();debS();}
 
-// ======== HELPERS ========
+// ================================================================
+// HELPERS
+// ================================================================
 function gFL(){let l=[...activeTP()];const fk=$('fk')?.value,fs=$('fs')?.value;if(fk)l=l.filter(d=>d.kelas===fk);if(fs)l=l.filter(d=>d.semester===fs);return l;}
 function fISO(d){let m=''+(d.getMonth()+1),dy=''+d.getDate(),y=d.getFullYear();if(m.length<2)m='0'+m;if(dy.length<2)dy='0'+dy;return[y,m,dy].join('-');}
 function gWeeks(sk,di,tot){const s=gs();const bs=sk==='Semester 1'?s.tgl1:s.tgl2;const bp=bs.split('-');const bd=new Date(+bp[0],+bp[1]-1,+bp[2]);const bw=bd.getDay();const tw=(di+1)%7;let df=tw-bw;if(df<0)df+=7;const f=new Date(bd);f.setDate(bd.getDate()+df);const w=[];for(let i=0;i<tot;i++){const d=new Date(f);d.setDate(f.getDate()+i*7);const iso=fISO(d);w.push({wn:i+1,date:d,dn:d.getDate(),mn:BL[d.getMonth()],iso,lib:libNas.includes(iso),eff:!libNas.includes(iso)});}return w;}
 function lastNH(y,m){let d=new Date(y,m+1,0);while(d.getDay()===0||d.getDay()===6||libNas.includes(fISO(d)))d.setDate(d.getDate()-1);return d;}
 function sig(dt){const s=gs();return`<div class="mt-4 pt-3 border-t-2 border-slate-300 grid grid-cols-2 gap-3 text-[9px]"><div class="text-center"><p class="font-bold">Mengetahui,</p><p class="font-bold mb-12">Kepala ${s.sek}</p><p class="font-extrabold underline">${s.kep}</p><p class="text-slate-500">NIP. ${s.nipK}</p></div><div class="text-center"><p>${dt||s.ktgl}</p><p class="font-bold mb-12">Guru ${D.activeMapel}</p><p class="font-extrabold underline">${s.guru}</p><p class="text-slate-500">NIP. ${s.nipG}</p></div></div>`;}
-function dH(t,sub){const s=gs();return`<div class="text-center mb-3 pb-2 border-b-2 border-slate-800"><h2 class="text-xs md:text-sm font-black uppercase">${t}</h2><p class="text-[8px] text-slate-600 font-bold uppercase">${sub||D.activeMapel}</p><p class="text-[7px] text-slate-500">${s.sek} (NPSN: ${s.npsn}) • T.A. ${s.ta}</p></div>`;}
+function dH(t,sub){const s=gs();return`<div class="text-center mb-3 pb-2 border-b-2 border-slate-800"><h2 class="text-xs md:text-sm font-black uppercase">${t}</h2><p class="text-[8px] text-slate-600 font-bold uppercase">${sub||D.activeMapel}</p><p class="text-[7px] text-slate-500">${s.sek}${s.npsn?' ('+s.npsn+')':''} • T.A. ${s.ta}</p></div>`;}
 
-// ======== TABS ========
-const TABS=[{id:'jadwal',i:'📅',l:'Jadwal'},{id:'data',i:'📊',l:'Data CP/TP'},{id:'siswa',i:'👨‍🎓',l:'Siswa'},{id:'atp',i:'🗺️',l:'ATP'},{id:'prota',i:'📋',l:'PROTA'},{id:'promes',i:'🗓️',l:'PROMES'},{id:'modul',i:'🧠',l:'Modul'},{id:'kktp',i:'🎯',l:'KKTP'},{id:'nilai',i:'📝',l:'Nilai'},{id:'absen',i:'📋',l:'Absen'},{id:'jurnal',i:'📔',l:'Jurnal'}];
-function buildNav(){$('navBox').innerHTML=TABS.map((t,i)=>`<button onclick="sw('${t.id}')" id="t_${t.id}" class="nb ${i===0?'na':''} w-full text-left py-1 px-2 rounded-lg text-[9px] ${i===0?'font-bold':'font-semibold text-slate-400 hover:bg-slate-800/60'} flex items-center gap-1.5">${t.i} ${t.l}</button>`).join('');}
+// ================================================================
+// TABS & NAV
+// ================================================================
+const TABS=[{id:'jadwal',i:'📅',l:'Jadwal'},{id:'data',i:'📊',l:'CP/TP'},{id:'siswa',i:'👨‍🎓',l:'Siswa'},{id:'atp',i:'🗺️',l:'ATP'},{id:'prota',i:'📋',l:'PROTA'},{id:'promes',i:'🗓️',l:'PROMES'},{id:'modul',i:'🧠',l:'Modul'},{id:'kktp',i:'🎯',l:'KKTP'},{id:'nilai',i:'📝',l:'Nilai'},{id:'absen',i:'📋',l:'Absen'},{id:'jurnal',i:'📔',l:'Jurnal'}];
+function buildNav(){const n=$('navBox');if(!n)return;n.innerHTML=TABS.map((t,i)=>`<button onclick="sw('${t.id}')" id="t_${t.id}" class="nb ${i===0?'na':''} w-full text-left py-1 px-2 rounded-lg text-[9px] ${i===0?'font-bold':'font-semibold text-slate-400 hover:bg-slate-800/60'} flex items-center gap-1.5">${t.i} ${t.l}</button>`).join('');}
 function sw(t){TABS.forEach(x=>{$('c_'+x.id)?.classList.add('hidden');const b=$('t_'+x.id);if(b)b.className="nb w-full text-left py-1 px-2 rounded-lg text-[9px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-1.5";});$('c_'+t)?.classList.remove('hidden');const ab=$('t_'+t);if(ab)ab.className="nb na w-full text-left py-1 px-2 rounded-lg text-[9px] font-bold flex items-center gap-1.5";document.querySelectorAll('.mn').forEach(b=>{b.classList.toggle('text-indigo-400',b.dataset.t===t);b.classList.toggle('text-slate-400',b.dataset.t!==t);});}
-function buildContent(){$('mainContent').innerHTML=`<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3 np">${[
-    {c:'indigo',l:'TP ('+D.activeMapel.substring(0,15)+'...)',id:'s1',sub:'s1d'},
-    {c:'violet',l:'Rombel',id:'s2',sub:'s2d'},
-    {c:'emerald',l:'Siswa',id:'s3',sub:'s3d'},
-    {c:'amber',l:'JP '+durJP()+"' ("+($('jnj')?.value||'SD')+')',id:'s4',sub:'s4d'}
-].map(s=>`<div class="bg-gradient-to-br from-${s.c}-50 to-${s.c}-100/30 rounded-xl p-2 border border-${s.c}-200/50 hl"><span class="text-[7px] text-${s.c}-600 font-bold uppercase">${s.l}</span><p id="${s.id}" class="text-lg font-black text-${s.c}-900">0</p><p id="${s.sub}" class="text-[8px] text-${s.c}-600 font-semibold">-</p></div>`).join('')}</div><div class="mb-2 np"><span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">📚 Mapel Aktif: ${D.activeMapel}</span></div>`+TABS.map((t,i)=>`<div id="c_${t.id}" class="gc rounded-xl shadow-lg p-2 md:p-4 border border-slate-200/60 ${i>0?'hidden':''} af"></div>`).join('');}
+function buildContent(){const mc=$('mc');if(!mc)return;mc.innerHTML=`<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3 np"><div class="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl p-2 border border-indigo-200/50 hl"><span class="text-[7px] text-indigo-600 font-bold uppercase">TP</span><p id="s1" class="text-lg font-black text-indigo-900">0</p><p id="s1d" class="text-[8px] text-indigo-600">0 JP</p></div><div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-2 border border-violet-200/50 hl"><span class="text-[7px] text-violet-600 font-bold uppercase">Rombel</span><p id="s2" class="text-lg font-black text-violet-900">0</p><p id="s2d" class="text-[8px] text-violet-600">-</p></div><div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-2 border border-emerald-200/50 hl"><span class="text-[7px] text-emerald-600 font-bold uppercase">Siswa</span><p id="s3" class="text-lg font-black text-emerald-900">0</p><p id="s3d" class="text-[8px] text-emerald-600">-</p></div><div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-2 border border-amber-200/50 hl"><span class="text-[7px] text-amber-600 font-bold uppercase">JP ${durJP()}'</span><p id="s4" class="text-lg font-black text-amber-900">${$('jnj')?.value||'SD'}</p><p id="s4d" class="text-[8px] text-amber-600">${D.activeMapel.substring(0,20)}</p></div></div><div class="mb-2 np"><span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">📚 ${D.activeMapel}</span></div>`+TABS.map((t,i)=>`<div id="c_${t.id}" class="gc rounded-xl shadow-lg p-2 md:p-4 border border-slate-200/60 ${i>0?'hidden':''} af"></div>`).join('');}
 
-// ======== RENDERERS (Compact) ========
-function rJadwal(){const hl=getHL();const dur=durJP();const jm={};hl.forEach((_,i)=>{jm[i]={};});const fR=$('fr')?.value;(fR?D.rombel.filter(r=>r.id==fR):D.rombel).forEach(r=>{for(let jp=r.jp1;jp<=r.jp2;jp++){if(!jm[r.hari])jm[r.hari]={};if(!jm[r.hari][jp])jm[r.hari][jp]=[];jm[r.hari][jp].push(r);}});
-let st=7*60;const slots=[];for(let jp=1;jp<=10;jp++){if(jp-1===D.ist1)slots.push({t:'ist',l:'Ist 1',s:st,e:st+20});if(D.ist>=2&&jp-1===D.ist2)slots.push({t:'ist',l:'Ist 2',s:st,e:st+15});slots.push({t:'jp',jp,s:st,e:st+dur});st+=dur;if(jp===D.ist1)st+=20;if(D.ist>=2&&jp===D.ist2)st+=15;}
-const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}.${String(m%60).padStart(2,'0')}`;
-let rows='';slots.forEach(sl=>{if(sl.t==='ist'){rows+=`<tr class="bg-amber-50 text-amber-700 font-bold text-[7px]"><td class="p-0.5 border text-center" colspan="${hl.length+2}">${sl.l} (${fmt(sl.s)}-${fmt(sl.e)})</td></tr>`;return;}
-let cells='';hl.forEach((_,hi)=>{const rs=jm[hi]?.[sl.jp]||[];if(!rs.length)cells+=`<td class="p-0.5 border text-center text-slate-300 text-[7px]">-</td>`;else cells+=`<td class="p-0.5 border text-center ${rs.length===1?WR[rs[0].warna%WR.length].bg+' text-white font-bold text-[7px]':'bg-slate-50 text-[6px]'}">${rs.map(r=>r.nama).join(' ')}</td>`;});
-rows+=`<tr class="border-b"><td class="p-0.5 border text-center font-bold bg-slate-50 text-[7px]">${sl.jp}</td><td class="p-0.5 border text-center text-[6px] text-slate-500 bg-slate-50">${fmt(sl.s)}-${fmt(sl.e)}</td>${cells}</tr>`;});
-$('c_jadwal').innerHTML=dH('JADWAL PELAJARAN')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[450px]"><thead><tr class="bg-indigo-700 text-white text-[7px] font-bold"><th class="p-1 border w-6">JP</th><th class="p-1 border w-14">Waktu(${dur}')</th>${hl.map(h=>`<th class="p-1 border">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${sig()}`;}
+// ================================================================
+// RENDERERS - NILAI & ABSEN (FIXED - per rombel filtering)
+// ================================================================
+function getActiveRombels(){const fR=$('fr')?.value;return fR?D.rombel.filter(r=>r.id==parseInt(fR)):[...D.rombel];}
 
-function rData(){const fl=gFL();$('c_data').innerHTML=dH('DATA CP/TP')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[800px]"><thead><tr class="bg-indigo-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-10">Kls</th><th class="p-1 border w-8">Fase</th><th class="p-1 border w-12">Smt</th><th class="p-1 border w-16">Elemen</th><th class="p-1 border">CP</th><th class="p-1 border">TP</th><th class="p-1 border w-16">Dimensi</th><th class="p-1 border w-4">Prt</th><th class="p-1 border w-4 np">⚙</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b text-[8px] hover:bg-slate-50"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r">${d.kelas}</td><td class="p-1 border-r text-indigo-600">${fase(d.kelas)}</td><td class="p-1 border-r">${d.semester}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-slate-500">${d.cp}</td><td class="p-1 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1 border-r text-slate-500">${d.dimensi}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan}</td><td class="p-1 text-center np"><button onclick="delTP(${activeTP().indexOf(d)})" class="text-rose-500 text-[8px]">🗑</button></td></tr>`).join('')||'<tr><td colspan="10" class="p-3 text-center text-slate-400">Belum ada data TP untuk mapel: '+D.activeMapel+'</td></tr>'}</tbody></table></div>`;}
-
-function rSiswa(){const fR=$('fr')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):D.rombel;let h=dH('DATA SISWA');rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);h+=`<div class="mb-3 border rounded-lg overflow-hidden"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] flex justify-between"><span>${rb.nama}—${rb.kelas} (${sw.length})</span><button onclick="addSW(${rb.id})" class="bg-white/20 px-1.5 py-0.5 rounded text-[8px] np">＋</button></div><table class="w-full text-[9px] border-collapse"><thead><tr class="bg-slate-100 font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">NIS</th><th class="p-1 border">Nama</th><th class="p-1 border w-6">JK</th><th class="p-1 border w-4 np">⚙</th></tr></thead><tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-0.5 border text-center">${i+1}</td><td class="p-0.5 border"><input value="${s.nis}" onchange="uSW(${s.id},'nis',this.value)" class="w-full bg-transparent text-[9px] focus:outline-none"></td><td class="p-0.5 border"><input value="${s.nama}" onchange="uSW(${s.id},'nama',this.value)" class="w-full bg-transparent text-[9px] font-bold focus:outline-none"></td><td class="p-0.5 border text-center"><select onchange="uSW(${s.id},'jk',this.value)" class="bg-transparent text-[9px]"><option ${s.jk==='L'?'selected':''}>L</option><option ${s.jk==='P'?'selected':''}>P</option></select></td><td class="p-0.5 border text-center np"><button onclick="rmSW(${s.id})" class="text-rose-500 text-[8px]">🗑</button></td></tr>`).join('')||'<tr><td colspan="5" class="p-2 text-center text-slate-400">No siswa</td></tr>'}</tbody></table></div>`;});$('c_siswa').innerHTML=h;}
-
-// Simplified renders for ATP, PROTA, PROMES, Modul, KKTP, Nilai, Absen, Jurnal
-// (Same logic as previous version, using activeTP() instead of D.tp)
-
-function rAtp(){const s=gs(),fl=gFL();$('c_atp').innerHTML=dH('ATP / SILABUS')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[700px]"><thead><tr class="bg-emerald-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-24">CP</th><th class="p-1 border w-10">Alokasi</th><th class="p-1 border w-20">Metode</th><th class="p-1 border w-16">Dimensi</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b text-[8px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-emerald-900">${d.tp}</td><td class="p-1 border-r text-slate-500 truncate max-w-[120px]">${d.cp}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan*4}JP</td><td class="p-1 border-r text-slate-500">${s.metode}</td><td class="p-1 text-slate-500">${d.dimensi}</td></tr>`).join('')||'<tr><td colspan="7" class="p-3 text-center text-slate-400">No data</td></tr>'}</tbody></table></div>${sig()}`;}
-
-function rProta(){let body='',gt=0;['Semester 1','Semester 2'].forEach(sem=>{let list=activeTP().filter(d=>d.semester===sem);const fk=$('fk')?.value;if(fk)list=list.filter(d=>d.kelas===fk);let st=0;list.forEach(d=>st+=d.pertemuan*4);gt+=st;body+=`<tr class="bg-indigo-100 font-bold text-indigo-900"><td colspan="5" class="p-1 uppercase text-[8px]">${sem}—${st}JP</td></tr>`;list.forEach((d,i)=>{body+=`<tr class="border-b text-[8px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r">${d.tp}</td><td class="p-1 border-r text-center">${sem}</td><td class="p-1 text-center font-bold">${d.pertemuan*4}JP</td></tr>`;});});body+=`<tr class="bg-indigo-800 text-white font-black text-[9px]"><td colspan="4" class="p-1 text-right border-r">Total:</td><td class="p-1 text-center">${gt}JP</td></tr>`;
-$('c_prota').innerHTML=dH('PROTA')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[500px]"><thead><tr class="bg-emerald-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-12">Smt</th><th class="p-1 border w-10">Alokasi</th></tr></thead><tbody>${body}</tbody></table></div>${sig()}`;}
-
-function rPromes(){const s=gs(),sem=$('fs')?.value||'Semester 1';let fl=activeTP().filter(d=>d.semester===sem);const fk=$('fk')?.value;if(fk)fl=fl.filter(d=>d.kelas===fk);const aR=($('fr')?.value?D.rombel.find(r=>r.id==$('fr').value):D.rombel[0]);const di=aR?aR.hari:4;const wks=gWeeks(sem,di,s.mgg);const mg=[];let cm2=null;wks.forEach(w=>{if(!cm2||cm2.n!==w.mn){cm2={n:w.mn,w:[]};mg.push(cm2);}cm2.w.push(w);});
-let th1=`<tr class="bg-indigo-700 text-white font-bold text-[6px]"><th rowspan="2" class="border w-4">No</th><th rowspan="2" class="border text-left min-w-[100px]">TP</th><th rowspan="2" class="border w-5">JP</th><th rowspan="2" class="border w-4">Mg</th>`;mg.forEach(m=>{th1+=`<th colspan="${m.w.length}" class="border text-center">${m.n.substr(0,3)}</th>`;});th1+=`</tr><tr class="bg-indigo-600 text-white text-[5px]">`;mg.forEach(m=>{m.w.forEach((_,i)=>{th1+=`<th class="border w-4">${i+1}</th>`;});});th1+=`</tr>`;
-const ew=[];wks.forEach((w,i)=>{if(w.eff)ew.push(i);});let tb='',ep=0;
-fl.forEach((d,di)=>{const ai=[];for(let k=0;k<d.pertemuan;k++)if(ep<ew.length)ai.push(ew[ep++]);tb+=`<tr class="border-b text-[8px]"><td class="border py-0.5 text-center">${di+1}</td><td class="border px-1 py-0.5 text-[7px]">${d.tp}</td><td class="border py-0.5 text-center font-bold">${d.pertemuan*4}</td><td class="border py-0.5 text-center">${d.pertemuan}</td>`;wks.forEach((w,gi)=>{tb+=ai.includes(gi)?`<td class="border py-0.5 text-center font-bold bg-indigo-200 text-indigo-950 text-[7px]">${w.dn}</td>`:w.lib?`<td class="border py-0.5 text-center bg-red-100 text-red-800 text-[5px]">LBR</td>`:`<td class="border py-0.5 text-center text-slate-300 text-[6px]">·</td>`;});tb+=`</tr>`;});
-tb+=`<tr class="bg-slate-100 font-bold border-t-2 text-[7px]"><td colspan="4" class="border px-1 py-0.5 text-right text-[6px]">Tgl:</td>`;wks.forEach(w=>{tb+=w.lib?`<td class="border py-0.5 text-center bg-red-200 text-red-900 text-[5px]">LBR</td>`:`<td class="border py-0.5 text-center text-indigo-900 font-extrabold text-[7px]">${w.dn}</td>`;});tb+=`</tr>`;
-$('c_promes').innerHTML=dH('PROMES',`${D.activeMapel} • ${sem}`)+`<p class="text-[7px] text-indigo-700 font-bold mb-1">*Angka=Tgl real ${HR[di]}</p><table class="w-full border-collapse border min-w-[700px]"><thead>${th1}</thead><tbody>${tb}</tbody></table>${sig()}`;}
-
-function rModul(){const fl=gFL();if(!fl.length){$('c_modul').innerHTML='<div class="text-center py-6 text-slate-400">No data</div>';return;}const d=fl[0],s=gs();const djp=durJP();$('c_modul').innerHTML=dH('MODUL AJAR')+`<table class="w-full text-[9px] border-collapse border mb-2"><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border-r w-1/3">Kelas/Fase</td><td class="p-1">${d.kelas} (Fase ${fase(d.kelas)}) / ${d.semester}</td></tr><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border-r">TP</td><td class="p-1 font-bold text-emerald-900">${d.tp}</td></tr><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border-r">Alokasi</td><td class="p-1">${d.pertemuan} Prt (${d.pertemuan*4} JP @ ${djp}')</td></tr></table><select id="msl" onchange="rMT()" class="w-full bg-slate-50 border rounded p-1 text-[9px] mb-2 np">${fl.map((t,i)=>`<option value="${i}">[${t.elemen}] ${t.tp}</option>`).join('')}</select><div id="mbox">${Array.from({length:d.pertemuan},(_,i)=>`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><h5 class="font-bold text-indigo-900 text-[10px] border-b pb-1 mb-1">Prt ${i+1} (${djp*4}')</h5><div class="text-[9px] space-y-1"><div class="p-1 bg-blue-50 border border-blue-200 rounded">🧘 Pendahuluan (${Math.round(djp*4*.1)}')</div><div class="p-1 bg-emerald-50 border border-emerald-200 rounded">💡 Inti (${Math.round(djp*4*.8)}') — ${s.metode}</div><div class="p-1 bg-amber-50 border border-amber-200 rounded">🎉 Penutup (${Math.round(djp*4*.1)}')</div></div></div>`).join('')}</div>${sig()}`;}
-function rMT(){const fl=gFL(),i=parseInt($('msl')?.value)||0,d=fl[i];if(!d)return;const s=gs(),djp=durJP();$('mbox').innerHTML=Array.from({length:d.pertemuan},(_,j)=>`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><h5 class="font-bold text-indigo-900 text-[10px] border-b pb-1 mb-1">Prt ${j+1}—${d.tp}</h5><div class="text-[9px] space-y-1"><div class="p-1 bg-blue-50 border border-blue-200 rounded">🧘 Pendahuluan</div><div class="p-1 bg-emerald-50 border border-emerald-200 rounded">💡 Inti—${s.metode}</div><div class="p-1 bg-amber-50 border border-amber-200 rounded">🎉 Penutup</div></div></div>`).join('');}
-
-function rKktp(){const fl=gFL();$('c_kktp').innerHTML=dH('KKTP')+`${fl.map((d,i)=>`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><div class="flex justify-between border-b pb-1 mb-1"><div><span class="bg-indigo-700 text-white text-[6px] font-black px-1 rounded">${d.elemen} TP${i+1}</span><h4 class="font-bold text-[10px] mt-0.5">${d.tp}</h4></div><span class="text-[8px] bg-indigo-100 text-indigo-900 font-bold px-1 rounded">${d.pertemuan*4}JP</span></div><table class="w-full text-[8px] border-collapse border bg-white"><thead><tr class="bg-slate-100 font-bold"><th class="p-0.5 border text-left w-1/5">Aspek</th><th class="p-0.5 border bg-rose-50">0-60%</th><th class="p-0.5 border bg-amber-50">61-70%</th><th class="p-0.5 border bg-emerald-50">71-85%</th><th class="p-0.5 border bg-blue-50">86-100%</th></tr></thead><tbody><tr><td class="p-0.5 font-bold bg-slate-50 border">Konsep</td><td class="p-0.5 border">Belum</td><td class="p-0.5 border">Bimbingan</td><td class="p-0.5 border font-medium">Mandiri</td><td class="p-0.5 border font-bold">Fasih</td></tr><tr><td class="p-0.5 font-bold bg-slate-50 border">Perilaku</td><td class="p-0.5 border">Belum</td><td class="p-0.5 border">Diingatkan</td><td class="p-0.5 border font-medium">Konsisten</td><td class="p-0.5 border font-bold">Teladan</td></tr></tbody></table></div>`).join('')||'<p class="text-center py-4 text-slate-400">No data</p>'}${sig()}`;}
-
-function rNilai(){const fl=gFL(),sem=$('fs')?.value||'Semester 1';const krits=D.krit.map(k=>({...k,d:k.n==='ASSAS'&&sem==='Semester 2'?'ASSAJ':k.n}));const fR=$('fr')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):D.rombel;const semEnd=sem==='Semester 1'?lastNH(2026,11):lastNH(2027,5);const dtN=`${gs().sek.split(' ')[0]||''}, ${semEnd.getDate()} ${BL[semEnd.getMonth()]} ${semEnd.getFullYear()}`;
-let h=dH('DAFTAR NILAI',`${D.activeMapel} • ${sem}`);
-rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);if(!D.nilai[rb.id])D.nilai[rb.id]={};
-h+=`<div class="mb-3"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] rounded-t">${rb.nama}—${rb.kelas}</div><div class="tr"><table class="w-full text-[8px] border-collapse border min-w-[500px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-0.5 border w-4" rowspan="2">No</th><th class="p-0.5 border text-left" rowspan="2">Nama</th>`;
-fl.forEach((tp,ti)=>{h+=`<th class="p-0.5 border text-center" colspan="${krits.length+1}">${tp.elemen.substr(0,6)}</th>`;});
-h+=`</tr><tr class="bg-slate-100 text-[6px]">`;fl.forEach(()=>{krits.forEach(k=>{h+=`<th class="p-0.5 border w-5">${k.d}</th>`;});h+=`<th class="p-0.5 border w-5 bg-emerald-100">NR</th>`;});h+=`</tr></thead><tbody>`;
-sw.forEach((s,si)=>{if(!D.nilai[rb.id][s.id])D.nilai[rb.id][s.id]={};h+=`<tr class="border-b"><td class="p-0.5 border text-center">${si+1}</td><td class="p-0.5 border px-1">${s.nama||'-'}</td>`;
-fl.forEach((tp,ti)=>{if(!D.nilai[rb.id][s.id][ti])D.nilai[rb.id][s.id][ti]={};const v=D.nilai[rb.id][s.id][ti];krits.forEach((k,ki)=>{h+=`<td class="p-0 border"><input type="number" value="${v[D.krit[ki].n]||''}" min="0" max="100" onchange="sN(${rb.id},${s.id},${ti},'${D.krit[ki].n}',this.value)" class="w-full text-center text-[8px] bg-transparent focus:outline-none focus:bg-indigo-50 p-0.5"></td>`;});
-let nr=0;D.krit.forEach(k=>{nr+=(parseFloat(v[k.n])||0)*(k.b/100);});h+=`<td class="p-0.5 border text-center font-bold bg-emerald-50">${nr?nr.toFixed(1):'-'}</td>`;});h+=`</tr>`;});
-h+=`</tbody></table></div></div>`;});$('c_nilai').innerHTML=h+sig(dtN);}
+function rNilai(){
+    const fl=gFL(),sem=$('fs')?.value||'Semester 1';
+    const krits=D.krit.map(k=>({...k,d:k.n==='ASSAS'&&sem==='Semester 2'?'ASSAJ':k.n}));
+    const rbs=getActiveRombels();
+    const semEnd=sem==='Semester 1'?lastNH(2026,11):lastNH(2027,5);
+    const dtN=`${(gs().sek||'').split(' ')[0]||''}, ${semEnd.getDate()} ${BL[semEnd.getMonth()]} ${semEnd.getFullYear()}`;
+    
+    let h=dH('DAFTAR NILAI',`${D.activeMapel} • ${sem}`);
+    if(!fl.length){h+='<p class="text-center py-4 text-slate-400">Belum ada TP. Tambahkan data terlebih dahulu.</p>';$('c_nilai').innerHTML=h;return;}
+    
+    rbs.forEach(rb=>{
+        const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);
+        if(!D.nilai[rb.id])D.nilai[rb.id]={};
+        h+=`<div class="mb-3"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] rounded-t">${rb.nama} — ${rb.kelas}</div><div class="tr"><table class="w-full text-[8px] border-collapse border min-w-[500px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-0.5 border w-4" rowspan="2">No</th><th class="p-0.5 border text-left" rowspan="2">Nama</th>`;
+        fl.forEach((tp,ti)=>{h+=`<th class="p-0.5 border text-center" colspan="${krits.length+1}">${(tp.elemen||'').substring(0,8)}</th>`;});
+        h+=`</tr><tr class="bg-slate-100 text-[6px]">`;
+        fl.forEach(()=>{krits.forEach(k=>{h+=`<th class="p-0.5 border w-5">${k.d}</th>`;});h+=`<th class="p-0.5 border w-5 bg-emerald-100">NR</th>`;});
+        h+=`</tr></thead><tbody>`;
+        
+        sw.forEach((s,si)=>{
+            if(!D.nilai[rb.id][s.id])D.nilai[rb.id][s.id]={};
+            h+=`<tr class="border-b hover:bg-slate-50"><td class="p-0.5 border text-center">${si+1}</td><td class="p-0.5 border px-1">${s.nama||'-'}</td>`;
+            fl.forEach((tp,ti)=>{
+                if(!D.nilai[rb.id][s.id][ti])D.nilai[rb.id][s.id][ti]={};
+                const v=D.nilai[rb.id][s.id][ti];
+                krits.forEach((k,ki)=>{
+                    h+=`<td class="p-0 border"><input type="number" value="${v[D.krit[ki].n]||''}" min="0" max="100" onchange="sN(${rb.id},${s.id},${ti},'${D.krit[ki].n}',this.value)" class="w-full text-center text-[8px] bg-transparent focus:outline-none focus:bg-indigo-50 p-0.5"></td>`;
+                });
+                let nr=0;D.krit.forEach(k=>{nr+=(parseFloat(v[k.n])||0)*(k.b/100);});
+                h+=`<td class="p-0.5 border text-center font-bold bg-emerald-50">${nr?nr.toFixed(1):'-'}</td>`;
+            });
+            h+=`</tr>`;
+        });
+        if(!sw.length)h+=`<tr><td colspan="100" class="p-2 text-center text-slate-400">Tambah siswa di tab Siswa</td></tr>`;
+        h+=`</tbody></table></div></div>`;
+    });
+    if(!rbs.length)h+='<p class="text-center py-4 text-slate-400">Pilih rombel di filter atau tambahkan rombel</p>';
+    $('c_nilai').innerHTML=h+sig(dtN);
+}
 function sN(r,s,t,k,v){if(!D.nilai[r])D.nilai[r]={};if(!D.nilai[r][s])D.nilai[r][s]={};if(!D.nilai[r][s][t])D.nilai[r][s][t]={};D.nilai[r][s][t][k]=v?parseInt(v):'';debS();}
 
-function rAbsen(){const sem=$('fs')?.value||'Semester 1',fR=$('fr')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):D.rombel;const aR=rbs[0];const di=aR?aR.hari:4;const wks=gWeeks(sem,di,gs().mgg);const mm={};wks.forEach(w=>{if(!mm[w.mn])mm[w.mn]=[];if(!w.lib)mm[w.mn].push(w);});const mns=Object.keys(mm);
-const mIdx=BL.indexOf($('abln')?.value||mns[0]||'Juli');const yr=sem==='Semester 1'?2026:2027;const dtA=lastNH(yr,mIdx>=0?mIdx:6);const dtAS=`${gs().sek.split(' ')[0]||''}, ${dtA.getDate()} ${BL[dtA.getMonth()]} ${dtA.getFullYear()}`;
-
-let h=dH('ABSEN',`${D.activeMapel} • ${sem}`)+`<select id="abln" onchange="rAbsen()" class="bg-slate-50 border rounded p-1 text-[9px] mb-2 np">${mns.map(m=>`<option>${m}</option>`).join('')}</select>`;
-const selM=$('abln')?.value||mns[0]||'';const dates=mm[selM]||[];
-rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);if(!D.absen[rb.id])D.absen[rb.id]={};
-h+=`<div class="mb-3"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] rounded-t">${rb.nama}—${selM}</div><div class="tr"><table class="w-full text-[8px] border-collapse border min-w-[400px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-0.5 border w-4">No</th><th class="p-0.5 border text-left">Nama</th>`;dates.forEach(d=>{h+=`<th class="p-0.5 border w-5">${d.dn}</th>`;});h+=`<th class="p-0.5 border w-4 bg-emerald-100">H</th><th class="p-0.5 border w-4 bg-blue-100">I</th><th class="p-0.5 border w-4 bg-amber-100">S</th><th class="p-0.5 border w-4 bg-rose-100">A</th></tr></thead><tbody>`;
-sw.forEach((s,si)=>{let ct={H:0,I:0,S:0,A:0};h+=`<tr class="border-b"><td class="p-0.5 border text-center">${si+1}</td><td class="p-0.5 border px-1">${s.nama||'-'}</td>`;dates.forEach(d=>{if(!D.absen[rb.id][d.iso])D.absen[rb.id][d.iso]={};const v=D.absen[rb.id][d.iso][s.id]||'';if(v)ct[v]=(ct[v]||0)+1;h+=`<td class="p-0 border text-center ${{H:'bg-emerald-100',I:'bg-blue-100',S:'bg-amber-100',A:'bg-rose-100'}[v]||''}"><select onchange="sA(${rb.id},'${d.iso}',${s.id},this.value)" class="w-full bg-transparent text-center text-[7px] focus:outline-none cursor-pointer"><option value="">-</option>${['H','I','S','A'].map(x=>`<option ${v===x?'selected':''}>${x}</option>`).join('')}</select></td>`;});
-h+=`<td class="p-0.5 border text-center font-bold bg-emerald-50">${ct.H}</td><td class="p-0.5 border text-center font-bold bg-blue-50">${ct.I}</td><td class="p-0.5 border text-center font-bold bg-amber-50">${ct.S}</td><td class="p-0.5 border text-center font-bold bg-rose-50">${ct.A}</td></tr>`;});
-h+=`</tbody></table></div></div>`;});$('c_absen').innerHTML=h+sig(dtAS);}
+function rAbsen(){
+    const sem=$('fs')?.value||'Semester 1';
+    const rbs=getActiveRombels();
+    const aR=rbs[0];const di=aR?aR.hari:4;
+    const wks=gWeeks(sem,di,gs().mgg);
+    const mm={};wks.forEach(w=>{if(!mm[w.mn])mm[w.mn]=[];if(!w.lib)mm[w.mn].push(w);});
+    const mns=Object.keys(mm);
+    
+    // Build month selector first, preserve selection
+    const existingSel = $('abln')?.value;
+    const selM = existingSel && mns.includes(existingSel) ? existingSel : (mns[0]||'');
+    const dates=mm[selM]||[];
+    
+    const mIdx=BL.indexOf(selM);const yr=sem==='Semester 1'?2026:2027;
+    const dtA=lastNH(yr,mIdx>=0?mIdx:6);
+    const dtAS=`${(gs().sek||'').split(' ')[0]||''}, ${dtA.getDate()} ${BL[dtA.getMonth()]} ${dtA.getFullYear()}`;
+    
+    let h=dH('ABSEN KEHADIRAN',`${D.activeMapel} • ${sem}`);
+    h+=`<select id="abln" onchange="rAbsen()" class="bg-slate-50 border rounded p-1 text-[9px] mb-2 np">${mns.map(m=>`<option ${m===selM?'selected':''}>${m}</option>`).join('')}</select>`;
+    
+    rbs.forEach(rb=>{
+        const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);
+        if(!D.absen[rb.id])D.absen[rb.id]={};
+        h+=`<div class="mb-3"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] rounded-t">${rb.nama} — ${selM}</div><div class="tr"><table class="w-full text-[8px] border-collapse border min-w-[400px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-0.5 border w-4">No</th><th class="p-0.5 border text-left">Nama</th>`;
+        dates.forEach(d=>{h+=`<th class="p-0.5 border w-5">${d.dn}</th>`;});
+        h+=`<th class="p-0.5 border w-4 bg-emerald-100">H</th><th class="p-0.5 border w-4 bg-blue-100">I</th><th class="p-0.5 border w-4 bg-amber-100">S</th><th class="p-0.5 border w-4 bg-rose-100">A</th></tr></thead><tbody>`;
+        
+        sw.forEach((s,si)=>{
+            let ct={H:0,I:0,S:0,A:0};
+            h+=`<tr class="border-b"><td class="p-0.5 border text-center">${si+1}</td><td class="p-0.5 border px-1">${s.nama||'-'}</td>`;
+            dates.forEach(d=>{
+                if(!D.absen[rb.id][d.iso])D.absen[rb.id][d.iso]={};
+                const v=D.absen[rb.id][d.iso][s.id]||'';
+                if(v)ct[v]=(ct[v]||0)+1;
+                const bg={H:'bg-emerald-100',I:'bg-blue-100',S:'bg-amber-100',A:'bg-rose-100'};
+                h+=`<td class="p-0 border text-center ${bg[v]||''}"><select onchange="sA(${rb.id},'${d.iso}',${s.id},this.value)" class="w-full bg-transparent text-center text-[7px] focus:outline-none cursor-pointer"><option value="">-</option>${['H','I','S','A'].map(x=>`<option ${v===x?'selected':''}>${x}</option>`).join('')}</select></td>`;
+            });
+            h+=`<td class="p-0.5 border text-center font-bold bg-emerald-50">${ct.H}</td><td class="p-0.5 border text-center font-bold bg-blue-50">${ct.I}</td><td class="p-0.5 border text-center font-bold bg-amber-50">${ct.S}</td><td class="p-0.5 border text-center font-bold bg-rose-50">${ct.A}</td></tr>`;
+        });
+        if(!sw.length)h+=`<tr><td colspan="100" class="p-2 text-center text-slate-400">Tambah siswa</td></tr>`;
+        h+=`</tbody></table></div></div>`;
+    });
+    if(!rbs.length)h+='<p class="text-center py-4 text-slate-400">Pilih rombel</p>';
+    $('c_absen').innerHTML=h+sig(dtAS);
+}
 function sA(r,iso,sw,v){if(!D.absen[r])D.absen[r]={};if(!D.absen[r][iso])D.absen[r][iso]={};D.absen[r][iso][sw]=v;debS();}
 
-function rJurnal(){const sem=$('fs')?.value||'Semester 1',fR=$('fr')?.value;let rbs=fR?D.rombel.filter(r=>r.id==fR):D.rombel;const aR=rbs[0];const di=aR?aR.hari:4;const fl=gFL();const allWks=gWeeks(sem,di,gs().mgg).filter(w=>!w.lib);
-const smBl=sem==='Semester 1'?['Juli','Agustus','September','Oktober','November','Desember']:['Januari','Februari','Maret','April','Mei','Juni'];
-const mm={};allWks.forEach(w=>{if(!mm[w.mn])mm[w.mn]=[];mm[w.mn].push(w);});
+// ================================================================
+// OTHER RENDERERS (simplified - jadwal, data, siswa, atp, prota, promes, modul, kktp, jurnal)
+// ================================================================
+function rJadwal(){const hl=getHL();const dur=durJP();const jm={};hl.forEach((_,i)=>{jm[i]={};});const rbs=getActiveRombels();rbs.forEach(r=>{for(let jp=r.jp1;jp<=r.jp2;jp++){if(!jm[r.hari])jm[r.hari]={};if(!jm[r.hari][jp])jm[r.hari][jp]=[];jm[r.hari][jp].push(r);}});let st=7*60;const slots=[];for(let jp=1;jp<=10;jp++){if(jp-1===D.ist1)slots.push({t:'ist',l:'Ist 1',s:st,e:st+20});if(D.ist>=2&&jp-1===D.ist2)slots.push({t:'ist',l:'Ist 2',s:st,e:st+15});slots.push({t:'jp',jp,s:st,e:st+dur});st+=dur;if(jp===D.ist1)st+=20;if(D.ist>=2&&jp===D.ist2)st+=15;}const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}.${String(m%60).padStart(2,'0')}`;let rows='';slots.forEach(sl=>{if(sl.t==='ist'){rows+=`<tr class="bg-amber-50 text-amber-700 font-bold text-[7px]"><td class="p-0.5 border text-center" colspan="${hl.length+2}">${sl.l} (${fmt(sl.s)}-${fmt(sl.e)})</td></tr>`;return;}let cells='';hl.forEach((_,hi)=>{const rs=jm[hi]?.[sl.jp]||[];if(!rs.length)cells+=`<td class="p-0.5 border text-center text-slate-300 text-[7px]">-</td>`;else cells+=`<td class="p-0.5 border text-center ${rs.length===1?WR[rs[0].warna%WR.length].bg+' text-white font-bold text-[7px]':'bg-slate-50 text-[6px]'}">${rs.map(r=>r.nama).join(' ')}</td>`;});rows+=`<tr class="border-b"><td class="p-0.5 border text-center font-bold bg-slate-50 text-[7px]">${sl.jp}</td><td class="p-0.5 border text-center text-[6px] text-slate-500 bg-slate-50">${fmt(sl.s)}-${fmt(sl.e)}</td>${cells}</tr>`;});
+$('c_jadwal').innerHTML=dH('JADWAL PELAJARAN')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[450px]"><thead><tr class="bg-indigo-700 text-white text-[7px] font-bold"><th class="p-1 border w-6">JP</th><th class="p-1 border w-14">Waktu(${dur}')</th>${hl.map(h=>`<th class="p-1 border">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${sig()}`;}
 
-const selM=$('jbln')?.value||smBl[0]||'';const mIdx=BL.indexOf(selM);const yr=sem==='Semester 1'?2026:2027;const dtJ=lastNH(yr,mIdx>=0?mIdx:6);const dtJS=`${gs().sek.split(' ')[0]||''}, ${dtJ.getDate()} ${BL[dtJ.getMonth()]} ${dtJ.getFullYear()}`;
+function rData(){const fl=gFL();$('c_data').innerHTML=dH('DATA CP/TP')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[800px]"><thead><tr class="bg-indigo-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-10">Kls</th><th class="p-1 border w-8">Fase</th><th class="p-1 border w-12">Smt</th><th class="p-1 border w-16">Elemen</th><th class="p-1 border">CP</th><th class="p-1 border">TP</th><th class="p-1 border w-16">Dimensi</th><th class="p-1 border w-4">Prt</th><th class="p-1 border w-4 np">⚙</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b text-[8px] hover:bg-slate-50"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r">${d.kelas}</td><td class="p-1 border-r text-indigo-600">${fase(d.kelas)}</td><td class="p-1 border-r">${d.semester}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-slate-500">${d.cp}</td><td class="p-1 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1 border-r text-slate-500">${d.dimensi}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan}</td><td class="p-1 text-center np"><button onclick="delTP(${activeTP().indexOf(d)})" class="text-rose-500">🗑</button></td></tr>`).join('')||'<tr><td colspan="10" class="p-3 text-center text-slate-400">No data</td></tr>'}</tbody></table></div>`;}
 
-let h=dH('JURNAL PEMBELAJARAN',`${D.activeMapel} • ${sem} • ${selM}`)+`<select id="jbln" onchange="rJurnal()" class="bg-slate-50 border rounded p-1 text-[9px] mb-2 np">${smBl.map(m=>`<option>${m}</option>`).join('')}</select>`;
-const dates=mm[selM]||[];
-// Map global weeks to TP
+function rSiswa(){const rbs=getActiveRombels();let h=dH('DATA SISWA');rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);h+=`<div class="mb-3 border rounded-lg overflow-hidden"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] flex justify-between"><span>${rb.nama}—${rb.kelas} (${sw.length})</span><button onclick="addSW(${rb.id})" class="bg-white/20 px-1.5 py-0.5 rounded text-[8px] np">＋</button></div><table class="w-full text-[9px] border-collapse"><thead><tr class="bg-slate-100 font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">NIS</th><th class="p-1 border">Nama</th><th class="p-1 border w-6">JK</th><th class="p-1 border w-4 np">⚙</th></tr></thead><tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-0.5 border text-center">${i+1}</td><td class="p-0.5 border"><input value="${s.nis}" onchange="uSW(${s.id},'nis',this.value)" class="w-full bg-transparent text-[9px] focus:outline-none"></td><td class="p-0.5 border"><input value="${s.nama}" onchange="uSW(${s.id},'nama',this.value)" class="w-full bg-transparent text-[9px] font-bold focus:outline-none"></td><td class="p-0.5 border text-center"><select onchange="uSW(${s.id},'jk',this.value)" class="bg-transparent text-[9px]"><option ${s.jk==='L'?'selected':''}>L</option><option ${s.jk==='P'?'selected':''}>P</option></select></td><td class="p-0.5 border text-center np"><button onclick="rmSW(${s.id})" class="text-rose-500 text-[8px]">🗑</button></td></tr>`).join('')||'<tr><td colspan="5" class="p-2 text-center text-slate-400">No siswa</td></tr>'}</tbody></table></div>`;});if(!rbs.length)h+='<p class="text-center py-4 text-slate-400">Pilih/tambah rombel</p>';$('c_siswa').innerHTML=h;}
+
+function rAtp(){const s=gs(),fl=gFL();$('c_atp').innerHTML=dH('ATP / SILABUS')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[700px]"><thead><tr class="bg-emerald-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-24">CP</th><th class="p-1 border w-10">JP</th><th class="p-1 border w-20">Metode</th><th class="p-1 border w-16">Dimensi</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b text-[8px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-emerald-900">${d.tp}</td><td class="p-1 border-r text-slate-500 truncate max-w-[120px]">${d.cp}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan*4}</td><td class="p-1 border-r text-slate-500">${s.metode}</td><td class="p-1 text-slate-500">${d.dimensi}</td></tr>`).join('')||'<tr><td colspan="7" class="p-3 text-center text-slate-400">No data</td></tr>'}</tbody></table></div>${sig()}`;}
+
+function rProta(){let body='',gt=0;['Semester 1','Semester 2'].forEach(sem=>{let list=activeTP().filter(d=>d.semester===sem);const fk=$('fk')?.value;if(fk)list=list.filter(d=>d.kelas===fk);let st=0;list.forEach(d=>st+=d.pertemuan*4);gt+=st;body+=`<tr class="bg-indigo-100 font-bold text-indigo-900"><td colspan="5" class="p-1 uppercase text-[8px]">${sem}—${st}JP</td></tr>`;list.forEach((d,i)=>{body+=`<tr class="border-b text-[8px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r">${d.tp}</td><td class="p-1 border-r text-center">${sem}</td><td class="p-1 text-center font-bold">${d.pertemuan*4}JP</td></tr>`;});});body+=`<tr class="bg-indigo-800 text-white font-black text-[9px]"><td colspan="4" class="p-1 text-right border-r">Total:</td><td class="p-1 text-center">${gt}JP</td></tr>`;$('c_prota').innerHTML=dH('PROTA')+`<div class="tr"><table class="w-full text-xs border-collapse border min-w-[500px]"><thead><tr class="bg-emerald-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-12">Smt</th><th class="p-1 border w-10">JP</th></tr></thead><tbody>${body}</tbody></table></div>${sig()}`;}
+
+function rPromes(){const s=gs(),sem=$('fs')?.value||'Semester 1';let fl=activeTP().filter(d=>d.semester===sem);const fk=$('fk')?.value;if(fk)fl=fl.filter(d=>d.kelas===fk);const aR=getActiveRombels()[0]||D.rombel[0];const di=aR?aR.hari:4;const wks=gWeeks(sem,di,s.mgg);const mg=[];let cm2=null;wks.forEach(w=>{if(!cm2||cm2.n!==w.mn){cm2={n:w.mn,w:[]};mg.push(cm2);}cm2.w.push(w);});let th1=`<tr class="bg-indigo-700 text-white font-bold text-[6px]"><th rowspan="2" class="border w-4">No</th><th rowspan="2" class="border text-left min-w-[100px]">TP</th><th rowspan="2" class="border w-5">JP</th><th rowspan="2" class="border w-4">Mg</th>`;mg.forEach(m=>{th1+=`<th colspan="${m.w.length}" class="border text-center">${m.n.substr(0,3)}</th>`;});th1+=`</tr><tr class="bg-indigo-600 text-white text-[5px]">`;mg.forEach(m=>{m.w.forEach((_,i)=>{th1+=`<th class="border w-4">${i+1}</th>`;});});th1+=`</tr>`;const ew=[];wks.forEach((w,i)=>{if(w.eff)ew.push(i);});let tb='',ep=0;fl.forEach((d,di)=>{const ai=[];for(let k=0;k<d.pertemuan;k++)if(ep<ew.length)ai.push(ew[ep++]);tb+=`<tr class="border-b text-[8px]"><td class="border py-0.5 text-center">${di+1}</td><td class="border px-1 py-0.5 text-[7px]">${d.tp}</td><td class="border py-0.5 text-center font-bold">${d.pertemuan*4}</td><td class="border py-0.5 text-center">${d.pertemuan}</td>`;wks.forEach((w,gi)=>{tb+=ai.includes(gi)?`<td class="border py-0.5 text-center font-bold bg-indigo-200 text-indigo-950 text-[7px]">${w.dn}</td>`:w.lib?`<td class="border py-0.5 text-center bg-red-100 text-red-800 text-[5px]">LBR</td>`:`<td class="border py-0.5 text-center text-slate-300 text-[6px]">·</td>`;});tb+=`</tr>`;});tb+=`<tr class="bg-slate-100 font-bold border-t-2 text-[7px]"><td colspan="4" class="border px-1 py-0.5 text-right text-[6px]">Tgl:</td>`;wks.forEach(w=>{tb+=w.lib?`<td class="border py-0.5 text-center bg-red-200 text-red-900 text-[5px]">LBR</td>`:`<td class="border py-0.5 text-center text-indigo-900 font-extrabold text-[7px]">${w.dn}</td>`;});tb+=`</tr>`;$('c_promes').innerHTML=dH('PROMES',`${D.activeMapel} • ${sem}`)+`<p class="text-[7px] text-indigo-700 font-bold mb-1">*Tgl real ${HR[di]}</p><table class="w-full border-collapse border min-w-[700px]"><thead>${th1}</thead><tbody>${tb}</tbody></table>${sig()}`;}
+
+function rModul(){const fl=gFL();if(!fl.length){$('c_modul').innerHTML='<div class="text-center py-6 text-slate-400">No data</div>';return;}const d=fl[0],s=gs(),djp=durJP();$('c_modul').innerHTML=dH('MODUL AJAR')+`<table class="w-full text-[9px] border-collapse border mb-2"><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border-r w-1/3">Kelas/Fase</td><td class="p-1">${d.kelas} (Fase ${fase(d.kelas)}) / ${d.semester}</td></tr><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border-r">TP</td><td class="p-1 font-bold text-emerald-900">${d.tp}</td></tr><tr><td class="p-1 font-bold bg-slate-50 border-r">Alokasi</td><td class="p-1">${d.pertemuan} Prt (${d.pertemuan*4} JP @ ${djp}')</td></tr></table>${Array.from({length:d.pertemuan},(_,i)=>`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><h5 class="font-bold text-indigo-900 text-[10px] border-b pb-1 mb-1">Prt ${i+1}</h5><div class="text-[9px] space-y-1"><div class="p-1 bg-blue-50 border border-blue-200 rounded">🧘 Pendahuluan (${Math.round(djp*4*.1)}')</div><div class="p-1 bg-emerald-50 border border-emerald-200 rounded">💡 Inti (${Math.round(djp*4*.8)}')—${s.metode}</div><div class="p-1 bg-amber-50 border border-amber-200 rounded">🎉 Penutup (${Math.round(djp*4*.1)}')</div></div></div>`).join('')}${sig()}`;}
+
+function rKktp(){const fl=gFL();$('c_kktp').innerHTML=dH('KKTP')+`${fl.map((d,i)=>`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><div class="flex justify-between border-b pb-1 mb-1"><div><span class="bg-indigo-700 text-white text-[6px] font-black px-1 rounded">${d.elemen}</span><h4 class="font-bold text-[10px] mt-0.5">${d.tp}</h4></div><span class="text-[8px] bg-indigo-100 font-bold px-1 rounded">${d.pertemuan*4}JP</span></div><table class="w-full text-[8px] border-collapse border bg-white"><thead><tr class="bg-slate-100 font-bold"><th class="p-0.5 border text-left w-1/5">Aspek</th><th class="p-0.5 border bg-rose-50">0-60%</th><th class="p-0.5 border bg-amber-50">61-70%</th><th class="p-0.5 border bg-emerald-50">71-85%</th><th class="p-0.5 border bg-blue-50">86-100%</th></tr></thead><tbody><tr><td class="p-0.5 font-bold bg-slate-50 border">Konsep</td><td class="p-0.5 border">Belum</td><td class="p-0.5 border">Bimbingan</td><td class="p-0.5 border font-medium">Mandiri</td><td class="p-0.5 border font-bold">Fasih</td></tr><tr><td class="p-0.5 font-bold bg-slate-50 border">Perilaku</td><td class="p-0.5 border">Belum</td><td class="p-0.5 border">Diingatkan</td><td class="p-0.5 border font-medium">Konsisten</td><td class="p-0.5 border font-bold">Teladan</td></tr></tbody></table></div>`).join('')||'<p class="text-center py-4 text-slate-400">No data</p>'}${sig()}`;}
+
+function rJurnal(){const sem=$('fs')?.value||'Semester 1';const rbs=getActiveRombels();const aR=rbs[0];const di=aR?aR.hari:4;const fl=gFL();const allWks=gWeeks(sem,di,gs().mgg).filter(w=>!w.lib);const smBl=sem==='Semester 1'?['Juli','Agustus','September','Oktober','November','Desember']:['Januari','Februari','Maret','April','Mei','Juni'];const mm={};allWks.forEach(w=>{if(!mm[w.mn])mm[w.mn]=[];mm[w.mn].push(w);});const existingSel=$('jbln')?.value;const selM=existingSel&&smBl.includes(existingSel)?existingSel:(smBl[0]||'');const dates=mm[selM]||[];const mIdx=BL.indexOf(selM);const yr=sem==='Semester 1'?2026:2027;const dtJ=lastNH(yr,mIdx>=0?mIdx:6);const dtJS=`${(gs().sek||'').split(' ')[0]||''}, ${dtJ.getDate()} ${BL[dtJ.getMonth()]} ${dtJ.getFullYear()}`;
+let h=dH('JURNAL PEMBELAJARAN',`${D.activeMapel} • ${sem} • ${selM}`)+`<select id="jbln" onchange="rJurnal()" class="bg-slate-50 border rounded p-1 text-[9px] mb-2 np">${smBl.map(m=>`<option ${m===selM?'selected':''}>${m}</option>`).join('')}</select>`;
 let tpI=0,tpP=0;const wtm={};allWks.forEach(w=>{const ct=fl[tpI];if(!ct){wtm[w.iso]=fl[fl.length-1]||{tp:'-'};return;}tpP++;if(ct&&tpP>ct.pertemuan){tpP=1;tpI++;}wtm[w.iso]=fl[tpI]||{tp:'-'};});
-
-rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);
-h+=`<div class="mb-3"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] rounded-t">Jurnal ${rb.nama}—${selM}</div><div class="tr"><table class="w-full text-[8px] border-collapse border min-w-[650px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Tgl</th><th class="p-1 border w-6">JP</th><th class="p-1 border">Materi/TP</th><th class="p-1 border w-28">Kegiatan</th><th class="p-1 border w-6">H</th><th class="p-1 border w-6">A</th><th class="p-1 border w-24">Catatan</th></tr></thead><tbody>`;
-dates.forEach((wk,wi)=>{const tp=wtm[wk.iso]||{tp:'-'};const abD=D.absen[rb.id]?.[wk.iso]||{};let hdr=0,abs=0;sw.forEach(s=>{const v=abD[s.id];if(v==='H')hdr++;else if(v)abs++;});
-const jE=D.jurnal.find(j=>j.t===wk.iso&&j.r===rb.id);
-h+=`<tr class="border-b hover:bg-slate-50"><td class="p-0.5 border text-center">${wi+1}</td><td class="p-0.5 border text-[7px]">${HR[di].substr(0,3)}, ${wk.dn}/${BL.indexOf(wk.mn)+1}</td><td class="p-0.5 border text-center">${rb.jp1}-${rb.jp2}</td><td class="p-0.5 border px-1 text-emerald-900 text-[7px]">${tp.tp}</td><td class="p-0 border"><input value="${jE?.k||''}" onchange="sJ('${wk.iso}',${rb.id},'k',this.value)" class="w-full bg-transparent text-[8px] focus:outline-none focus:bg-indigo-50 p-0.5"></td><td class="p-0.5 border text-center font-bold text-emerald-700">${hdr||'-'}</td><td class="p-0.5 border text-center font-bold text-rose-700">${abs||'-'}</td><td class="p-0 border"><input value="${jE?.c||''}" onchange="sJ('${wk.iso}',${rb.id},'c',this.value)" class="w-full bg-transparent text-[8px] focus:outline-none focus:bg-amber-50 p-0.5"></td></tr>`;});
-h+=`</tbody></table></div></div>`;});$('c_jurnal').innerHTML=h+sig(dtJS);}
+rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);h+=`<div class="mb-3"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] rounded-t">Jurnal ${rb.nama}—${selM}</div><div class="tr"><table class="w-full text-[8px] border-collapse border min-w-[650px]"><thead><tr class="bg-slate-200 font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Tgl</th><th class="p-1 border w-6">JP</th><th class="p-1 border">Materi</th><th class="p-1 border w-28">Kegiatan</th><th class="p-1 border w-6">H</th><th class="p-1 border w-6">A</th><th class="p-1 border w-24">Catatan</th></tr></thead><tbody>`;dates.forEach((wk,wi)=>{const tp=wtm[wk.iso]||{tp:'-'};const abD=D.absen[rb.id]?.[wk.iso]||{};let hdr=0,abs=0;sw.forEach(s=>{const v=abD[s.id];if(v==='H')hdr++;else if(v)abs++;});const jE=D.jurnal.find(j=>j.t===wk.iso&&j.r===rb.id);h+=`<tr class="border-b hover:bg-slate-50"><td class="p-0.5 border text-center">${wi+1}</td><td class="p-0.5 border text-[7px]">${HR[di].substr(0,3)},${wk.dn}/${BL.indexOf(wk.mn)+1}</td><td class="p-0.5 border text-center">${rb.jp1}-${rb.jp2}</td><td class="p-0.5 border px-1 text-emerald-900 text-[7px]">${tp.tp}</td><td class="p-0 border"><input value="${jE?.k||''}" onchange="sJ('${wk.iso}',${rb.id},'k',this.value)" class="w-full bg-transparent text-[8px] focus:outline-none focus:bg-indigo-50 p-0.5"></td><td class="p-0.5 border text-center font-bold text-emerald-700">${hdr||'-'}</td><td class="p-0.5 border text-center font-bold text-rose-700">${abs||'-'}</td><td class="p-0 border"><input value="${jE?.c||''}" onchange="sJ('${wk.iso}',${rb.id},'c',this.value)" class="w-full bg-transparent text-[8px] focus:outline-none focus:bg-amber-50 p-0.5"></td></tr>`;});h+=`</tbody></table></div></div>`;});$('c_jurnal').innerHTML=h+sig(dtJS);}
 function sJ(t,r,f,v){let i=D.jurnal.findIndex(j=>j.t===t&&j.r===r);if(i===-1){D.jurnal.push({t,r,k:'',c:''});i=D.jurnal.length-1;}D.jurnal[i][f]=v;debS();}
 
-// ======== PROMPT AI ========
-function promptAI(type){
-    const s=gs(),fl=gFL(),d=fl[0]||{kelas:'Kelas 1',elemen:'-',tp:'-',cp:'-',dimensi:'-',semester:'Semester 1'};let txt='',title='',extra='';
-    if(type==='lkpd'){title='✨ LKPD AI';txt=`Buatkan LKPD A4:\n- ${s.sek} (NPSN:${s.npsn})\n- ${D.activeMapel}, ${d.kelas}(Fase ${fase(d.kelas)}), ${d.semester}\n- Elemen: ${d.elemen}\n- TP: "${d.tp}"\n- Durasi JP: ${durJP()} menit\n- Guru: ${s.guru}\n\n1.Header 2.Pemantik 3.Menjodohkan,Isian,Analisis 4.Refleksi 5.Rubrik`;}
-    else if(type==='soal'){title='📝 Soal AI';extra=`<div class="space-y-1"><p class="text-[9px] font-bold">Tipe Soal:</p><div class="flex flex-wrap gap-1"><label class="text-[9px]"><input type="checkbox" class="scb" value="Pilihan Ganda" checked> PG</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Benar Salah"> B/S</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Menjodohkan"> Jodoh</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Isian Singkat" checked> Isian</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Uraian"> Uraian</label></div><div class="flex gap-2 items-center"><label class="text-[9px]">Per tipe:</label><input type="number" id="jSoal" value="5" min="1" max="20" class="w-12 iw text-[9px]"></div><button onclick="genSoal()" class="bg-cyan-600 text-white text-[9px] font-bold px-3 py-1 rounded mt-1">Generate</button></div>`;txt='(Pilih tipe soal lalu klik Generate)';}
-    else if(type==='csv_tp'){title='📄 AI CSV TP';txt=`Buatkan CSV lengkap:\nKelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan\n\n- Mapel: ${D.activeMapel}\n- Jenjang: ${s.jnj}\n- Kelas: 1-${['SD','MI'].includes(s.jnj)?6:['SMP','MTs'].includes(s.jnj)?9:12}\n- Semester 1 & 2\n- CP sesuai kurikulum merdeka resmi\n- TP operasional dari CP\n- Dimensi Profil Lulusan Pancasila\n- Pertemuan = estimasi angka\n\nFormat CSV langsung siap import!`;}
-    else if(type==='csv_siswa'){title='👨‍🎓 AI CSV Siswa';txt=`Buatkan CSV siswa:\nNama,NIS,Rombel,JK\n\n- Rombel: ${D.rombel.map(r=>r.nama).join(', ')||'1A, 1B'}\n- 25-30 siswa/rombel\n- Nama Indonesia umum\n- NIS 5 digit\n- JK: L/P merata\n\nFormat CSV siap import!`;}
-    $('mdlT').textContent=title;$('mdlX').innerHTML=extra;$('pta').value=txt;$('cfb').classList.add('hidden');$('mdl').classList.remove('hidden');
-}
-function genSoal(){const s=gs(),fl=gFL(),d=fl[0]||{kelas:'Kelas 1',elemen:'-',tp:'-',cp:'-'};const types=Array.from(document.querySelectorAll('.scb:checked')).map(c=>c.value);const jml=parseInt($('jSoal')?.value)||5;if(!types.length){toast('Pilih min 1 tipe!');return;}
-$('pta').value=`Buatkan soal evaluasi:\n\n📋 INFO:\n- ${D.activeMapel}, ${s.jnj} ${d.kelas} (Fase ${fase(d.kelas)})\n- ${d.semester||$('fs')?.value||'Semester 1'}\n- Elemen: ${d.elemen}\n- CP: ${d.cp}\n- TP: "${d.tp}"\n- Durasi JP: ${durJP()} menit\n\n📝 TIPE:\n${types.map(t=>`- ${t}: ${jml} soal`).join('\n')}\n\nTotal: ${types.length*jml} soal\n\n⚙️ KETENTUAN:\n- Level C1-C4\n- Sertakan KUNCI JAWABAN\n- PG: 4 pilihan (A-D)\n- Bahasa sesuai ${s.jnj}\n\nBuatkan variatif & berkualitas!`;}
+// ================================================================
+// PROMPT AI
+// ================================================================
+function promptAI(type){const s=gs(),fl=gFL(),d=fl[0]||{kelas:'Kelas 1',elemen:'-',tp:'-',cp:'-',dimensi:'-',semester:'Semester 1'};let txt='',title='',extra='';
+if(type==='lkpd'){title='✨ LKPD';txt=`Buatkan LKPD A4:\n- ${s.sek}(${s.npsn})\n- ${D.activeMapel}, ${d.kelas}(Fase ${fase(d.kelas)}), ${d.semester}\n- Elemen:${d.elemen}\n- TP:"${d.tp}"\n- JP:${durJP()}'\n- Guru:${s.guru}\n\n1.Header 2.Pemantik 3.Aktivitas 4.Refleksi 5.Rubrik`;}
+else if(type==='soal'){title='📝 Soal';extra=`<div class="space-y-1"><p class="text-[9px] font-bold">Tipe:</p><div class="flex flex-wrap gap-1"><label class="text-[9px]"><input type="checkbox" class="scb" value="Pilihan Ganda" checked> PG</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Benar Salah"> B/S</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Menjodohkan"> Jodoh</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Isian Singkat" checked> Isian</label><label class="text-[9px]"><input type="checkbox" class="scb" value="Uraian"> Uraian</label></div><div class="flex gap-2 items-center"><label class="text-[9px]">Per tipe:</label><input type="number" id="jSoal" value="5" min="1" max="20" class="w-12 iw text-[9px]"></div><button onclick="genSoal()" class="bg-cyan-600 text-white text-[9px] font-bold px-3 py-1 rounded mt-1">Generate</button></div>`;txt='(Pilih tipe lalu Generate)';}
+else if(type==='csv_tp'){title='📄 AI CSV TP';txt=`CSV lengkap:\nKelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan\n\n- Mapel:${D.activeMapel}\n- Jenjang:${s.jnj}\n- Kelas 1-${['SD','MI'].includes(s.jnj)?6:['SMP','MTs'].includes(s.jnj)?9:12}\n- Smt 1&2, CP resmi, TP operasional\nFormat CSV siap import!`;}
+else if(type==='csv_siswa'){title='👨‍🎓 AI CSV Siswa';txt=`CSV siswa:\nNama,NIS,Rombel,JK\n\n- Rombel:${D.rombel.map(r=>r.nama).join(',')}\n- 25-30 siswa/rbl, nama Indonesia, NIS 5 digit, JK L/P\nFormat CSV siap import!`;}
+$('mdlT').textContent=title;$('mdlX').innerHTML=extra;$('pta').value=txt;$('cfb').classList.add('hidden');$('mdl').classList.remove('hidden');}
+function genSoal(){const s=gs(),fl=gFL(),d=fl[0]||{kelas:'Kelas 1',elemen:'-',tp:'-',cp:'-'};const types=Array.from(document.querySelectorAll('.scb:checked')).map(c=>c.value);const jml=parseInt($('jSoal')?.value)||5;if(!types.length){toast('Pilih min 1 tipe');return;}$('pta').value=`Soal evaluasi:\n\n- ${D.activeMapel}, ${s.jnj} ${d.kelas}(Fase ${fase(d.kelas)})\n- ${d.semester||$('fs')?.value||'Smt 1'}\n- Elemen:${d.elemen}\n- CP:${d.cp}\n- TP:"${d.tp}"\n- JP:${durJP()}'\n\nTipe:\n${types.map(t=>`- ${t}: ${jml} soal`).join('\n')}\nTotal: ${types.length*jml}\n\nKunci jawaban lengkap, level C1-C4, bahasa ${s.jnj}.`;}
 function cpx(){$('pta').select();document.execCommand('copy');$('cfb').classList.remove('hidden');setTimeout(()=>$('cfb').classList.add('hidden'),2000);}
 
-// ======== RENDER ALL ========
+// ================================================================
+// RENDER ALL
+// ================================================================
 function ra(){
     const fl=gFL();let tj=0;fl.forEach(d=>tj+=d.pertemuan*4);
-    $('s1').textContent=fl.length;$('s1d').textContent=tj+' JP';
-    $('s2').textContent=D.rombel.length;$('s2d').textContent=D.rombel.map(r=>r.nama).join(',')||'-';
-    $('s3').textContent=D.siswa.length;$('s3d').textContent=D.rombel.map(r=>`${r.nama}:${swByR(r.id).length}`).join(' ')||'-';
-    $('s4').textContent=durJP()+"'";$('s4d').textContent=$('jnj')?.value||'SD';
-    $('lta').textContent=`T.A. ${$('ta')?.value||''} • ${$('jnj')?.value||'SD'}`;$('fy').textContent=($('ta')?.value||'').split('/')[0]||'2026';
+    if($('s1'))$('s1').textContent=fl.length;
+    if($('s1d'))$('s1d').textContent=tj+' JP';
+    if($('s2'))$('s2').textContent=D.rombel.length;
+    if($('s2d'))$('s2d').textContent=D.rombel.map(r=>r.nama).join(',')||'-';
+    if($('s3'))$('s3').textContent=D.siswa.length;
+    if($('s3d'))$('s3d').textContent=D.rombel.map(r=>`${r.nama}:${swByR(r.id).length}`).join(' ')||'-';
+    if($('lta'))$('lta').textContent=`T.A. ${$('ta')?.value||''} • ${$('jnj')?.value||'SD'}`;
     D.hpm=parseInt($('iHari')?.value)||5;D.ist=parseInt($('iIst')?.value)||1;D.ist1=parseInt($('iIst1')?.value)||4;D.ist2=parseInt($('iIst2')?.value)||6;
-    buildContent();rJadwal();rData();rSiswa();rAtp();rProta();rPromes();rModul();rKktp();rNilai();rAbsen();rJurnal();
+    rJadwal();rData();rSiswa();rAtp();rProta();rPromes();rModul();rKktp();rNilai();rAbsen();rJurnal();
 }
-function resetAll(){if(confirm('Reset SEMUA?')){uDoc().delete().then(()=>{localStorage.removeItem('sg_uid');location.reload();}).catch(()=>location.reload());}}
+function resetAll(){if(confirm('Reset SEMUA?')){if(currentUser)uDoc().delete().then(()=>location.reload()).catch(()=>location.reload());}}
 
-// ======== INIT ========
-document.addEventListener('DOMContentLoaded',()=>{const dz=$('cdz');if(dz){dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dv');});dz.addEventListener('dragleave',()=>dz.classList.remove('dv'));dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dv');const f=e.dataTransfer.files[0];if(f?.name.endsWith('.csv')){const dt=new DataTransfer();dt.items.add(f);$('cf').files=dt.files;hcsv({target:$('cf')},'tp');}});}});
-
-window.addEventListener('DOMContentLoaded',async()=>{
-    popK();buildNav();buildContent();$('du').textContent=uid.substr(0,12)+'...';
-    await lfs();
-    if(!D.rombel.length){D.rc=2;D.rombel=[{id:1,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:0},{id:2,nama:'1B',hari:4,jp1:5,jp2:8,kelas:'Kelas 1',warna:1}];}
-    if(!D.tp[D.activeMapel])D.tp[D.activeMapel]=[];
-    $('iHari').value=D.hpm||5;$('iIst').value=D.ist||1;$('iIst1').value=D.ist1||4;$('iIst2').value=D.ist2||6;
-    renderMapelChips();rR();rK();ra();sync('ss','☁️');
-    setTimeout(()=>{$('lo').style.opacity='0';setTimeout(()=>$('lo').style.display='none',300);},400);
-    // Realtime sync
-    uDoc().onSnapshot(snap=>{if(!snap.exists||window._sk)return;const d=snap.data();if(d){D.mapelList=d.mapelList||D.mapelList;D.activeMapel=d.activeMapel||D.activeMapel;D.tp=d.tp||{};D.rombel=d.rombel||[];D.siswa=d.siswa||[];D.nilai=d.nilai||{};D.absen=d.absen||{};D.jurnal=d.jurnal||[];D.krit=d.krit||D.krit;D.rc=d.rc||0;D.sc=d.sc||0;D.hpm=d.hpm||5;D.ist=d.ist||1;D.ist1=d.ist1||4;D.ist2=d.ist2||6;if(d.set)aS(d.set);renderMapelChips();rR();rK();ra();}});
-    const os=sfs;sfs=function(){window._sk=true;os();setTimeout(()=>window._sk=false,2000);};
+// ================================================================
+// INIT DRAG DROP
+// ================================================================
+document.addEventListener('DOMContentLoaded',()=>{
+    const dz=$('cdz');
+    if(dz){
+        dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dv');});
+        dz.addEventListener('dragleave',()=>dz.classList.remove('dv'));
+        dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dv');const f=e.dataTransfer.files[0];if(f?.name.endsWith('.csv')){const dt=new DataTransfer();dt.items.add(f);$('cf').files=dt.files;hcsv({target:$('cf')},'tp');}});
+    }
     window.addEventListener('resize',()=>{if(window.innerWidth>=768&&sbO)tsb();});
 });
 </script>
