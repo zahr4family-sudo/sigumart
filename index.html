@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SI-GUMART v6 - Sistem Administrasi Guru Smart</title>
+  <title>SI-GUMART v6.1 - Sistem Administrasi Guru Smart</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -14,17 +14,16 @@
     .active-nav{background:#2563eb;color:#fff}
     .toast{position:fixed;bottom:16px;right:16px;z-index:9999;transform:translateY(120px);opacity:0;transition:all .35s}
     .toast.show{transform:translateY(0);opacity:1}
-    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center}
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
     .modal-bg.hidden{display:none}
     .pulse-dot{width:7px;height:7px;border-radius:50%;animation:pu 1.5s infinite}
     @keyframes pu{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
     .fade-in{animation:fi .25s ease}
     @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     .sb{font-size:9px;padding:2px 7px;border-radius:9999px;font-weight:600}
-    ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:3px}
+    ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:3px}
     .jd-cell{min-width:80px;text-align:center;vertical-align:middle;padding:6px 4px;font-size:11px;border:1px solid #cbd5e1}
-    .jd-mapel{color:#2563eb;font-weight:700;font-size:12px}
-    .jd-rombel{color:#9ca3af;font-size:10px}
+    .jd-mapel{color:#2563eb;font-weight:700}
     .jd-ist{background:#fef3c7;color:#92400e;font-weight:700;text-align:center}
     .jd-empty{color:#d1d5db}
     .jd-header{background:#f1f5f9;font-weight:700;color:#475569;text-align:center;padding:8px 4px;border:1px solid #cbd5e1}
@@ -33,6 +32,7 @@
     .rombel-tab{cursor:pointer;padding:4px 12px;border-radius:9999px;font-size:10px;font-weight:700;border:1px solid #e2e8f0;transition:all .2s}
     .rombel-tab.active{background:#2563eb;color:#fff;border-color:#2563eb}
     .rombel-tab:hover{border-color:#93c5fd}
+    .modal-content{background:#fff;border-radius:1rem;box-shadow:0 25px 50px -12px rgba(0,0,0,.25);width:100%;max-width:28rem;overflow:hidden;max-height:90vh;overflow-y:auto}
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row">
@@ -41,13 +41,13 @@
   <div id="tI" class="text-lg"></div><div><p id="tT" class="font-bold text-xs"></p><p id="tM" class="text-[10px] text-slate-500"></p></div>
 </div>
 
-<!-- AUTH -->
+<!-- AUTH SCREEN -->
 <div id="authScreen" class="fixed inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 z-50 flex items-center justify-center p-4">
 <div class="w-full max-w-md">
   <div class="text-center mb-5 fade-in">
     <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-2xl shadow-xl mb-2"><i class="fa-solid fa-graduation-cap text-2xl text-white"></i></div>
     <h1 class="text-2xl font-extrabold text-white">SI-GUMART</h1>
-    <p class="text-blue-300 text-[11px]">Sistem Administrasi Guru Smart</p>
+    <p class="text-blue-300 text-[11px]">Sistem Administrasi Guru Smart v6.1</p>
   </div>
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in">
     <div class="flex border-b">
@@ -82,13 +82,13 @@
 </div>
 </div>
 
-<!-- PENDING -->
+<!-- PENDING SCREEN -->
 <div id="pendingScr" class="fixed inset-0 bg-gradient-to-br from-amber-50 to-orange-50 z-50 flex items-center justify-center p-4 hidden">
 <div class="bg-white rounded-2xl shadow-xl p-5 max-w-sm text-center space-y-3">
   <div class="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-clock text-2xl text-amber-500"></i></div>
   <h2 class="font-bold text-lg">Menunggu Persetujuan</h2>
-  <p class="text-xs text-slate-500">Akun terdaftar. Hubungi Admin untuk persetujuan:</p>
-  <div id="waContactArea" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+  <p class="text-xs text-slate-500">Akun Anda terdaftar. Hubungi Admin untuk persetujuan akses:</p>
+  <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
     <a id="waLink" href="#" target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-bold text-sm transition">
       <i class="fa-brands fa-whatsapp text-lg"></i><span>Hubungi Admin via WhatsApp</span>
     </a>
@@ -105,13 +105,41 @@
 <div id="mProfile" class="modal-bg hidden"></div>
 <div id="mImport" class="modal-bg hidden"></div>
 <div id="mLock" class="modal-bg hidden no-print">
-  <div class="bg-white rounded-2xl p-5 max-w-sm text-center space-y-2 mx-4">
+  <div class="modal-content p-5 text-center space-y-2">
     <i class="fa-solid fa-lock text-3xl text-red-400"></i>
     <h3 class="font-bold text-sm">Akses Terbatas</h3>
+    <p class="text-xs text-slate-500">Login dan minta izin admin untuk mengedit/mencetak.</p>
     <div class="flex space-x-2"><button onclick="showAuth()" class="flex-1 bg-blue-600 text-white py-1.5 rounded-lg text-xs font-bold">Login</button><button onclick="closeM('mLock')" class="flex-1 bg-slate-100 py-1.5 rounded-lg text-xs font-bold">Tutup</button></div>
   </div>
 </div>
-<div id="mAdminWA" class="modal-bg hidden"></div>
+
+<!-- WA SETTINGS MODAL (fixed) -->
+<div id="mWA" class="modal-bg hidden">
+  <div class="modal-content p-5 space-y-3">
+    <h3 class="font-bold text-sm"><i class="fa-brands fa-whatsapp text-emerald-500 mr-1"></i>Seting WhatsApp Kontak Admin</h3>
+    <p class="text-[10px] text-slate-500">Konfigurasi pesan WhatsApp yang muncul untuk user yang menunggu persetujuan.</p>
+    <div>
+      <label class="block text-[11px] font-semibold mb-1">Nomor WhatsApp Admin</label>
+      <input id="waPhoneInput" placeholder="628123456789" class="w-full border rounded-lg p-2 text-sm">
+      <p class="text-[9px] text-slate-400 mt-0.5">Format: kode negara tanpa +. Contoh: 6281234567890</p>
+    </div>
+    <div>
+      <label class="block text-[11px] font-semibold mb-1">Template Pesan</label>
+      <textarea id="waTemplateInput" rows="4" class="w-full border rounded-lg p-2 text-sm font-mono"></textarea>
+      <p class="text-[9px] text-slate-400 mt-0.5">Gunakan <b>{email}</b> untuk placeholder email user (otomatis diganti).</p>
+    </div>
+    <div class="bg-slate-50 border rounded-lg p-2">
+      <p class="text-[9px] font-semibold text-slate-600 mb-1">Preview:</p>
+      <p id="waLivePreview" class="text-[10px] italic text-slate-500"></p>
+    </div>
+    <div class="flex space-x-2">
+      <button onclick="saveWAConfig()" id="btnSaveWA" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-bold text-sm">
+        <i class="fa-solid fa-save mr-1"></i>Simpan
+      </button>
+      <button onclick="closeM('mWA')" class="flex-1 bg-slate-100 py-2 rounded-lg font-bold text-sm">Batal</button>
+    </div>
+  </div>
+</div>
 
 <!-- MOBILE BAR -->
 <div class="md:hidden bg-slate-900 text-white p-3 flex justify-between items-center no-print">
@@ -123,7 +151,7 @@
 <aside id="sidebar" class="w-full md:w-56 bg-slate-900 text-slate-200 p-2.5 hidden md:flex md:flex-col no-print shrink-0 overflow-y-auto" style="max-height:100vh">
   <div class="flex items-center space-x-2 pb-2 border-b border-slate-700 mb-2">
     <div class="bg-blue-600 p-1.5 rounded-lg"><i class="fa-solid fa-graduation-cap text-white text-sm"></i></div>
-    <div><h1 class="font-bold text-white text-xs">SI-GUMART v6</h1><p class="text-[8px] text-slate-400">Administrasi Guru Smart</p></div>
+    <div><h1 class="font-bold text-white text-xs">SI-GUMART v6.1</h1><p class="text-[8px] text-slate-400">Administrasi Guru Smart</p></div>
   </div>
   <div id="sideUser" class="bg-slate-800 rounded-lg p-2 mb-2 hidden">
     <div class="flex items-center space-x-2">
@@ -184,7 +212,6 @@
       <p class="text-[10px] text-slate-500" id="pgS">-</p>
     </div>
     <div class="flex items-center space-x-1 flex-wrap gap-0.5">
-      <!-- Rombel Tabs for doc/penilaian pages -->
       <div id="rombelTabs" class="flex space-x-1 mr-2 hidden"></div>
       <span id="accB" class="text-[8px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500"><i class="fa-solid fa-eye mr-0.5"></i>LIHAT</span>
       <button onclick="saveCloud()" id="bSave" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold hidden"><i class="fa-solid fa-cloud-arrow-up mr-0.5"></i>Simpan</button>
@@ -194,7 +221,12 @@
 
   <!-- PROFIL -->
   <div id="tab-profil" class="tab-c bg-white p-4 rounded-xl border fade-in">
-    <h3 class="font-bold text-sm mb-3 border-b pb-2"><i class="fa-solid fa-school text-blue-500 mr-1"></i>Profil Sekolah & Guru</h3>
+    <div class="flex justify-between items-center mb-3 border-b pb-2">
+      <h3 class="font-bold text-sm"><i class="fa-solid fa-school text-blue-500 mr-1"></i>Profil Sekolah & Guru</h3>
+      <button onclick="saveProfileNow()" id="btnSaveProfile" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold hidden">
+        <i class="fa-solid fa-save mr-1"></i>Simpan Profil
+      </button>
+    </div>
     <form id="fProfil" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-sm">
       <div><label class="block text-[10px] font-semibold mb-0.5">Nama Sekolah</label><input id="fS" value="SDN Nagreg 05" class="w-full border rounded-lg p-1.5 ef"></div>
       <div><label class="block text-[10px] font-semibold mb-0.5">NPSN</label><input id="fNP" value="20254123" class="w-full border rounded-lg p-1.5 ef"></div>
@@ -206,15 +238,21 @@
       <div><label class="block text-[10px] font-semibold mb-0.5">Tipe Guru</label><select id="fTG" onchange="renderAll()" class="w-full border rounded-lg p-1.5 ef"><option value="mapel">Guru Mata Pelajaran</option><option value="kelas">Guru Kelas</option></select></div>
       <div><label class="block text-[10px] font-semibold mb-0.5">Hari Masuk</label><select id="fHari" onchange="renderAll()" class="w-full border rounded-lg p-1.5 ef"><option value="5">Senin - Jumat (5 hari)</option><option value="6">Senin - Sabtu (6 hari)</option></select></div>
       <div><label class="block text-[10px] font-semibold mb-0.5">Durasi JP: <b id="jpDurLabel">35 menit</b></label><input id="fTA" value="2026/2027" placeholder="Tahun Ajaran" class="w-full border rounded-lg p-1.5 ef"></div>
-      <div class="md:col-span-2"><label class="block text-[10px] font-semibold mb-0.5">TTD Perencanaan</label><input id="fTD" value="Nagreg, 13 Juli 2026" class="w-full border rounded-lg p-1.5 ef"></div>
+      <div class="md:col-span-2"><label class="block text-[10px] font-semibold mb-0.5">TTD Perencanaan (Dokumen Perencanaan)</label><input id="fTD" value="Nagreg, 13 Juli 2026" class="w-full border rounded-lg p-1.5 ef"></div>
     </form>
+    <div class="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-2 text-[10px] text-blue-700">
+      <i class="fa-solid fa-info-circle mr-1"></i>Profil disimpan otomatis saat diedit. Tombol <b>Simpan Profil</b> untuk manual save ke cloud.
+    </div>
   </div>
 
   <!-- KALENDER -->
   <div id="tab-kalender" class="tab-c hidden space-y-2 fade-in">
     <div class="bg-white p-3 rounded-xl border">
       <h3 class="font-bold text-xs mb-1"><i class="fa-solid fa-file-csv text-emerald-500 mr-1"></i>Import Kalender</h3>
-      <div class="flex space-x-1 mb-1"><input id="csvLinkKal" placeholder="URL Google Sheet CSV" class="flex-1 border rounded p-1.5 text-[11px] ef"><button onclick="ok()&&loadLink('kal')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-link"></i></button></div>
+      <div class="flex space-x-1 mb-1">
+        <input id="csvLinkKal" placeholder="URL Google Sheet (Publish to Web / Share)" class="flex-1 border rounded p-1.5 text-[11px] ef">
+        <button onclick="ok()&&loadLink('kal')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded" title="Ambil dari Link"><i class="fa-solid fa-link"></i></button>
+      </div>
       <textarea id="csvKal" rows="2" placeholder="Semester,Tanggal,Agenda,Kategori" class="w-full border rounded p-1.5 text-[10px] font-mono bg-slate-50 ef"></textarea>
       <button onclick="ok()&&procCSV('kal')" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded mt-1">Proses</button>
     </div>
@@ -231,9 +269,19 @@
         <h3 class="font-bold text-xs">Import CP/TP</h3>
         <button onclick="ok()&&openImport()" class="bg-teal-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-download mr-0.5"></i>Guru Lain</button>
       </div>
-      <div class="flex space-x-1 mb-1"><input id="csvLinkCP" placeholder="URL Google Sheet CSV" class="flex-1 border rounded p-1.5 text-[11px] ef"><button onclick="ok()&&loadLink('cp')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-link"></i></button></div>
+      <div class="flex space-x-1 mb-1">
+        <input id="csvLinkCP" placeholder="URL Google Sheet (Publish to Web / Share)" class="flex-1 border rounded p-1.5 text-[11px] ef">
+        <button onclick="ok()&&loadLink('cp')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-link"></i></button>
+      </div>
       <textarea id="csvCP" rows="3" placeholder="Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan" class="w-full border rounded p-1.5 text-[10px] font-mono bg-slate-50 ef"></textarea>
       <button onclick="ok()&&procCSV('cp')" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded mt-1">Proses</button>
+      <div class="mt-1 bg-amber-50 border border-amber-200 rounded p-2 text-[9px] text-amber-700">
+        <b><i class="fa-solid fa-lightbulb mr-1"></i>Cara Publish Google Sheet:</b><br>
+        1. Buka Sheet → <b>File → Share → Publish to web</b><br>
+        2. Pilih sheet & format <b>CSV</b><br>
+        3. Klik <b>Publish</b> → Copy link → Paste di atas<br>
+        <b>ATAU</b> gunakan link biasa dengan akses <b>Anyone with link (Viewer)</b>
+      </div>
     </div>
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex flex-wrap gap-1 items-center mb-2">
@@ -258,7 +306,7 @@
         </div>
       </div>
       <div id="csvSwA" class="hidden mb-2">
-        <div class="flex space-x-1 mb-1"><input id="csvLinkSw" placeholder="URL Google Sheet" class="flex-1 border rounded p-1 text-[10px] ef"><button onclick="ok()&&loadLink('siswa')" class="bg-purple-600 text-white text-[9px] px-2 rounded"><i class="fa-solid fa-link"></i></button></div>
+        <div class="flex space-x-1 mb-1"><input id="csvLinkSw" placeholder="URL Google Sheet (Publish to Web)" class="flex-1 border rounded p-1 text-[10px] ef"><button onclick="ok()&&loadLink('siswa')" class="bg-purple-600 text-white text-[9px] px-2 rounded"><i class="fa-solid fa-link"></i></button></div>
         <textarea id="csvSw" rows="2" placeholder="NIS,Nama,L/P" class="w-full border rounded p-1.5 text-[10px] font-mono bg-slate-50 ef"></textarea>
         <button onclick="ok()&&procCSV('siswa')" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded mt-1">Proses</button>
       </div>
@@ -290,7 +338,7 @@
     <div class="bg-white p-3 rounded-xl border"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-xs"><i class="fa-solid fa-robot text-purple-500 mr-1"></i>LKPD Visual + Modul</h3><button onclick="copyEl('prLK')" class="bg-purple-500 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-copy"></i></button></div><pre id="prLK" class="bg-slate-900 text-purple-400 p-2 rounded text-[10px] font-mono whitespace-pre-wrap max-h-[300px] overflow-y-auto"></pre></div>
   </div>
 
-  <!-- DOC OUTPUTS (per Rombel) -->
+  <!-- DOC OUTPUTS -->
   <div id="tab-dKal" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dKalContent"></div></div>
   <div id="tab-dAcp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dAcpContent"></div></div>
   <div id="tab-dAtp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dAtpContent"></div></div>
@@ -302,7 +350,7 @@
   <div id="tab-dModul" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dModulContent"></div></div>
   <div id="tab-dKktp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dKktpContent"></div></div>
 
-  <!-- ABSEN (per Rombel) -->
+  <!-- ABSEN -->
   <div id="tab-absen" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2">
@@ -314,7 +362,7 @@
     </div>
   </div>
 
-  <!-- NILAI (per Rombel) -->
+  <!-- NILAI -->
   <div id="tab-nilai" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2">
@@ -327,7 +375,7 @@
     </div>
   </div>
 
-  <!-- JURNAL (per bulan, semua rombel) -->
+  <!-- JURNAL -->
   <div id="tab-jurnal" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex items-center space-x-2 mb-2 no-print">
@@ -342,10 +390,10 @@
   <div id="tab-admin" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex justify-between items-center mb-2">
-        <h3 class="font-bold text-sm"><i class="fa-solid fa-shield-halved text-red-500 mr-1"></i>Admin</h3>
+        <h3 class="font-bold text-sm"><i class="fa-solid fa-shield-halved text-red-500 mr-1"></i>Panel Admin</h3>
         <div class="flex space-x-1">
-          <button onclick="openWASettings()" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-brands fa-whatsapp mr-0.5"></i>Seting WA</button>
-          <button onclick="loadAdmin()" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-sync"></i></button>
+          <button onclick="openWASettings()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] px-3 py-1.5 rounded font-bold"><i class="fa-brands fa-whatsapp mr-1"></i>Seting WA Kontak</button>
+          <button onclick="loadAdmin()" class="bg-blue-600 text-white text-[10px] px-3 py-1.5 rounded font-bold"><i class="fa-solid fa-sync mr-1"></i>Refresh</button>
         </div>
       </div>
       <div class="grid grid-cols-4 gap-1.5 mb-3" id="aSt"></div>
@@ -369,7 +417,7 @@ const BULAN_HARI=[31,31,30,31,30,31,31,28,31,30,31,30];
 let CU=null,UD=null,AL='guest';
 let ST={ps:1,mapel:'PAI dan Budi Pekerti',rombel:'1A',mapelList:[],rombelList:[],guruType:'mapel',activeDocRombel:''};
 let D={kal:[],cp:[],siswa:{},jadwal:[],absen:{},nilai:{},jurnal:{},kriteria:[]};
-let adminWAConfig={phone:'6282319001945',template:"Assalamu'alaikum saudara Admin yang terhormat, mohon email saya \"{email}\" disetujui akses SI-GUMART. Terima kasih."};
+let adminWAConfig={phone:'6281234567890',template:"Assalamu'alaikum saudara Admin yang terhormat, mohon email saya \"{email}\" disetujui akses SI-GUMART. Terima kasih."};
 
 const $=id=>document.getElementById(id);
 const v=id=>$(id)?.value||'';
@@ -385,81 +433,172 @@ const ok=()=>{if(AL==='approved'||AL==='admin')return true;$('mLock').classList.
 const handlePrint=()=>{if(ok())window.print()};
 const pcsv=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){q=!q;continue}if(ch===','&&!q){r.push(c.trim());c='';continue}c+=ch}r.push(c.trim());return r};
 const getDays=()=>ALLDAYS.slice(0,parseInt(v('fHari'))||5);
-const getRombelKelas=()=>{const r=ST.rombel;const n=parseInt(r.replace(/\D/g,''));return n?'Kelas '+n:v('fKl')||'Kelas 1'};
+const getRombelKelas=()=>{const r=ST.rombel;const n=parseInt(r.replace(/\D/g,''));return n?'Kelas '+n:'Kelas 1'};
 
-function updKelas(){const s=$('fK');s.innerHTML='<option value="">Kelas</option>'+kelasRange(v('fJn')).map(k=>`<option>Kelas ${k}</option>`).join('')}
+function updKelas(){const s=$('fK');if(s)s.innerHTML='<option value="">Kelas</option>'+kelasRange(v('fJn')).map(k=>`<option>Kelas ${k}</option>`).join('')}
 function updJPDuration(){$('jpDurLabel').textContent=getJPDur(v('fJn'))+' menit'}
 function authTab(t){$('loginForm').classList.toggle('hidden',t!=='login');$('regForm').classList.toggle('hidden',t!=='register');$('aTabL').className=`flex-1 py-2 text-xs font-bold border-b-2 ${t==='login'?'text-blue-600 border-blue-600':'text-slate-400 border-transparent'}`;$('aTabR').className=`flex-1 py-2 text-xs font-bold border-b-2 ${t==='register'?'text-blue-600 border-blue-600':'text-slate-400 border-transparent'}`}
 
-// Get last non-holiday weekday of month
+// ============ GOOGLE SHEET URL PARSER (FIXED) ============
+function convertGSheetURL(url){
+  url=url.trim();
+  // Match various Google Sheets URL formats:
+  // 1. /d/e/2PACX-.../pub?...  (published to web format)
+  // 2. /d/2PACX-.../edit  (standard sharing format)
+  // 3. /d/2PACX-.../export  (direct export)
+  
+  // Extract gid if present
+  let gid='0';
+  const gidMatch=url.match(/[?&]gid=(\d+)/);
+  if(gidMatch)gid=gidMatch[1];
+  
+  // Case 1: Published to web URL (contains /d/e/)
+  const pubMatch=url.match(/\/d\/e\/([a-zA-Z0-9_-]+)/);
+  if(pubMatch){
+    // Use the published format: /d/e/ID/pub?output=csv&gid=X
+    return `https://docs.google.com/spreadsheets/d/e/${pubMatch[1]}/pub?output=csv&gid=${gid}&single=true`;
+  }
+  
+  // Case 2: Standard sharing URL (contains /d/ but not /d/e/)
+  const stdMatch=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if(stdMatch&&!url.includes('/d/e/')){
+    return `https://docs.google.com/spreadsheets/d/${stdMatch[1]}/export?format=csv&gid=${gid}`;
+  }
+  
+  // If it's already a CSV export URL, return as-is
+  if(url.includes('output=csv')||url.includes('format=csv'))return url;
+  
+  // Return original if no pattern matched
+  return url;
+}
+
+async function loadLink(type){
+  const inputId=type==='kal'?'csvLinkKal':type==='cp'?'csvLinkCP':'csvLinkSw';
+  let url=$(inputId).value.trim();
+  if(!url)return toast('warning','','Masukkan URL');
+  
+  const csvUrl=convertGSheetURL(url);
+  console.log('Fetching CSV from:',csvUrl);
+  
+  try{
+    toast('info','Mengunduh...','Mohon tunggu');
+    const res=await fetch(csvUrl);
+    if(!res.ok){
+      throw new Error(`HTTP ${res.status}. Pastikan sheet dipublish (File→Share→Publish to Web) atau di-share sebagai "Anyone with link"`);
+    }
+    const text=await res.text();
+    
+    // Validate it's CSV, not HTML error page
+    if(text.trim().toLowerCase().startsWith('<!doctype')||text.trim().toLowerCase().startsWith('<html')){
+      throw new Error('Google Sheet tidak dapat diakses. Silakan: File → Share → Publish to Web, atau pastikan sharing "Anyone with link"');
+    }
+    
+    const targetId=type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw';
+    $(targetId).value=text;
+    procCSV(type);
+    toast('success','Berhasil!','Data CSV dimuat dari Google Sheet');
+  }catch(e){
+    console.error(e);
+    toast('error','Gagal',e.message);
+  }
+}
+
+// TTD & date helpers
 function getLastWorkday(bln){
   const mi=BULAN.indexOf(bln);
   const yr=mi<6?parseInt((v('fTA').split('/')[0])||2026):parseInt((v('fTA').split('/')[1])||2027);
-  const monthNum=mi<6?mi+7:mi-5; // Jul=7, Aug=8,...Jun=6
+  const monthNum=mi<6?mi+7:mi-5;
   const lastDay=BULAN_HARI[mi]||30;
-  // Simple: go backwards from lastDay until we hit a weekday
+  const maxDay=parseInt(v('fHari'))===6?6:5;
   for(let d=lastDay;d>=1;d--){
     const dt=new Date(yr,monthNum-1,d);
-    const dow=dt.getDay(); // 0=Sun,6=Sat
-    if(dow>=1&&dow<=5)return `${d} ${bln} ${yr}`;
-    if(dow===6&&parseInt(v('fHari'))===6)return `${d} ${bln} ${yr}`;
+    const dow=dt.getDay();
+    if(dow>=1&&dow<=maxDay)return `${d} ${bln} ${yr}`;
   }
   return `${lastDay} ${bln} ${yr}`;
 }
-
-function getTTDPelaporan(bln){
-  const loc=v('fTD').split(',')[0]||'Nagreg';
-  return `${loc}, ${getLastWorkday(bln)}`;
-}
+function getTTDPelaporan(bln){return `${v('fTD').split(',')[0]||'Nagreg'}, ${getLastWorkday(bln)}`}
 function getTTDPerencanaan(){return v('fTD')}
+function makeTTD(tanggal){return `<div class="flex justify-between pt-4 text-[10px] text-center"><div><p>Mengetahui,</p><p class="font-semibold">Kepala ${v('fS')}</p><div class="h-14"></div><p class="font-bold underline">${v('fKS')}</p><p>NIP. ${v('fNK')}</p></div><div><p>${tanggal}</p><p class="font-semibold">Guru ${ST.mapel}</p><div class="h-14"></div><p class="font-bold underline">${v('fG')}</p><p>NIP. ${v('fNI')}</p></div></div>`}
 
-function makeTTD(tanggal){
-  return `<div class="flex justify-between pt-4 text-[10px] text-center"><div><p>Mengetahui,</p><p class="font-semibold">Kepala ${v('fS')}</p><div class="h-14"></div><p class="font-bold underline">${v('fKS')}</p><p>NIP. ${v('fNK')}</p></div><div><p>${tanggal}</p><p class="font-semibold">Guru ${ST.mapel}</p><div class="h-14"></div><p class="font-bold underline">${v('fG')}</p><p>NIP. ${v('fNI')}</p></div></div>`;
-}
-
-// AUTH
-async function doLogin(){const e=$('lE').value.trim(),p=$('lP').value;if(!e||!p)return toast('warning','Isi email & password');try{await auth.signInWithEmailAndPassword(e,p);toast('success','OK')}catch(er){toast('error','Gagal',er.message)}}
+// ============ AUTH ============
+async function doLogin(){const e=$('lE').value.trim(),p=$('lP').value;if(!e||!p)return toast('warning','','Isi email & password');try{await auth.signInWithEmailAndPassword(e,p);toast('success','OK')}catch(er){toast('error','Gagal',er.message)}}
 async function doGoogle(){try{const r=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const u=r.user;const d=await db.collection('users').doc(u.uid).get();if(!d.exists){const ia=u.email===ADMIN_EMAIL;await db.collection('users').doc(u.uid).set({email:u.email,name:u.displayName||'',school:'',npsn:'',jenjang:'SD/MI',mapel:'',mapelList:[],rombelList:[],guruType:'mapel',role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()})}}catch(e){if(e.code!=='auth/popup-closed-by-user')toast('error','',e.message)}}
-async function doRegister(){const nm=$('rN').value.trim(),em=$('rE').value.trim(),pw=$('rP').value,sc=$('rS').value.trim(),np=$('rNP').value.trim(),jn=$('rJ').value,tg=$('rTG').value,mp=$('rM').value.trim();if(!nm||!em||!pw)return toast('warning','Isi semua');if(pw.length<6)return toast('warning','Min 6 char');try{const cr=await auth.createUserWithEmailAndPassword(em,pw);await cr.user.updateProfile({displayName:nm});const ia=em===ADMIN_EMAIL;await db.collection('users').doc(cr.user.uid).set({email:em,name:nm,school:sc,npsn:np,jenjang:jn,guruType:tg,mapel:mp,mapelList:mp?[mp]:[],rombelList:[],role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});toast('success','Terdaftar!')}catch(e){toast('error','',e.message)}}
+async function doRegister(){const nm=$('rN').value.trim(),em=$('rE').value.trim(),pw=$('rP').value,sc=$('rS').value.trim(),np=$('rNP').value.trim(),jn=$('rJ').value,tg=$('rTG').value,mp=$('rM').value.trim();if(!nm||!em||!pw)return toast('warning','','Isi semua');if(pw.length<6)return toast('warning','','Min 6 char');try{const cr=await auth.createUserWithEmailAndPassword(em,pw);await cr.user.updateProfile({displayName:nm});const ia=em===ADMIN_EMAIL;await db.collection('users').doc(cr.user.uid).set({email:em,name:nm,school:sc,npsn:np,jenjang:jn,guruType:tg,mapel:mp,mapelList:mp?[mp]:[],rombelList:[],role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});toast('success','Terdaftar!','Menunggu persetujuan admin')}catch(e){toast('error','',e.message)}}
 async function doLogout(){await auth.signOut();CU=null;UD=null;AL='guest';showAuth();updUI()}
 function enterGuest(){AL='guest';CU=null;hideAuth();$('pendingScr').classList.add('hidden');updUI();loadCloud()}
 function enterViewOnly(){$('pendingScr').classList.add('hidden');hideAuth();updUI()}
 
-// WA Contact Config
+// ============ WA CONFIG (FIXED) ============
 async function loadWAConfig(){
-  try{const d=await db.collection('config').doc('waContact').get();if(d.exists){adminWAConfig=d.data()}}catch(e){}
+  try{
+    const d=await db.collection('config').doc('waContact').get();
+    if(d.exists){
+      adminWAConfig=d.data();
+      console.log('WA Config loaded:',adminWAConfig);
+    }
+  }catch(e){console.error('Load WA fail:',e)}
 }
 
 function updateWALink(){
   const email=CU?.email||'';
-  const msg=adminWAConfig.template.replace('{email}',email);
+  const msg=(adminWAConfig.template||'').replace('{email}',email);
   const encoded=encodeURIComponent(msg);
-  const phone=adminWAConfig.phone||'6281234567890';
-  $('waLink').href=`https://wa.me/${phone}?text=${encoded}`;
-  $('waPreview').textContent=msg;
+  const phone=(adminWAConfig.phone||'6281234567890').replace(/\D/g,'');
+  const link=`https://wa.me/${phone}?text=${encoded}`;
+  const l=$('waLink');
+  if(l){l.href=link}
+  const p=$('waPreview');
+  if(p)p.textContent=msg;
 }
 
 function openWASettings(){
-  $('mAdminWA').classList.remove('hidden');
-  $('mAdminWA').innerHTML=`<div class="bg-white rounded-2xl w-full max-w-md mx-4 p-5 space-y-3">
-    <h3 class="font-bold text-sm"><i class="fa-brands fa-whatsapp text-emerald-500 mr-1"></i>Seting WhatsApp Kontak</h3>
-    <div><label class="block text-[10px] font-semibold mb-0.5">Nomor WA (format: 628xxx)</label><input id="waPhone" value="${adminWAConfig.phone}" class="w-full border rounded-lg p-2 text-sm"></div>
-    <div><label class="block text-[10px] font-semibold mb-0.5">Template Pesan (gunakan {email} untuk email user)</label><textarea id="waTemplate" rows="3" class="w-full border rounded-lg p-2 text-sm">${adminWAConfig.template}</textarea></div>
-    <div class="flex space-x-2">
-      <button onclick="saveWAConfig()" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-bold text-sm">Simpan</button>
-      <button onclick="closeM('mAdminWA')" class="flex-1 bg-slate-100 py-2 rounded-lg font-bold text-sm">Batal</button>
-    </div>
-  </div>`;
+  $('mWA').classList.remove('hidden');
+  // Populate current values
+  $('waPhoneInput').value=adminWAConfig.phone||'';
+  $('waTemplateInput').value=adminWAConfig.template||'';
+  updateWAPreview();
+  // Add live preview listener
+  $('waPhoneInput').oninput=updateWAPreview;
+  $('waTemplateInput').oninput=updateWAPreview;
+}
+
+function updateWAPreview(){
+  const tmpl=$('waTemplateInput').value||'';
+  const preview=tmpl.replace('{email}','user@example.com');
+  $('waLivePreview').textContent=preview||'(Template kosong)';
 }
 
 async function saveWAConfig(){
-  adminWAConfig.phone=$('waPhone').value.trim();
-  adminWAConfig.template=$('waTemplate').value;
-  try{await db.collection('config').doc('waContact').set(adminWAConfig);toast('success','WA Config tersimpan');closeM('mAdminWA')}catch(e){toast('error','',e.message)}
+  const phone=$('waPhoneInput').value.trim();
+  const template=$('waTemplateInput').value.trim();
+  
+  if(!phone)return toast('warning','','Nomor WA harus diisi');
+  if(!template)return toast('warning','','Template pesan harus diisi');
+  
+  const btn=$('btnSaveWA');
+  const orig=btn.innerHTML;
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';
+  
+  try{
+    adminWAConfig={phone:phone.replace(/\D/g,''),template};
+    await db.collection('config').doc('waContact').set(adminWAConfig);
+    toast('success','Tersimpan!','Konfigurasi WA berhasil disimpan');
+    closeM('mWA');
+  }catch(e){
+    console.error(e);
+    toast('error','Gagal',e.message);
+  }
+  btn.disabled=false;
+  btn.innerHTML=orig;
 }
 
+// ============ AUTH STATE ============
 auth.onAuthStateChanged(async u=>{
-  if(u){CU=u;let d=await db.collection('users').doc(u.uid).get();
+  if(u){
+    CU=u;
+    let d=await db.collection('users').doc(u.uid).get();
     if(!d.exists){const ia=u.email===ADMIN_EMAIL;const nd={email:u.email,name:u.displayName||'',school:'',npsn:'',jenjang:'SD/MI',guruType:'mapel',mapel:'',mapelList:[],rombelList:[],role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()};await db.collection('users').doc(u.uid).set(nd);UD=nd}else UD=d.data();
     if(u.email===ADMIN_EMAIL){UD.role='admin';UD.status='approved';await db.collection('users').doc(u.uid).update({role:'admin',status:'approved'})}
     AL=UD.role==='admin'?'admin':UD.status==='approved'?'approved':'pending';
@@ -467,7 +606,10 @@ auth.onAuthStateChanged(async u=>{
     if(UD.mapel&&!ST.mapelList.includes(UD.mapel))ST.mapelList.push(UD.mapel);
     if(ST.mapelList.length)ST.mapel=ST.mapelList[0];
     if(ST.rombelList.length){ST.rombel=ST.rombelList[0];ST.activeDocRombel=ST.rombelList[0]}
-    if(UD.jenjang)$('fJn').value=UD.jenjang;if(UD.npsn)$('fNP').value=UD.npsn;if(UD.school)$('fS').value=UD.school;if(UD.guruType)$('fTG').value=UD.guruType;
+    if(UD.jenjang)$('fJn').value=UD.jenjang;
+    if(UD.npsn)$('fNP').value=UD.npsn;
+    if(UD.school)$('fS').value=UD.school;
+    if(UD.guruType)$('fTG').value=UD.guruType;
     updKelas();updJPDuration();hideAuth();
     await loadWAConfig();
     if(AL==='pending'){$('pendingScr').classList.remove('hidden');updateWALink()}
@@ -476,22 +618,16 @@ auth.onAuthStateChanged(async u=>{
   }else showAuth()
 });
 
-// MAPEL/ROMBEL
+// ============ MAPEL / ROMBEL ============
 function renderSel(){$('selMap').innerHTML=ST.mapelList.map(m=>`<option ${m===ST.mapel?'selected':''}>${m}</option>`).join('');$('selRom').innerHTML=ST.rombelList.map(r=>`<option ${r===ST.rombel?'selected':''}>${r}</option>`).join('');$('selArea').classList.toggle('hidden',!CU)}
 function onMapChange(){ST.mapel=$('selMap').value;loadCloud()}
 function onRomChange(){ST.rombel=$('selRom').value;ST.activeDocRombel=ST.rombel;renderAll();rAbsen();rNilai();rJurnal()}
 async function addMapel(){if(!ok())return;const m=prompt('Mapel baru:');if(!m)return;ST.mapelList.push(m.trim());ST.mapel=m.trim();if(CU)await db.collection('users').doc(CU.uid).update({mapelList:ST.mapelList});renderSel();D.cp=[];D.kal=[];rt();renderAll();toast('success','',m)}
 async function addRombel(){if(!ok())return;const r=prompt('Rombel baru (contoh: 1A, 5B):');if(!r)return;ST.rombelList.push(r.trim());ST.rombel=r.trim();ST.activeDocRombel=r.trim();if(CU)await db.collection('users').doc(CU.uid).update({rombelList:ST.rombelList});if(!D.siswa[r.trim()])D.siswa[r.trim()]=[];renderSel();renderAll();toast('success','',r)}
 
-// Rombel tabs for doc pages
-function renderRombelTabs(show){
-  const el=$('rombelTabs');
-  if(!show||!ST.rombelList.length){el.classList.add('hidden');return}
-  el.classList.remove('hidden');
-  el.innerHTML=ST.rombelList.map(r=>`<span class="rombel-tab ${r===ST.activeDocRombel?'active':''}" onclick="ST.activeDocRombel='${r}';renderAll();renderRombelTabs(true)">${r}</span>`).join('');
-}
+function renderRombelTabs(show){const el=$('rombelTabs');if(!show||!ST.rombelList.length){el.classList.add('hidden');return}el.classList.remove('hidden');el.innerHTML=ST.rombelList.map(r=>`<span class="rombel-tab ${r===ST.activeDocRombel?'active':''}" onclick="ST.activeDocRombel='${r}';renderAll();renderRombelTabs(true)">${r}</span>`).join('')}
 
-// UI
+// ============ UI ============
 function updUI(){
   const ie=AL==='approved'||AL==='admin',ia=AL==='admin',il=!!CU;
   const b=$('accB');
@@ -499,36 +635,127 @@ function updUI(){
   else if(ie){b.innerHTML='<i class="fa-solid fa-pen mr-0.5"></i>PENUH';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700'}
   else if(il){b.innerHTML='<i class="fa-solid fa-clock mr-0.5"></i>TUNGGU';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-700'}
   else{b.innerHTML='<i class="fa-solid fa-eye mr-0.5"></i>LIHAT';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500'}
-  $('bSave').classList.toggle('hidden',!ie);$('navAdmin').classList.toggle('hidden',!ia);$('gBtn').classList.toggle('hidden',il);$('oBtn').classList.toggle('hidden',!il);
-  const ui=$('sideUser');if(il&&UD){ui.classList.remove('hidden');const n=UD.name||CU.email.split('@')[0];$('sName').textContent=n;$('sAvatar').textContent=n.charAt(0).toUpperCase();if(ia){$('sRole').textContent='Admin';$('sDot').className='pulse-dot bg-red-500'}else if(ie){$('sRole').textContent='Penuh';$('sDot').className='pulse-dot bg-emerald-500'}else{$('sRole').textContent='Tunggu';$('sDot').className='pulse-dot bg-amber-400'}}else ui.classList.add('hidden');
-  document.querySelectorAll('.ef').forEach(el=>{el.disabled=!ie});renderSel()
+  $('bSave').classList.toggle('hidden',!ie);
+  $('btnSaveProfile').classList.toggle('hidden',!ie);
+  $('navAdmin').classList.toggle('hidden',!ia);
+  $('gBtn').classList.toggle('hidden',il);
+  $('oBtn').classList.toggle('hidden',!il);
+  const ui=$('sideUser');
+  if(il&&UD){ui.classList.remove('hidden');const n=UD.name||CU.email.split('@')[0];$('sName').textContent=n;$('sAvatar').textContent=n.charAt(0).toUpperCase();if(ia){$('sRole').textContent='Admin';$('sDot').className='pulse-dot bg-red-500'}else if(ie){$('sRole').textContent='Penuh';$('sDot').className='pulse-dot bg-emerald-500'}else{$('sRole').textContent='Tunggu';$('sDot').className='pulse-dot bg-amber-400'}}
+  else ui.classList.add('hidden');
+  document.querySelectorAll('.ef').forEach(el=>{el.disabled=!ie});
+  renderSel()
 }
 
-// CLOUD
+// ============ CLOUD ============
 function gp(){return CU?`u/${CU.uid}/m/${ST.mapel.replace(/[^a-zA-Z0-9]/g,'_')}`:'_g'}
-async function saveCloud(){if(!ok()||!CU)return;try{const p=gp();await db.doc(`${p}/d/profil`).set({s:v('fS'),np:v('fNP'),g:v('fG'),ni:v('fNI'),ks:v('fKS'),nk:v('fNK'),jn:v('fJn'),tg:v('fTG'),hari:v('fHari'),ta:v('fTA'),td:v('fTD'),mp:ST.mapel});await db.doc(`${p}/d/kal`).set({i:D.kal});await db.doc(`${p}/d/cp`).set({i:D.cp});await db.doc(`${p}/d/sw`).set(D.siswa);await db.doc(`${p}/d/jd`).set({i:D.jadwal});await db.doc(`${p}/d/ab`).set(D.absen);await db.doc(`${p}/d/nl`).set(D.nilai);await db.doc(`${p}/d/kr`).set({i:D.kriteria});await db.doc(`${p}/d/jr`).set(D.jurnal);toast('success','Tersimpan!')}catch(e){toast('error','',e.message)}}
 
-async function loadCloud(){if(!CU){rt();renderAll();return}try{const p=gp();const pd=await db.doc(`${p}/d/profil`).get();if(pd.exists){const d=pd.data();if(d.s)$('fS').value=d.s;if(d.np)$('fNP').value=d.np;if(d.g)$('fG').value=d.g;if(d.ni)$('fNI').value=d.ni;if(d.ks)$('fKS').value=d.ks;if(d.nk)$('fNK').value=d.nk;if(d.jn){$('fJn').value=d.jn;updKelas();updJPDuration()}if(d.tg)$('fTG').value=d.tg;if(d.hari)$('fHari').value=d.hari;if(d.ta)$('fTA').value=d.ta;if(d.td)$('fTD').value=d.td}const kd=await db.doc(`${p}/d/kal`).get();if(kd.exists&&kd.data().i)D.kal=kd.data().i;const cd=await db.doc(`${p}/d/cp`).get();if(cd.exists&&cd.data().i)D.cp=cd.data().i;const sd=await db.doc(`${p}/d/sw`).get();if(sd.exists)D.siswa=sd.data();const jdd=await db.doc(`${p}/d/jd`).get();if(jdd.exists&&jdd.data().i)D.jadwal=jdd.data().i;const ad=await db.doc(`${p}/d/ab`).get();if(ad.exists)D.absen=ad.data();const nd=await db.doc(`${p}/d/nl`).get();if(nd.exists)D.nilai=nd.data();const krd=await db.doc(`${p}/d/kr`).get();if(krd.exists&&krd.data().i)D.kriteria=krd.data().i;const jrd=await db.doc(`${p}/d/jr`).get();if(jrd.exists)D.jurnal=jrd.data()}catch(e){console.log('No data')}if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];rt();renderAll();updElFlt();genPrompts()}
+// ============ SAVE PROFILE MANUALLY (FIXED) ============
+async function saveProfileNow(){
+  if(!ok()||!CU)return;
+  const btn=$('btnSaveProfile');
+  const orig=btn.innerHTML;
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...';
+  
+  try{
+    // Save user meta (jenjang, school, npsn, guruType) to user doc
+    await db.collection('users').doc(CU.uid).update({
+      school:v('fS'),
+      npsn:v('fNP'),
+      jenjang:v('fJn'),
+      guruType:v('fTG')
+    });
+    
+    // Save profile data to mapel-specific location
+    const p=gp();
+    await db.doc(`${p}/d/profil`).set({
+      s:v('fS'),np:v('fNP'),g:v('fG'),ni:v('fNI'),ks:v('fKS'),nk:v('fNK'),
+      jn:v('fJn'),tg:v('fTG'),hari:v('fHari'),ta:v('fTA'),td:v('fTD'),mp:ST.mapel
+    });
+    
+    toast('success','Tersimpan!','Profil berhasil disimpan ke cloud');
+  }catch(e){
+    console.error(e);
+    toast('error','Gagal',e.message);
+  }
+  btn.disabled=false;
+  btn.innerHTML=orig;
+}
 
-async function loadLink(type){const inputId=type==='kal'?'csvLinkKal':type==='cp'?'csvLinkCP':'csvLinkSw';let url=$(inputId).value.trim();if(!url)return toast('warning','Masukkan URL');if(url.includes('docs.google.com/spreadsheets')){const m=url.match(/\/d\/([a-zA-Z0-9_-]+)/);if(m)url=`https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv`}try{toast('info','Mengunduh...');const res=await fetch(url);const text=await res.text();$(type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw').value=text;procCSV(type)}catch(e){toast('error','Gagal',e.message)}}
+async function saveCloud(){
+  if(!ok()||!CU)return;
+  try{
+    const p=gp();
+    await db.doc(`${p}/d/profil`).set({s:v('fS'),np:v('fNP'),g:v('fG'),ni:v('fNI'),ks:v('fKS'),nk:v('fNK'),jn:v('fJn'),tg:v('fTG'),hari:v('fHari'),ta:v('fTA'),td:v('fTD'),mp:ST.mapel});
+    await db.doc(`${p}/d/kal`).set({i:D.kal});
+    await db.doc(`${p}/d/cp`).set({i:D.cp});
+    await db.doc(`${p}/d/sw`).set(D.siswa);
+    await db.doc(`${p}/d/jd`).set({i:D.jadwal});
+    await db.doc(`${p}/d/ab`).set(D.absen);
+    await db.doc(`${p}/d/nl`).set(D.nilai);
+    await db.doc(`${p}/d/kr`).set({i:D.kriteria});
+    await db.doc(`${p}/d/jr`).set(D.jurnal);
+    toast('success','Tersimpan!','Semua data tersimpan')
+  }catch(e){toast('error','Gagal',e.message)}
+}
 
-// DEFAULT JADWAL
+async function loadCloud(){
+  if(!CU){rt();renderAll();return}
+  try{
+    const p=gp();
+    const pd=await db.doc(`${p}/d/profil`).get();
+    if(pd.exists){
+      const d=pd.data();
+      if(d.s)$('fS').value=d.s;if(d.np)$('fNP').value=d.np;if(d.g)$('fG').value=d.g;if(d.ni)$('fNI').value=d.ni;if(d.ks)$('fKS').value=d.ks;if(d.nk)$('fNK').value=d.nk;
+      if(d.jn){$('fJn').value=d.jn;updKelas();updJPDuration()}
+      if(d.tg)$('fTG').value=d.tg;if(d.hari)$('fHari').value=d.hari;if(d.ta)$('fTA').value=d.ta;if(d.td)$('fTD').value=d.td
+    }
+    const kd=await db.doc(`${p}/d/kal`).get();if(kd.exists&&kd.data().i)D.kal=kd.data().i;
+    const cd=await db.doc(`${p}/d/cp`).get();if(cd.exists&&cd.data().i)D.cp=cd.data().i;
+    const sd=await db.doc(`${p}/d/sw`).get();if(sd.exists)D.siswa=sd.data();
+    const jdd=await db.doc(`${p}/d/jd`).get();if(jdd.exists&&jdd.data().i)D.jadwal=jdd.data().i;
+    const ad=await db.doc(`${p}/d/ab`).get();if(ad.exists)D.absen=ad.data();
+    const nd=await db.doc(`${p}/d/nl`).get();if(nd.exists)D.nilai=nd.data();
+    const krd=await db.doc(`${p}/d/kr`).get();if(krd.exists&&krd.data().i)D.kriteria=krd.data().i;
+    const jrd=await db.doc(`${p}/d/jr`).get();if(jrd.exists)D.jurnal=jrd.data()
+  }catch(e){console.log('No cloud data')}
+  if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();
+  if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];
+  rt();renderAll();updElFlt();genPrompts()
+}
+
+// ============ DEFAULT JADWAL ============
 function defJadwal(){
   const dur=getJPDur(v('fJn'));
-  let t=7*60; // 07:00
+  let t=7*60;
   const rows=[];
-  for(let j=1;j<=4;j++){const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;rows.push({j,w:`${s}-${e}`,h:{}});} 
-  rows.push({j:'ist',w:`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`,h:{}});t+=30;
-  const s2=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;
-  for(let j=5;j<=8;j++){const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;rows.push({j,w:`${s}-${e}`,h:{}});}
-  return rows;
+  for(let j=1;j<=4;j++){const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;rows.push({j,w:`${s}-${e}`,h:{}})}
+  rows.push({j:'ist',w:`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`+`-${String(Math.floor((t+30)/60)).padStart(2,'0')}.${String((t+30)%60).padStart(2,'0')}`,h:{}});t+=30;
+  for(let j=5;j<=8;j++){const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;rows.push({j,w:`${s}-${e}`,h:{}})}
+  return rows
 }
 
-// TABS
+// ============ TABS ============
 const docTabs=['dKal','dAcp','dAtp','dProta','dPromes','dModul','dKktp','absen','nilai','jurnal'];
-function go(id){document.querySelectorAll('.tab-c').forEach(e=>e.classList.add('hidden'));const t=$('tab-'+id);if(t)t.classList.remove('hidden');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-nav'));const b=$('btn-'+id);if(b)b.classList.add('active-nav');$('pgT').textContent={profil:'Profil',kalender:'Kalender',cptp:'CP/TP',siswa:'Data Siswa',jadwal:'Jadwal',prompt:'Prompt AI',dKal:'Kalender',dAcp:'ACP',dAtp:'ATP',dProta:'Prota',dPromes:'Promes',dModul:'Modul Ajar',dKktp:'KKTP',absen:'Absen',nilai:'Nilai',jurnal:'Jurnal',admin:'Admin'}[id]||'';$('pgS').textContent=docTabs.includes(id)?`Rombel: ${ST.activeDocRombel||ST.rombel}`:'-';renderRombelTabs(docTabs.includes(id));renderAll();genPrompts();if(id==='admin')loadAdmin();if(id==='absen')rAbsen();if(id==='nilai')rNilai();if(id==='jurnal')rJurnal();if(id==='jadwal')rJadwal();if(window.innerWidth<768)$('sidebar').classList.add('hidden')}
+function go(id){
+  document.querySelectorAll('.tab-c').forEach(e=>e.classList.add('hidden'));
+  const t=$('tab-'+id);if(t)t.classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-nav'));
+  const b=$('btn-'+id);if(b)b.classList.add('active-nav');
+  $('pgT').textContent={profil:'Profil',kalender:'Kalender',cptp:'CP/TP',siswa:'Data Siswa',jadwal:'Jadwal',prompt:'Prompt AI',dKal:'Kalender',dAcp:'ACP',dAtp:'ATP',dProta:'Prota',dPromes:'Promes',dModul:'Modul Ajar',dKktp:'KKTP',absen:'Absen',nilai:'Nilai',jurnal:'Jurnal',admin:'Admin'}[id]||'';
+  $('pgS').textContent=docTabs.includes(id)?`Rombel: ${ST.activeDocRombel||ST.rombel}`:'-';
+  renderRombelTabs(docTabs.includes(id));
+  renderAll();genPrompts();
+  if(id==='admin')loadAdmin();
+  if(id==='absen')rAbsen();
+  if(id==='nilai')rNilai();
+  if(id==='jurnal')rJurnal();
+  if(id==='jadwal')rJadwal();
+  if(window.innerWidth<768)$('sidebar').classList.add('hidden')
+}
 
-// RENDER TABLES
+// ============ RENDER TABLES ============
 function rt(){rKalT();rCP();rSwT();rJadwal()}
 function rKalT(){const ie=AL==='approved'||AL==='admin';$('tbKal').innerHTML=D.kal.map((k,i)=>`<tr class="border-b"><td class="p-0.5"><input value="${k.S||''}" onchange="D.kal[${i}].S=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.T||''}" onchange="D.kal[${i}].T=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.A||''}" onchange="D.kal[${i}].A=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.K||''}" onchange="D.kal[${i}].K=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5">${ie?`<button onclick="D.kal.splice(${i},1);rt()" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button>`:''}</td></tr>`).join('')}
 
@@ -538,7 +765,7 @@ function updElFlt(){const els=[...new Set(D.cp.map(c=>c.E).filter(Boolean))];con
 function rSwT(){const ie=AL==='approved'||AL==='admin';const list=D.siswa[ST.rombel]||[];$('swR').textContent=ST.rombel;$('tbSw').innerHTML=list.map((s,i)=>`<tr class="border-b"><td class="p-0.5 text-center text-[10px]">${i+1}</td><td class="p-0.5"><input value="${s.nis||''}" onchange="D.siswa['${ST.rombel}'][${i}].nis=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${s.nama||''}" onchange="D.siswa['${ST.rombel}'][${i}].nama=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><select onchange="D.siswa['${ST.rombel}'][${i}].jk=this.value" class="border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}><option ${s.jk==='L'?'selected':''}>L</option><option ${s.jk==='P'?'selected':''}>P</option></select></td><td class="p-0.5">${ie?`<button onclick="D.siswa['${ST.rombel}'].splice(${i},1);rSwT()" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button>`:''}</td></tr>`).join('');$('swI').textContent=`${list.length} siswa • L:${list.filter(s=>s.jk==='L').length} P:${list.filter(s=>s.jk==='P').length}`}
 function addSiswa(){if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];D.siswa[ST.rombel].push({nis:'',nama:'',jk:'L'});rSwT()}
 
-// JADWAL - format seperti gambar: JP | WAKTU | SENIN | SELASA | ... each cell = "MAPEL\nROMBEL"
+// ============ JADWAL ============
 function rJadwal(){
   const ie=AL==='approved'||AL==='admin';
   const days=getDays();
@@ -546,91 +773,51 @@ function rJadwal(){
   const isGK=v('fTG')==='kelas';
   $('jdGuruInfo').textContent=isGK?`Guru Kelas — ${ST.rombel}`:`${ST.mapel} — Semua Rombel`;
   if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();
-
   let html=`<table class="w-full" style="border-collapse:collapse"><thead><tr><td class="jd-header" style="width:40px">JP</td><td class="jd-header" style="width:90px">WAKTU</td>`;
   days.forEach(d=>html+=`<td class="jd-header">${d.toUpperCase()}</td>`);
   html+=`</tr></thead><tbody>`;
-
   D.jadwal.forEach((r,ri)=>{
-    if(r.j==='ist'){
-      html+=`<tr><td class="jd-ist" style="font-size:12px;font-weight:700;padding:8px"><b>IST</b></td><td class="jd-ist" style="font-size:11px;color:#b45309">${r.w||''}</td><td class="jd-ist" colspan="${days.length}" style="font-size:13px;letter-spacing:2px"><b>ISTIRAHAT</b></td></tr>`;
-      return;
-    }
-    html+=`<tr>`;
-    html+=`<td class="jd-cell" style="font-weight:700;color:#2563eb;font-size:13px">JP${r.j}</td>`;
-    html+=`<td class="jd-cell" style="color:#6b7280;font-size:11px"><input value="${r.w||''}" onchange="D.jadwal[${ri}].w=this.value" class="w-20 text-center text-[10px] border rounded p-0.5 ef" ${ie?'':'disabled'}></td>`;
-    
+    if(r.j==='ist'){html+=`<tr><td class="jd-ist" style="font-size:12px;padding:8px"><b>IST</b></td><td class="jd-ist" style="font-size:11px;color:#b45309">${r.w||''}</td><td class="jd-ist" colspan="${days.length}" style="font-size:13px;letter-spacing:2px"><b>ISTIRAHAT</b></td></tr>`;return}
+    html+=`<tr><td class="jd-cell" style="font-weight:700;color:#2563eb;font-size:13px">JP${r.j}</td><td class="jd-cell" style="color:#6b7280;font-size:11px"><input value="${r.w||''}" onchange="D.jadwal[${ri}].w=this.value" class="w-20 text-center text-[10px] border rounded p-0.5 ef" ${ie?'':'disabled'}></td>`;
     days.forEach(d=>{
       if(!r.h)r.h={};
-      // Each cell stores: "MAPEL\nROMBEL" format
-      const cellKey=`${d}`;
-      const val=r.h[cellKey]||'';
-      // Parse mapel and rombel from cell
+      const val=r.h[d]||'';
       const parts=val.split('\n');
       const cellMapel=parts[0]||'';
       const cellRombel=parts[1]||'';
       const isSelf=cellMapel.toLowerCase().includes(mapelLC);
-
       if(isGK){
-        // Guru kelas: just mapel name
-        html+=`<td class="jd-cell ${isSelf?'jd-mapel':'jd-empty'}">
-          <input value="${val}" onchange="D.jadwal[${ri}].h['${cellKey}']=this.value;rJadwal()" 
-          class="w-full text-center text-[10px] p-0.5 rounded ef border-0 bg-transparent" 
-          placeholder="-" ${ie?'':'disabled'}>
-        </td>`;
+        html+=`<td class="jd-cell ${isSelf?'jd-mapel':'jd-empty'}"><input value="${val}" onchange="D.jadwal[${ri}].h['${d}']=this.value;rJadwal()" class="w-full text-center text-[10px] p-0.5 rounded ef border-0 bg-transparent" placeholder="-" ${ie?'':'disabled'}></td>`;
       } else {
-        // Guru mapel: show MAPEL + ROMBEL (two-line input)
-        html+=`<td class="jd-cell ${isSelf?'':''}">
-          <div class="flex flex-col items-center">
-            <input value="${cellMapel}" onchange="updateJdCell(${ri},'${d}',0,this.value)" 
-              class="w-full text-center text-[11px] font-bold p-0 rounded ef border-0 bg-transparent ${isSelf?'text-blue-600':'text-slate-400'}" 
-              placeholder="-" ${ie?'':'disabled'}>
-            <input value="${cellRombel}" onchange="updateJdCell(${ri},'${d}',1,this.value)" 
-              class="w-full text-center text-[9px] p-0 rounded ef border-0 bg-transparent text-slate-400" 
-              placeholder="" ${ie?'':'disabled'}>
-          </div>
-        </td>`;
+        html+=`<td class="jd-cell"><div class="flex flex-col items-center"><input value="${cellMapel}" onchange="updateJdCell(${ri},'${d}',0,this.value)" class="w-full text-center text-[11px] font-bold p-0 rounded ef border-0 bg-transparent ${isSelf?'text-blue-600':'text-slate-400'}" placeholder="-" ${ie?'':'disabled'}><input value="${cellRombel}" onchange="updateJdCell(${ri},'${d}',1,this.value)" class="w-full text-center text-[9px] p-0 rounded ef border-0 bg-transparent text-slate-400" placeholder="" ${ie?'':'disabled'}></div></td>`;
       }
     });
     html+=`</tr>`;
   });
   html+=`</tbody></table>`;
-
-  // Count JP
   let jpCount=0;
   D.jadwal.forEach(r=>{if(r.j!=='ist')getDays().forEach(d=>{const val=r.h?.[d]||'';const mp=(val.split('\n')[0]||'').toLowerCase();if(mp.includes(mapelLC))jpCount++})});
   html+=`<p class="text-[9px] mt-1 text-slate-500 no-print">Total JP <b>${ST.mapel}</b>/minggu: <b class="text-blue-600">${jpCount}</b> (${jpCount*getJPDur(v('fJn'))} menit)</p>`;
-  $('jdArea').innerHTML=html;
+  $('jdArea').innerHTML=html
 }
 
-function updateJdCell(ri,day,part,val){
-  if(!D.jadwal[ri].h)D.jadwal[ri].h={};
-  const cur=D.jadwal[ri].h[day]||'';
-  const parts=cur.split('\n');
-  parts[part]=val;
-  D.jadwal[ri].h[day]=parts.join('\n');
-  rJadwal();
-}
-
-function addJP(){const n=D.jadwal.filter(r=>r.j!=='ist').length+1;const dur=getJPDur(v('fJn'));const lastRow=D.jadwal.filter(r=>r.j!=='ist').pop();let t=7*60;if(lastRow){const end=lastRow.w.split('-')[1];const p=end.split('.');t=parseInt(p[0])*60+parseInt(p[1])}const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;D.jadwal.push({j:n,w:`${s}-${e}`,h:{}});rJadwal()}
-function addIstirahat(){const lastRow=D.jadwal[D.jadwal.length-1];let t=7*60;if(lastRow){const end=(lastRow.w||'07.00').split('-').pop();const p=end.split('.');t=parseInt(p[0])*60+parseInt(p[1])}const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=30;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;D.jadwal.push({j:'ist',w:`${s}-${e}`,h:{}});rJadwal()}
-
+function updateJdCell(ri,day,part,val){if(!D.jadwal[ri].h)D.jadwal[ri].h={};const cur=D.jadwal[ri].h[day]||'';const parts=cur.split('\n');parts[part]=val;D.jadwal[ri].h[day]=parts.join('\n');rJadwal()}
+function addJP(){const n=D.jadwal.filter(r=>r.j!=='ist').length+1;const dur=getJPDur(v('fJn'));D.jadwal.push({j:n,w:'00.00-00.00',h:{}});rJadwal()}
+function addIstirahat(){D.jadwal.push({j:'ist',w:'00.00-00.00',h:{}});rJadwal()}
 async function shareJd(){const np=v('fNP');if(!np)return toast('warning','Isi NPSN');try{await db.collection('sharedJadwal').doc(np).set({npsn:np,jadwal:D.jadwal,by:CU.uid,guru:v('fG'),mapel:ST.mapel,rombelList:ST.rombelList,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});toast('success','Jadwal dibagikan!')}catch(e){toast('error','',e.message)}}
 async function pullJd(){const np=v('fNP');if(!np)return toast('warning','Isi NPSN');try{const d=await db.collection('sharedJadwal').doc(np).get();if(!d.exists)return toast('info','Belum ada jadwal');D.jadwal=d.data().jadwal;rJadwal();toast('success','Jadwal diambil!')}catch(e){toast('error','',e.message)}}
 
-// ABSEN (per rombel, default hadir)
+// ============ ABSEN ============
 function rAbsen(){const bln=$('abBln').value;const rom=ST.activeDocRombel||ST.rombel;const list=D.siswa[rom]||[];$('abR').textContent=rom;if(!D.absen[rom])D.absen[rom]={};if(!D.absen[rom][bln]){D.absen[rom][bln]={};list.forEach((s,si)=>{for(let di=0;di<20;di++)D.absen[rom][bln][`${si}_${di}`]='H'})}const ie=AL==='approved'||AL==='admin';const prt=getJPPerWeekForRombel(rom)*4;let html=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1 text-left min-w-[80px]">Nama</th>`;for(let i=1;i<=Math.min(prt,20);i++)html+=`<th class="border p-0.5 w-4">${i}</th>`;html+=`<th class="border p-1">H</th><th class="border p-1">S</th><th class="border p-1">I</th><th class="border p-1">A</th></tr></thead><tbody>`;list.forEach((s,si)=>{html+=`<tr><td class="border p-0.5 text-center">${si+1}</td><td class="border p-0.5">${s.nama||'-'}</td>`;let h=0,sk=0,iz=0,a=0;for(let di=0;di<Math.min(prt,20);di++){const key=`${si}_${di}`;const val=D.absen[rom][bln][key]||'H';if(val==='H')h++;else if(val==='S')sk++;else if(val==='I')iz++;else if(val==='A')a++;const clr={H:'bg-emerald-50',S:'bg-amber-100',I:'bg-blue-100',A:'bg-red-100'};html+=`<td class="border p-0 ${clr[val]||''}"><select onchange="D.absen['${rom}']['${bln}']['${key}']=this.value;rAbsen()" class="w-full text-[7px] p-0 bg-transparent outline-none text-center" ${ie?'':'disabled'}><option ${val==='H'?'selected':''}>H</option><option ${val==='S'?'selected':''}>S</option><option ${val==='I'?'selected':''}>I</option><option ${val==='A'?'selected':''}>A</option></select></td>`}html+=`<td class="border p-0.5 text-center font-bold text-emerald-600">${h}</td><td class="border p-0.5 text-center text-amber-600">${sk}</td><td class="border p-0.5 text-center text-blue-600">${iz}</td><td class="border p-0.5 text-center text-red-600">${a}</td></tr>`});html+=`</tbody></table>`;$('abArea').innerHTML=html;$('abTTD').innerHTML=makeTTD(getTTDPelaporan(bln))}
 
 function getJPPerWeekForRombel(rom){let c=0;const ml=ST.mapel.toLowerCase();D.jadwal.forEach(r=>{if(r.j!=='ist')getDays().forEach(d=>{const val=r.h?.[d]||'';const parts=val.split('\n');const mp=(parts[0]||'').toLowerCase();const rb=(parts[1]||'').trim();if(mp.includes(ml)&&(!rb||rb===rom))c++})});return c||2}
 
-// NILAI (per rombel)
+// ============ NILAI ============
 function addKrit(){D.kriteria.push({n:'Kriteria Baru',b:100});rNilai()}
-function rNilai(){const ie=AL==='approved'||AL==='admin';const rom=ST.activeDocRombel||ST.rombel;const list=D.siswa[rom]||[];$('nlR').textContent=rom;if(!D.nilai[rom])D.nilai[rom]={};$('krArea').innerHTML=D.kriteria.map((k,i)=>`<div class="flex items-center space-x-1 text-[10px]"><input value="${k.n}" onchange="D.kriteria[${i}].n=this.value;rNilai()" class="border rounded p-0.5 flex-1 ef" ${ie?'':'disabled'}><span class="text-slate-500">Bobot:</span><input type="number" value="${k.b}" onchange="D.kriteria[${i}].b=+this.value;rNilai()" class="border rounded p-0.5 w-12 ef" ${ie?'':'disabled'}>%${ie?`<button onclick="D.kriteria.splice(${i},1);rNilai()" class="text-red-500"><i class="fa-solid fa-trash text-[8px]"></i></button>`:''}</div>`).join('');let html=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1 text-left">Nama</th>`;D.kriteria.forEach(k=>html+=`<th class="border p-1">${k.n}<br><span class="text-[7px]">(${k.b}%)</span></th>`);html+=`<th class="border p-1 bg-blue-50">Rata</th><th class="border p-1 bg-emerald-50">Predikat</th></tr></thead><tbody>`;list.forEach((s,si)=>{html+=`<tr><td class="border p-0.5 text-center">${si+1}</td><td class="border p-0.5">${s.nama||'-'}</td>`;let tw=0;D.kriteria.forEach((k,ki)=>{const key=`${si}_${ki}`;const val=D.nilai[rom][key]||'';const nv=parseFloat(val)||0;tw+=nv*(k.b/100);html+=`<td class="border p-0"><input type="number" value="${val}" onchange="D.nilai['${rom}']['${key}']=this.value;rNilai()" class="w-full text-center text-[9px] p-0.5 ef border-0" min="0" max="100" ${ie?'':'disabled'}></td>`});const avg=Math.round(tw);const pred=avg>=89?'Sangat Baik':avg>=76?'Baik':avg>=61?'Cukup':'Bimbingan';const pc=avg>=89?'text-emerald-600':avg>=76?'text-blue-600':avg>=61?'text-amber-600':'text-red-600';html+=`<td class="border p-0.5 text-center font-bold">${avg}</td><td class="border p-0.5 text-center font-bold ${pc} text-[8px]">${pred}</td></tr>`});html+=`</tbody></table>`;$('nlArea').innerHTML=html;$('nlTTD').innerHTML=makeTTD(getTTDPelaporan($('abBln').value||'Juli'))}
+function rNilai(){const ie=AL==='approved'||AL==='admin';const rom=ST.activeDocRombel||ST.rombel;const list=D.siswa[rom]||[];$('nlR').textContent=rom;if(!D.nilai[rom])D.nilai[rom]={};$('krArea').innerHTML=D.kriteria.map((k,i)=>`<div class="flex items-center space-x-1 text-[10px]"><input value="${k.n}" onchange="D.kriteria[${i}].n=this.value;rNilai()" class="border rounded p-0.5 flex-1 ef" ${ie?'':'disabled'}><span class="text-slate-500">Bobot:</span><input type="number" value="${k.b}" onchange="D.kriteria[${i}].b=+this.value;rNilai()" class="border rounded p-0.5 w-12 ef" ${ie?'':'disabled'}>%${ie?`<button onclick="D.kriteria.splice(${i},1);rNilai()" class="text-red-500"><i class="fa-solid fa-trash text-[8px]"></i></button>`:''}</div>`).join('');let html=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1 text-left">Nama</th>`;D.kriteria.forEach(k=>html+=`<th class="border p-1">${k.n}<br><span class="text-[7px]">(${k.b}%)</span></th>`);html+=`<th class="border p-1 bg-blue-50">Rata</th><th class="border p-1 bg-emerald-50">Predikat</th></tr></thead><tbody>`;list.forEach((s,si)=>{html+=`<tr><td class="border p-0.5 text-center">${si+1}</td><td class="border p-0.5">${s.nama||'-'}</td>`;let tw=0;D.kriteria.forEach((k,ki)=>{const key=`${si}_${ki}`;const val=D.nilai[rom][key]||'';const nv=parseFloat(val)||0;tw+=nv*(k.b/100);html+=`<td class="border p-0"><input type="number" value="${val}" onchange="D.nilai['${rom}']['${key}']=this.value;rNilai()" class="w-full text-center text-[9px] p-0.5 ef border-0" min="0" max="100" ${ie?'':'disabled'}></td>`});const avg=Math.round(tw);const pred=avg>=89?'Sangat Baik':avg>=76?'Baik':avg>=61?'Cukup':'Bimbingan';const pc=avg>=89?'text-emerald-600':avg>=76?'text-blue-600':avg>=61?'text-amber-600':'text-red-600';html+=`<td class="border p-0.5 text-center font-bold">${avg}</td><td class="border p-0.5 text-center font-bold ${pc} text-[8px]">${pred}</td></tr>`});html+=`</tbody></table>`;$('nlArea').innerHTML=html;$('nlTTD').innerHTML=makeTTD(getTTDPelaporan($('abBln')?.value||'Juli'))}
 
-// JURNAL (per bulan, semua rombel, ttd tanggal akhir bulan)
-function rJurnal(){const bln=$('jrBln').value;const ie=AL==='approved'||AL==='admin';const mapelLC=ST.mapel.toLowerCase();const kelas=getRombelKelas();const cpK=D.cp.filter(c=>c.K===kelas);const days=getDays();
-  // Build entries from jadwal
-  let entries=[];for(let w=0;w<4;w++){days.forEach(day=>{D.jadwal.forEach(r=>{if(r.j==='ist'||!r.h)return;const val=r.h[day]||'';const parts=val.split('\n');const mp=(parts[0]||'').toLowerCase();const rb=(parts[1]||'').trim();if(mp.includes(mapelLC))entries.push({day,jam:r.j,waktu:r.w,rombel:rb||ST.rombel,week:w+1})})})}
+// ============ JURNAL ============
+function rJurnal(){const bln=$('jrBln').value;const ie=AL==='approved'||AL==='admin';const mapelLC=ST.mapel.toLowerCase();const kelas=getRombelKelas();const cpK=D.cp.filter(c=>c.K===kelas);const days=getDays();let entries=[];for(let w=0;w<4;w++){days.forEach(day=>{D.jadwal.forEach(r=>{if(r.j==='ist'||!r.h)return;const val=r.h[day]||'';const parts=val.split('\n');const mp=(parts[0]||'').toLowerCase();const rb=(parts[1]||'').trim();if(mp.includes(mapelLC))entries.push({day,jam:r.j,waktu:r.w,rombel:rb||ST.rombel,week:w+1})})})}
   if(!D.jurnal[bln])D.jurnal[bln]=[];const jd=D.jurnal[bln];while(jd.length<entries.length)jd.push({tgl:'',tp:'',keg:'',cat:''});
   const sub=`${v('fS')} • ${ST.mapel} • Bulan ${bln} TA ${v('fTA')}`;const tpOpts=cpK.map((c,ci)=>`<option value="${ci}">${(c.T||'').substring(0,35)}</option>`).join('');
   let html=`<h2 class="text-sm font-bold text-center uppercase">JURNAL PEMBELAJARAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Hari/Tgl</th><th class="border p-1">Rombel</th><th class="border p-1">JP</th><th class="border p-1">TP</th><th class="border p-1">Kegiatan</th><th class="border p-1">H</th><th class="border p-1">S</th><th class="border p-1">I</th><th class="border p-1">A</th><th class="border p-1">Catatan</th></tr></thead><tbody>`;
@@ -638,14 +825,26 @@ function rJurnal(){const bln=$('jrBln').value;const ie=AL==='approved'||AL==='ad
   html+=`<tr class="border ${i%2?'bg-slate-50/30':''}"><td class="border p-0.5 text-center">${i+1}</td><td class="border p-0.5"><input value="${j.tgl||`${e.day} M${e.week}`}" onchange="D.jurnal['${bln}'][${i}].tgl=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td><td class="border p-0.5 text-center font-bold text-blue-600">${e.rombel}</td><td class="border p-0.5 text-center text-[8px]">JP${e.jam}</td><td class="border p-0.5"><select onchange="D.jurnal['${bln}'][${i}].tp=this.value" class="w-full text-[7px] ef" ${ie?'':'disabled'}><option>-</option>${tpOpts}</select></td><td class="border p-0.5"><input value="${j.keg||''}" onchange="D.jurnal['${bln}'][${i}].keg=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td><td class="border p-0.5 text-center text-emerald-600 font-bold">${h}</td><td class="border p-0.5 text-center text-amber-600">${s}</td><td class="border p-0.5 text-center text-blue-600">${iz}</td><td class="border p-0.5 text-center text-red-600">${a}</td><td class="border p-0.5"><input value="${j.cat||''}" onchange="D.jurnal['${bln}'][${i}].cat=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td></tr>`});
   html+=`</tbody></table>`;html+=makeTTD(getTTDPelaporan(bln));$('jrContent').innerHTML=html}
 
-// CSV
-function procCSV(type){const raw=$(type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw').value.trim();if(!raw)return toast('warning','Paste CSV');const lines=raw.split('\n').filter(l=>l.trim());if(type==='kal'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{S:r[0]||'',T:r[1]||'',A:r[2]||'',K:r[3]||''}}).filter(k=>k.A);D.kal=D.kal.concat(nd);toast('success','',`${nd.length} agenda`)}else if(type==='cp'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{K:r[0]||'',S:r[1]||'',E:r[2]||'',C:r[3]||'',T:r[4]||'',Di:r[5]||'',M:r[6]||METODE[0],P:parseInt(r[7])||2}}).filter(c=>c.T);D.cp=D.cp.concat(nd);toast('success','',`${nd.length} TP`)}else{if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{nis:r[0]||'',nama:r[1]||'',jk:r[2]||'L'}}).filter(s=>s.nama);D.siswa[ST.rombel]=D.siswa[ST.rombel].concat(nd);toast('success','',`${nd.length} siswa`);$('csvSwA').classList.add('hidden')}rt();renderAll();updElFlt()}
+// ============ CSV ============
+function procCSV(type){
+  const raw=$(type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw').value.trim();
+  if(!raw)return toast('warning','Paste CSV');
+  // Validate: must not be HTML
+  if(raw.toLowerCase().startsWith('<!doctype')||raw.toLowerCase().startsWith('<html')){
+    return toast('error','Format Salah','Data terdeteksi HTML. Pastikan URL Google Sheet dipublish dengan benar (File→Share→Publish to Web→CSV)')
+  }
+  const lines=raw.split('\n').filter(l=>l.trim());
+  if(type==='kal'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{S:r[0]||'',T:r[1]||'',A:r[2]||'',K:r[3]||''}}).filter(k=>k.A);D.kal=D.kal.concat(nd);toast('success','',`${nd.length} agenda`)}
+  else if(type==='cp'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{K:r[0]||'',S:r[1]||'',E:r[2]||'',C:r[3]||'',T:r[4]||'',Di:r[5]||'',M:r[6]||METODE[0],P:parseInt(r[7])||2}}).filter(c=>c.T);D.cp=D.cp.concat(nd);toast('success','',`${nd.length} TP`)}
+  else{if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{nis:r[0]||'',nama:r[1]||'',jk:r[2]||'L'}}).filter(s=>s.nama);D.siswa[ST.rombel]=D.siswa[ST.rombel].concat(nd);toast('success','',`${nd.length} siswa`);$('csvSwA').classList.add('hidden')}
+  rt();renderAll();updElFlt()
+}
 
-// IMPORT
+// ============ IMPORT ============
 async function openImport(){$('mImport').classList.remove('hidden');$('mImport').innerHTML=`<div class="bg-white rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-hidden flex flex-col"><div class="bg-teal-700 text-white p-3 flex justify-between"><div><b>Ambil CP/TP</b><p class="text-[10px] text-teal-200">Guru se-NPSN / sesama mapel</p></div><button onclick="closeM('mImport')" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button></div><div class="p-3 flex-1 overflow-y-auto" id="impL"><div class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div>`;try{const myNP=v('fNP'),myM=ST.mapel.toLowerCase();const snap=await db.collection('users').get();const mt=[];for(const ud of snap.docs){if(ud.id===CU?.uid)continue;const u=ud.data();const sameNP=myNP&&u.npsn&&u.npsn===myNP;const sameM=(u.mapelList||[]).some(m=>m.toLowerCase()===myM);if(!sameNP&&!sameM)continue;const mks=[...new Set((u.mapelList||[]).concat(u.mapel?[u.mapel]:[]))];for(const mk of mks){if(!mk)continue;try{const cd=await db.doc(`u/${ud.id}/m/${mk.replace(/[^a-zA-Z0-9]/g,'_')}/d/cp`).get();if(cd.exists&&cd.data().i?.length)mt.push({name:u.name,school:u.school,npsn:u.npsn,mapel:mk,count:cd.data().i.length,sameNP,sameM:mk.toLowerCase()===myM,items:cd.data().i})}catch(ee){}}}if(!mt.length){$('impL').innerHTML='<p class="text-center py-4 text-slate-400 text-xs">Tidak ada</p>';return}window._imp=mt;$('impL').innerHTML=mt.map((m,i)=>`<div class="border rounded p-2 mb-1 hover:bg-slate-50 flex justify-between items-center"><div><b class="text-xs">${m.name}</b> <span class="text-[9px] text-slate-400">${m.school} NPSN:${m.npsn||'-'} • ${m.mapel} • ${m.count} TP</span></div><button onclick="doImp(${i})" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded">Ambil</button></div>`).join('')}catch(e){$('impL').innerHTML=`<p class="text-red-500 text-xs">${e.message}</p>`}}
 function doImp(i){const m=window._imp[i];if(!m)return;D.cp=D.cp.concat(m.items);rt();renderAll();updElFlt();closeM('mImport');toast('success','',`${m.items.length} TP`)}
 
-// RENDER ALL DOCS (per rombel via ST.activeDocRombel)
+// ============ RENDER ALL DOCS ============
 function renderAll(){
   const rom=ST.activeDocRombel||ST.rombel;
   const kelas=getRombelKelas();
@@ -657,30 +856,23 @@ function renderAll(){
   const cp1=cpK.filter(c=>c.S==='Semester 1'),cp2=cpK.filter(c=>c.S==='Semester 2');
   const JP=2;
 
-  // Kalender
   $('dKalContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">KALENDER PENDIDIKAN TA ${v('fTA')}</h2><p class="text-[10px] text-center font-semibold text-slate-600 mb-2">${v('fS')} — Rombel ${rom}</p><table class="w-full text-[10px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Smt</th><th class="border p-1">Tanggal</th><th class="border p-1">Agenda</th><th class="border p-1">Kategori</th></tr></thead><tbody>${D.kal.map((k,i)=>`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${k.S}</td><td class="border p-1">${k.T}</td><td class="border p-1">${k.A}</td><td class="border p-1 text-[9px]">${k.K}</td></tr>`).join('')}</tbody></table>${ttdPlan}`;
 
-  // ACP
   const eg={};cpK.forEach(c=>{if(!eg[c.E])eg[c.E]={cp:'',s1:[],s2:[],di:new Set()};if(c.C)eg[c.E].cp=c.C;if(c.S==='Semester 1')eg[c.E].s1.push(c.T);else eg[c.E].s2.push(c.T);if(c.Di)c.Di.split(';').forEach(d=>eg[c.E].di.add(d.trim()))});let an=0;
   $('dAcpContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">ANALISIS CAPAIAN PEMBELAJARAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">CP</th><th class="border p-1">TP Smt 1</th><th class="border p-1">TP Smt 2</th><th class="border p-1">Dimensi PL</th></tr></thead><tbody>${Object.entries(eg).map(([e,d])=>{an++;return`<tr class="border"><td class="border p-1 text-center">${an}</td><td class="border p-1 font-semibold">${e}</td><td class="border p-1 text-[8px]">${d.cp}</td><td class="border p-1 text-[8px]">${d.s1.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${d.s2.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${[...d.di].join('; ')}</td></tr>`}).join('')}</tbody></table>${ttdPlan}`;
 
-  // ATP
   $('dAtpContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">ALUR TUJUAN PEMBELAJARAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">TP</th><th class="border p-1">Smt</th><th class="border p-1">Prt</th><th class="border p-1">Metode</th><th class="border p-1">Dimensi PL</th></tr></thead><tbody>${cpK.map((c,i)=>`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${c.S==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-[8px]">${c.M}</td><td class="border p-1 text-[8px]">${c.Di}</td></tr>`).join('')}</tbody></table>${ttdPlan}`;
 
-  // Prota
   let ph='';[['Semester 1','bg-blue-50',cp1],['Semester 2','bg-emerald-50',cp2]].forEach(([lb,bg,data])=>{if(!data.length)return;ph+=`<tr class="${bg} font-bold"><td colspan="6" class="border p-1">${lb}</td></tr>`;let tot=0;data.forEach((c,i)=>{const jp=(c.P||1)*JP;tot+=jp;ph+=`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${lb==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-center">${jp}</td></tr>`});ph+=`<tr class="${bg} font-bold"><td colspan="5" class="border p-1 text-right">Total:</td><td class="border p-1 text-center">${tot} JP</td></tr>`});
   $('dProtaContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">PROGRAM TAHUNAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">TP</th><th class="border p-1">Smt</th><th class="border p-1">Prt</th><th class="border p-1">JP</th></tr></thead><tbody>${ph}</tbody></table>${ttdPlan}`;
 
-  // Promes
   $('bS1').className=`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ST.ps===1?'bg-blue-100 text-blue-700':'bg-slate-100'}`;$('bS2').className=`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ST.ps===2?'bg-blue-100 text-blue-700':'bg-slate-100'}`;
   const smD=ST.ps===1?cp1:cp2;const mons=ST.ps===1?['Jul','Ags','Sep','Okt','Nov','Des']:['Jan','Feb','Mar','Apr','Mei','Jun'];const wpm=[3,4,4,4,5,4];const tw=wpm.reduce((a,b)=>a+b,0);let mh=mons.map((m,i)=>`<th class="border p-0.5 text-[7px]" colspan="${wpm[i]}">${m}</th>`).join('');let wh=wpm.map(w=>Array.from({length:w},(_,i)=>`<th class="border p-0.5 text-[6px]">M${i+1}</th>`).join('')).join('');let wc=0;let pr=smD.map((c,idx)=>{const p=c.P||1;let cells='';for(let w=0;w<tw;w++){if(w>=wc&&w<wc+p)cells+=`<td class="border p-0.5 bg-emerald-100 text-emerald-700 font-bold text-[7px]">${JP}</td>`;else cells+=`<td class="border p-0.5"></td>`}wc+=p;if(wc>=tw)wc=0;return`<tr class="border"><td class="border p-0.5 text-center">${idx+1}</td><td class="border p-0.5 text-left text-[7px]">${c.T}</td><td class="border p-0.5 text-center">${p*JP}</td>${cells}</tr>`}).join('');
   $('dPromesContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER</h2><p class="text-[10px] text-center font-semibold mb-1">${sub}</p><div class="overflow-x-auto"><table class="w-full text-[8px] text-center"><thead class="bg-slate-100"><tr><th class="border p-0.5" rowspan="2">No</th><th class="border p-0.5 text-left" rowspan="2" style="min-width:100px">TP</th><th class="border p-0.5" rowspan="2">JP</th>${mh}</tr><tr class="bg-slate-50">${wh}</tr></thead><tbody>${pr}</tbody></table></div>${ttdPlan}`;
 
-  // Modul
   const met=cpK[0]?.M||METODE[0];const metInfo={'PBL (Problem Based Learning)':'Siswa mengidentifikasi masalah→analisis→solusi→presentasi','PjBL (Project Based Learning)':'Siswa merancang proyek→melaksanakan→evaluasi→produk','Inquiry Based Learning':'Siswa merumuskan pertanyaan→investigasi→penemuan→simpulan','Cooperative Learning':'Kelompok→diskusi→saling ajar→berbagi','Discovery Learning':'Eksplorasi→pola→konsep→aplikasi'};
-  $('dModulContent').innerHTML=`<h2 class="text-base font-bold text-center border-b pb-1">MODUL AJAR DEEP LEARNING</h2><div class="bg-slate-50 p-2 rounded border grid grid-cols-2 gap-1 text-[10px] mt-2"><div><b>Sekolah:</b> ${v('fS')}</div><div><b>Mapel:</b> ${mp}</div><div><b>Guru:</b> ${v('fG')}</div><div><b>Rombel:</b> ${rom} (${kelas} Fase ${fase})</div></div><div class="space-y-2 mt-2 text-[10px]"><div><h4 class="font-bold bg-slate-200 p-1 rounded">A. TUJUAN PEMBELAJARAN</h4><p class="p-1.5 border rounded mt-0.5">${cpK[0]?.T||'-'}</p></div><div><h4 class="font-bold bg-blue-100 p-1 rounded">B. METODE / MODEL</h4><p class="p-1.5 border rounded mt-0.5"><b>${met}</b><br>${metInfo[met]||''}</p></div><div><h4 class="font-bold bg-amber-100 p-1 rounded">C. PERTANYAAN PEMANTIK</h4><p class="p-1.5 border rounded mt-0.5">1. Mengapa penting? 2. Bagaimana penerapan? 3. Apa dampaknya?</p></div><div><h4 class="font-bold bg-slate-200 p-1 rounded">D. DIMENSI PROFIL LULUSAN</h4><p class="p-1.5 border rounded mt-0.5">${cpK[0]?.Di||'-'}</p></div><div><h4 class="font-bold bg-emerald-100 p-1 rounded">E. KEGIATAN DEEP LEARNING</h4><div class="mt-0.5 space-y-1"><div class="border rounded p-1.5"><b>🟢 Pendahuluan (15'):</b> Salam, doa, apersepsi, motivasi</div><div class="border rounded p-1.5"><b>🔵 Inti (${getJPDur(v('fJn'))*2-30}'):</b><br>• <b>Experiencing:</b> Mengamati fenomena<br>• <b>Reflecting:</b> Diskusi reflektif<br>• <b>Conceptualizing:</b> Membangun konsep<br>• <b>Applying:</b> Menerapkan konteks baru<br><i class="text-blue-600">${metInfo[met]||''}</i></div><div class="border rounded p-1.5"><b>🟡 Penutup (15'):</b> Simpulan, asesmen, refleksi, doa</div></div></div><div><h4 class="font-bold bg-red-100 p-1 rounded">F. ASESMEN</h4><p class="p-1.5 border rounded mt-0.5">Diagnostik • Formatif • Sumatif</p></div></div>${ttdPlan}`;
+  $('dModulContent').innerHTML=`<h2 class="text-base font-bold text-center border-b pb-1">MODUL AJAR DEEP LEARNING</h2><div class="bg-slate-50 p-2 rounded border grid grid-cols-2 gap-1 text-[10px] mt-2"><div><b>Sekolah:</b> ${v('fS')}</div><div><b>Mapel:</b> ${mp}</div><div><b>Guru:</b> ${v('fG')}</div><div><b>Rombel:</b> ${rom} (${kelas} Fase ${fase})</div></div><div class="space-y-2 mt-2 text-[10px]"><div><h4 class="font-bold bg-slate-200 p-1 rounded">A. TUJUAN PEMBELAJARAN</h4><p class="p-1.5 border rounded mt-0.5">${cpK[0]?.T||'-'}</p></div><div><h4 class="font-bold bg-blue-100 p-1 rounded">B. METODE / MODEL</h4><p class="p-1.5 border rounded mt-0.5"><b>${met}</b><br>${metInfo[met]||''}</p></div><div><h4 class="font-bold bg-amber-100 p-1 rounded">C. PERTANYAAN PEMANTIK</h4><p class="p-1.5 border rounded mt-0.5">1. Mengapa penting? 2. Bagaimana penerapan? 3. Apa dampaknya?</p></div><div><h4 class="font-bold bg-slate-200 p-1 rounded">D. DIMENSI PROFIL LULUSAN</h4><p class="p-1.5 border rounded mt-0.5">${cpK[0]?.Di||'-'}</p></div><div><h4 class="font-bold bg-emerald-100 p-1 rounded">E. KEGIATAN DEEP LEARNING</h4><div class="mt-0.5 space-y-1"><div class="border rounded p-1.5"><b>🟢 Pendahuluan (15'):</b> Salam, doa, apersepsi, motivasi</div><div class="border rounded p-1.5"><b>🔵 Inti:</b><br>• <b>Experiencing:</b> Mengamati fenomena<br>• <b>Reflecting:</b> Diskusi reflektif<br>• <b>Conceptualizing:</b> Membangun konsep<br>• <b>Applying:</b> Menerapkan konteks baru<br><i class="text-blue-600">${metInfo[met]||''}</i></div><div class="border rounded p-1.5"><b>🟡 Penutup (15'):</b> Simpulan, asesmen, refleksi, doa</div></div></div><div><h4 class="font-bold bg-red-100 p-1 rounded">F. ASESMEN</h4><p class="p-1.5 border rounded mt-0.5">Diagnostik • Formatif • Sumatif</p></div></div>${ttdPlan}`;
 
-  // KKTP
   $('dKktpContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">KKTP</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">TP</th><th class="border p-1 bg-red-50">Bimbingan (0-60)</th><th class="border p-1 bg-amber-50">Cukup (61-75)</th><th class="border p-1 bg-blue-50">Baik (76-88)</th><th class="border p-1 bg-emerald-50">Sangat Baik (89-100)</th></tr></thead><tbody>${cpK.map((c,i)=>{const t=(c.T||'').toLowerCase().substring(0,40);return`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-[8px] text-red-600">Belum mampu ${t}...</td><td class="border p-1 text-[8px] text-amber-600">Mampu ${t}... dengan bimbingan</td><td class="border p-1 text-[8px] text-blue-600">Mampu ${t}... mandiri</td><td class="border p-1 text-[8px] text-emerald-600 font-semibold">Mampu ${t}... dan bantu teman</td></tr>`}).join('')}</tbody></table>${ttdPlan}`;
 
   $('pgS').textContent=docTabs.includes(getCurrentTab())?`Rombel: ${rom}`:'-';
@@ -688,21 +880,21 @@ function renderAll(){
 
 function getCurrentTab(){const vis=document.querySelector('.tab-c:not(.hidden)');return vis?vis.id.replace('tab-',''):'profil'}
 
-// PROMPTS
-function genPrompts(){const mp=ST.mapel,kl=getRombelKelas(),fase=getFase(kl),jn=v('fJn'),ta=v('fTA');$('prCP').textContent=`Saya guru ${mp} jenjang ${jn}.\nBuatkan CSV CP & TP Kurikulum Merdeka.\n\nFORMAT (header persis):\nKelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan\n\n- Kelas: "${kl}"\n- Dimensi PL: ${DIMEN}\n- Metode (pilih): ${METODE.join(', ')}\n- Min 10 TP/semester, total ~16-18 pertemuan/semester\n- JANGAN koma dalam isi (ganti titik koma)\n\nBuatkan untuk ${mp} ${kl} Fase ${fase}.`;$('prKl').textContent=`CSV Kalender Pendidikan TA ${ta} ${jn}.\nFORMAT: Semester,Tanggal,Agenda,Kategori\nMin 15 agenda/semester. JANGAN koma.`;const tp1=D.cp.filter(c=>c.K===kl)[0];$('prLK').textContent=`Guru ${mp} ${jn}, ${kl} Fase ${fase}.\nBuatkan LKPD VISUAL terintegrasi Modul Ajar Deep Learning.\n\nTP: ${tp1?.T||'[sesuaikan]'}\nMetode: ${tp1?.M||METODE[0]}\nDimensi PL: ${tp1?.Di||DIMEN}\n\nBuat:\n1. Identitas LKPD\n2. Petunjuk\n3. Aktivitas Deep Learning:\n   - Experiencing (mengamati+ilustrasi)\n   - Reflecting (mind map+pertanyaan HOTS)\n   - Conceptualizing (tabel data+diagram)\n   - Applying (proyek mini)\n   - Evaluasi (PG bergambar+uraian)\n4. Rubrik penilaian\n5. Deskripsi visual DETAIL tiap ilustrasi\n6. Format A4, 6-10 halaman\n\nSertakan deskripsi gambar untuk AI image generator.`}
+// ============ PROMPTS ============
+function genPrompts(){const mp=ST.mapel,kl=getRombelKelas(),fase=getFase(kl),jn=v('fJn'),ta=v('fTA');$('prCP').textContent=`Saya guru ${mp} jenjang ${jn}.\nBuatkan CSV CP & TP Kurikulum Merdeka.\n\nFORMAT (header persis):\nKelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan\n\n- Kelas: "${kl}"\n- Dimensi PL: ${DIMEN}\n- Metode (pilih): ${METODE.join(', ')}\n- Min 10 TP/semester, total ~16-18 pertemuan/semester\n- JANGAN koma dalam isi (ganti titik koma)\n\nBuatkan untuk ${mp} ${kl} Fase ${fase}.`;$('prKl').textContent=`CSV Kalender Pendidikan TA ${ta} ${jn}.\nFORMAT: Semester,Tanggal,Agenda,Kategori\nMin 15 agenda/semester. JANGAN koma.`;const tp1=D.cp.filter(c=>c.K===kl)[0];$('prLK').textContent=`Guru ${mp} ${jn}, ${kl} Fase ${fase}.\nBuatkan LKPD VISUAL terintegrasi Modul Ajar Deep Learning.\n\nTP: ${tp1?.T||'[sesuaikan]'}\nMetode: ${tp1?.M||METODE[0]}\nDimensi PL: ${tp1?.Di||DIMEN}\n\nBuat:\n1. Identitas LKPD\n2. Petunjuk\n3. Aktivitas Deep Learning:\n   - Experiencing (mengamati+ilustrasi)\n   - Reflecting (mind map+pertanyaan HOTS)\n   - Conceptualizing (tabel data+diagram)\n   - Applying (proyek mini)\n   - Evaluasi (PG bergambar+uraian)\n4. Rubrik penilaian\n5. Deskripsi visual DETAIL tiap ilustrasi\n6. Format A4, 6-10 halaman`}
 
-// PROFILE
-function openProfile(){if(!CU||!UD)return;$('mProfile').classList.remove('hidden');$('mProfile').innerHTML=`<div class="bg-white rounded-2xl w-full max-w-sm mx-4 overflow-hidden"><div class="bg-blue-700 text-white p-4 text-center"><b>${UD.name||'-'}</b><p class="text-blue-200 text-[10px]">${CU.email}</p></div><div class="p-3 space-y-1 text-xs"><div class="flex justify-between"><span>Sekolah:</span><b>${UD.school||'-'} (${UD.npsn||'-'})</b></div><div class="flex justify-between"><span>Tipe:</span><b>${UD.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}</b></div><div class="flex justify-between"><span>Mapel:</span><b>${(UD.mapelList||[]).join(', ')}</b></div><div class="pt-2 space-y-1"><button onclick="doLogout()" class="w-full bg-red-500 text-white py-1.5 rounded-lg font-bold text-xs">Keluar</button><button onclick="closeM('mProfile')" class="w-full bg-slate-100 py-1.5 rounded-lg font-bold text-xs">Tutup</button></div></div></div>`}
+// ============ PROFILE ============
+function openProfile(){if(!CU||!UD)return;$('mProfile').classList.remove('hidden');$('mProfile').innerHTML=`<div class="modal-content"><div class="bg-blue-700 text-white p-4 text-center"><b>${UD.name||'-'}</b><p class="text-blue-200 text-[10px]">${CU.email}</p></div><div class="p-3 space-y-1 text-xs"><div class="flex justify-between"><span>Sekolah:</span><b>${UD.school||'-'} (${UD.npsn||'-'})</b></div><div class="flex justify-between"><span>Tipe:</span><b>${UD.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}</b></div><div class="flex justify-between"><span>Mapel:</span><b>${(UD.mapelList||[]).join(', ')}</b></div><div class="pt-2 space-y-1"><button onclick="doLogout()" class="w-full bg-red-500 text-white py-1.5 rounded-lg font-bold text-xs">Keluar</button><button onclick="closeM('mProfile')" class="w-full bg-slate-100 py-1.5 rounded-lg font-bold text-xs">Tutup</button></div></div></div>`}
 
-// ADMIN
+// ============ ADMIN ============
 async function loadAdmin(){if(AL!=='admin')return;$('aLoad').classList.remove('hidden');$('aBody').innerHTML='';try{const snap=await db.collection('users').orderBy('createdAt','desc').get();const users=[];snap.forEach(d=>users.push({id:d.id,...d.data()}));$('aLoad').classList.add('hidden');const t=users.length,p=users.filter(u=>u.status==='pending').length,a=users.filter(u=>u.status==='approved').length,r=users.filter(u=>u.status==='rejected').length;$('aSt').innerHTML=`<div class="bg-blue-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${t}</div><div class="text-[8px]">Total</div></div><div class="bg-amber-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${p}</div><div class="text-[8px]">Pending</div></div><div class="bg-emerald-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${a}</div><div class="text-[8px]">OK</div></div><div class="bg-red-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${r}</div><div class="text-[8px]">Tolak</div></div>`;$('aBody').innerHTML=users.map(u=>{const me=u.email===ADMIN_EMAIL;const sc={pending:'bg-amber-100 text-amber-700',approved:'bg-emerald-100 text-emerald-700',rejected:'bg-red-100 text-red-700'};let act='';if(!me){if(u.status!=='approved')act+=`<button onclick="setSt('${u.id}','approved')" class="bg-emerald-500 text-white px-1 py-0.5 rounded text-[8px]">✓</button> `;if(u.status!=='rejected')act+=`<button onclick="setSt('${u.id}','rejected')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[8px]">✗</button> `;act+=`<button onclick="if(confirm('Hapus?'))delU('${u.id}')" class="bg-slate-200 text-red-500 px-1 py-0.5 rounded text-[8px]"><i class="fa-solid fa-trash"></i></button>`}else act='<span class="text-[8px] text-red-500">ADMIN</span>';return`<tr><td class="p-2"><b class="text-[10px]">${u.name||'-'}</b><br><span class="text-[8px] text-slate-400">${u.email}</span></td><td class="p-2 text-[10px]">${u.school||'-'}<br>NPSN:${u.npsn||'-'}</td><td class="p-2 text-[10px]">${u.guruType==='kelas'?'Kelas':'Mapel'}</td><td class="p-2 text-center"><span class="sb ${sc[u.status]||sc.pending}">${u.status}</span></td><td class="p-2 text-center">${act}</td></tr>`}).join('')}catch(e){$('aLoad').classList.add('hidden');toast('error','',e.message)}}
 async function setSt(uid,st){try{await db.collection('users').doc(uid).update({status:st});toast('success','',st);loadAdmin()}catch(e){toast('error','',e.message)}}
 async function delU(uid){try{await db.collection('users').doc(uid).delete();toast('success','Hapus');loadAdmin()}catch(e){toast('error','',e.message)}}
 
-// EVENTS
+// ============ EVENTS ============
 document.querySelectorAll('#fProfil input,#fProfil select').forEach(el=>el.addEventListener('input',()=>{renderAll();genPrompts()}));
 $('lP').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM('mProfile');closeM('mLock');closeM('mImport');closeM('mAdminWA')}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM('mProfile');closeM('mLock');closeM('mImport');closeM('mWA')}});
 
 updKelas();updJPDuration();rt();renderAll();genPrompts();
 </script>
