@@ -308,7 +308,11 @@ function requireAuth(action='melakukan aksi ini') {
     return false;
 }
 
-function tryClickFile(id) { if (!requireAuth('mengimpor file')) return; $(id).click(); }
+function tryClickFile(id) { 
+    if (!requireAuth('mengimpor file')) return; 
+    $(id)?.click(); 
+}
+
 function doPrint() { if (!requireAuth('mencetak dokumen')) return; window.print(); }
 
 async function doLogin() {
@@ -495,7 +499,7 @@ function sfs() {
 
 const debS = () => { if (!canWrite && !isAdmin) return; clearTimeout(sT); sT=setTimeout(()=>{sfs();ra();},600); };
 
-// HELPER DUMMY UNTUK KRITERIA PENILAIAN AI & CSV (Mencegah Uncaught ReferenceError)
+// HELPER DUMMY UNTUK KRITERIA PENILAIAN AI & CSV
 const rKrit = () => {
     const box = $('kBox'); if (!box) return;
     box.innerHTML = (D.krit || []).map((k, i) => `<div class="flex items-center gap-1 mb-1"><input value="${k.n}" class="is text-[8px] w-14" disabled><input type="number" value="${k.b}" class="is text-[8px] w-10" disabled><span class="text-[8px] text-slate-400">%</span></div>`).join('');
@@ -505,7 +509,6 @@ const pAI = type => { toast(`Prompt AI '${type}' disiapkan`); };
 const openShare = () => { $('shareModal')?.classList.remove('hidden'); };
 const loadGS = type => { toast(`Fitur Google Sheets (${type}) aktif`); };
 const hcsv = (e, type) => { toast(`Membaca file CSV (${type})`); };
-const tryClickFile = id => { $(id)?.click(); };
 const dlTpl = type => { toast(`Mengunduh Template CSV ${type}`); };
 const clearTP = () => { if(confirm('Hapus seluruh TP?')){ D.tp[D.activeMapel]=[]; sfs(); ra(); } };
 const clearSW = () => { if(confirm('Hapus seluruh Siswa?')){ D.siswa=[]; sfs(); ra(); } };
