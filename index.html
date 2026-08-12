@@ -203,7 +203,7 @@
     </div>
   </div>
 
-  <!-- Mapel Selector (NO rombel — rombel auto from jadwal) -->
+  <!-- Mapel Selector -->
   <div id="selArea" class="mb-2 hidden">
     <label class="text-[8px] text-slate-500 uppercase font-bold">Mata Pelajaran Aktif</label>
     <div class="flex space-x-0.5 mt-0.5">
@@ -264,7 +264,7 @@
         <i class="fa-solid fa-right-from-bracket mr-1"></i>Keluar
       </button>
     </div>
-    <p class="text-[8px] text-slate-600 text-center">SI-GUMART v7.0 © 2025</p>
+    <p class="text-[8px] text-slate-600 text-center">SI-GUMART v7.0 © 2026</p>
   </div>
 </aside>
 
@@ -385,12 +385,6 @@
       <button onclick="ok()&&procCSV('cp')" class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded mt-1">
         <i class="fa-solid fa-upload mr-0.5"></i>Proses CSV
       </button>
-      <div class="mt-2 bg-amber-50 border border-amber-200 rounded p-2 text-[9px] text-amber-700">
-        <b><i class="fa-solid fa-lightbulb mr-1"></i>Cara Publish Google Sheet:</b><br>
-        1. Buka Sheet → <b>File → Share → Publish to web</b> → pilih Sheet & CSV → Publish<br>
-        2. Copy link → Paste di atas<br>
-        <b>Atau</b>: File → Share → Anyone with link (Viewer) → copy link biasa
-      </div>
     </div>
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex flex-wrap gap-1 items-center mb-2">
@@ -512,7 +506,7 @@
   </div>
   <div id="tab-dKktp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dKktpContent"></div></div>
 
-  <!-- ===== TAB: ABSEN SISWA (per Rombel) ===== -->
+  <!-- ===== TAB: ABSEN SISWA ===== -->
   <div id="tab-absen" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2 no-print">
@@ -529,7 +523,7 @@
     </div>
   </div>
 
-  <!-- ===== TAB: DAFTAR NILAI (per Rombel) ===== -->
+  <!-- ===== TAB: DAFTAR NILAI ===== -->
   <div id="tab-nilai" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2 no-print">
@@ -550,7 +544,7 @@
     </div>
   </div>
 
-  <!-- ===== TAB: JURNAL PEMBELAJARAN (per Bulan) ===== -->
+  <!-- ===== TAB: JURNAL PEMBELAJARAN ===== -->
   <div id="tab-jurnal" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex items-center space-x-2 mb-2 no-print">
@@ -633,7 +627,7 @@ const hideAuth=()=>$('authScreen').classList.add('hidden');
 const getFase=k=>{const n=parseInt(String(k).replace(/\D/g,''));return n<=2?'A':n<=4?'B':n<=6?'C':n<=8?'D':n<=10?'E':'F'};
 const kelasRange=j=>j==='SD/MI'?[1,2,3,4,5,6]:j==='SMP/MTs'?[7,8,9]:[10,11,12];
 const getJPDur=j=>j==='SD/MI'?35:j==='SMP/MTs'?40:45;
-const copyEl=id=>{navigator.clipboard.writeText($(id).innerText);toast('success','Disalin!')};
+const copyEl=id=>{navigator.clipboardText($(id).innerText);toast('success','Disalin!')};
 const ok=()=>{if(AL==='approved'||AL==='admin')return true;$('mLock').classList.remove('hidden');return false};
 const handlePrint=()=>{if(ok())window.print()};
 const pcsv=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){q=!q;continue}if(ch===','&&!q){r.push(c.trim());c='';continue}c+=ch}r.push(c.trim());return r};
@@ -697,7 +691,7 @@ function getLastWorkdayOfMonth(bln){
   const maxDay=parseInt(v('fHari'))===6?6:5;
   for(let d=lastDay;d>=1;d--){
     const dt=new Date(yr,monthNum,d);
-    const dow=dt.getDay();
+    const dow=dt.getDay(); 
     if(dow>=1&&dow<=maxDay)return `${d} ${bln} ${yr}`;
   }
   return `${lastDay} ${bln} ${yr}`;
@@ -774,7 +768,7 @@ async function loadWAConfig(){
   try{
     const d=await db.collection('config').doc('waContact').get();
     if(d.exists)adminWAConfig=d.data();
-  }catch(e){console.error('Load WA:',e)}
+  }catch(e){console.error('Load WA Error:',e)}
 }
 function updateWALink(){
   const email=CU?.email||'';
@@ -950,12 +944,6 @@ async function saveCloud(){
     await db.doc(`${p}/d/nl`).set(D.nilai);
     await db.doc(`${p}/d/kr`).set({i:D.kriteria});
     await db.doc(`${p}/d/jr`).set(D.jurnal);
-    
-    // Simpan Pengaturan WA khusus ke collection global jika Admin
-    if(AL==='admin'){
-      await db.collection('config').doc('waContact').set(adminWAConfig);
-    }
-    
     toast('success','Tersimpan!','Semua data tersimpan ke cloud');
   }catch(e){toast('error','Gagal',e.message)}
   btn.disabled=false;btn.innerHTML=orig;
@@ -1106,14 +1094,13 @@ function rSwT(){
   $('swI').textContent=`${list.length} siswa • L: ${list.filter(s=>s.jk==='L').length} • P: ${list.filter(s=>s.jk==='P').length}`;
 }
 
-// ============ JADWAL (auto-detect rombel) ============
+// ============ JADWAL ============
 function rJadwal(){
   const ie=isEdit();
   const days=getDays();
   const mapelLC=ST.mapel.toLowerCase();
   const isGK=v('fTG')==='kelas';
   
-  // AUTO-DETECT rombel dari jadwal
   const detectedRombel=new Set();
   if(D.jadwal)D.jadwal.forEach(r=>{
     if(r.j==='ist'||!r.h)return;
@@ -1188,7 +1175,6 @@ function rJadwal(){
   });
   html+=`</tbody></table>`;
   
-  // Rekap JP per rombel
   let jpCount=0;
   const rombelJP={};
   D.jadwal.forEach(r=>{
@@ -1358,14 +1344,16 @@ function doImp(i){
   }
 }
 
-// ============ ABSEN (default HADIR) ============
+// ============ ABSEN ============
 function getJPPerWeekForRombel(rom){
   let count=0;
+  if(!D.jadwal)return 2;
   const mapelLC=ST.mapel.toLowerCase();
-  (D.jadwal||[]).forEach(r=>{
+  D.jadwal.forEach(r=>{
     if(r.j==='ist'||!r.h)return;
     getDays().forEach(d=>{
-      const parts=(r.h[d]||'').split('\n');
+      const val=r.h[d]||'';
+      const parts=val.split('\n');
       if((parts[0]||'').toLowerCase().includes(mapelLC)&&(parts[1]||'').trim()===rom)count++;
     });
   });
@@ -1411,9 +1399,10 @@ function rAbsen(){
   $('abTTD').innerHTML=makeTTD(getTTDPelaporan(bln));
 }
 
-// ============ DAFTAR NILAI ============
+// ============ NILAI ============
 function addKrit(){
-  const k=prompt('Nama Kriteria Penilaian (mis: TP1, TP2, Formatif 1):');
+  if(!D.kriteria)D.kriteria=[];
+  const k=prompt('Nama kriteria penilaian baru (misal: Formatif 1, Sumatif Bab 1):');
   if(!k)return;
   D.kriteria.push(k.trim());
   rNilai();
@@ -1427,30 +1416,31 @@ function rNilai(){
     <h2 class="text-sm font-bold uppercase">DAFTAR NILAI SISWA</h2>
     <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • Rombel ${rom} • Bulan ${bln} TA ${v('fTA')}</p>
   </div>`;
-  if(!rom){$('nlArea').innerHTML='<p class="text-center py-6 text-slate-400 text-xs">Pilih rombel</p>';$('nlTTD').innerHTML='';return}
-  if(!D.kriteria.length)D.kriteria=['TP1','TP2','Formatif','Sumatif'];
-  if(!D.nilai[rom])D.nilai[rom]={};
-  if(!D.nilai[rom][bln])D.nilai[rom][bln]={};
+  if(!rom){$('nlArea').innerHTML='<p class="text-center py-6 text-slate-400 text-xs">Pilih rombel dari tab di atas</p>';$('nlTTD').innerHTML='';return}
+  if(!D.kriteria||!D.kriteria.length)D.kriteria=['Formatif 1','Formatif 2','Sumatif Bab 1','Sumatif Bab 2'];
   const ie=isEdit();
   
-  $('krArea').innerHTML=`<div class="flex items-center gap-1 flex-wrap"><span class="text-[10px] text-slate-500">Kriteria:</span>`+
-    D.kriteria.map((k,ki)=>`<span class="bg-slate-100 border text-[9px] px-1.5 py-0.5 rounded flex items-center gap-1">${k} ${ie?`<button onclick="D.kriteria.splice(${ki},1);rNilai()" class="text-red-500">×</button>`:''}</span>`).join('')+'</div>';
+  $('krArea').innerHTML=`<div class="flex items-center gap-1 text-[9px] text-slate-500"><span>Kriteria Aktif:</span>`+
+    D.kriteria.map((k,ki)=>`<span class="bg-slate-100 border px-1.5 py-0.5 rounded flex items-center gap-1">${k} ${ie?`<button onclick="D.kriteria.splice(${ki},1);rNilai()" class="text-red-500"><i class="fa-solid fa-xmark"></i></button>`:''}</span>`).join('')+`</div>`;
+    
+  if(!D.nilai[rom])D.nilai[rom]={};
+  if(!D.nilai[rom][bln])D.nilai[rom][bln]={};
 
   let html=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 text-left min-w-[100px]">Nama Siswa</th>`;
-  D.kriteria.forEach(k=>html+=`<th class="border p-1">${k}</th>`);
-  html+=`<th class="border p-1 bg-blue-50 w-12">Rata2</th></tr></thead><tbody>`;
-  
+    <th class="border p-1 w-6">No</th><th class="border p-1 text-left min-w-[120px]">Nama Siswa</th>`;
+  D.kriteria.forEach(k=>html+=`<th class="border p-1 text-center min-w-[50px]">${k}</th>`);
+  html+=`<th class="border p-1 bg-blue-50 text-center font-bold w-12">Rata2</th></tr></thead><tbody>`;
+
   list.forEach((s,si)=>{
     html+=`<tr><td class="border p-0.5 text-center">${si+1}</td><td class="border p-0.5">${s.nama||'-'}</td>`;
-    let tot=0,cnt=0;
+    let sum=0,cnt=0;
     D.kriteria.forEach((k,ki)=>{
       const key=`${si}_${ki}`;
       const val=D.nilai[rom][bln][key]||'';
-      if(val!==''){tot+=+val;cnt++}
-      html+=`<td class="border p-0"><input type="number" value="${val}" onchange="D.nilai['${rom}']['${bln}']['${key}']=this.value;rNilai()" class="w-full text-[9px] p-0.5 text-center border-0 outline-none" ${ie?'':'disabled'}></td>`;
+      if(val!==''&&!isNaN(val)){sum+=parseFloat(val);cnt++}
+      html+=`<td class="border p-0"><input type="number" value="${val}" onchange="D.nilai['${rom}']['${bln}']['${key}']=this.value;rNilai()" class="w-full text-[9px] text-center p-0.5 bg-transparent border-0 ef" ${ie?'':'disabled'}></td>`;
     });
-    const avg=cnt?(tot/cnt).toFixed(1):'-';
+    const avg=cnt>0?Math.round(sum/cnt):'-';
     html+=`<td class="border p-0.5 text-center font-bold text-blue-600 bg-blue-50/50">${avg}</td></tr>`;
   });
   html+=`</tbody></table>`;
@@ -1458,452 +1448,395 @@ function rNilai(){
   $('nlTTD').innerHTML=makeTTD(getTTDPelaporan(bln));
 }
 
-// ============ JURNAL PEMBELAJARAN (Ringkas Jam ke X - Jam ke Y) ============
+// ============ JURNAL PEMBELAJARAN (JP Berurutan Ringkas) ============
 function rJurnal(){
   const bln=$('jrBln').value;
-  const days=getDays();
-  const mapelLC=ST.mapel.toLowerCase();
-  const mi=BULAN.indexOf(bln);
-  if(mi<0)return;
-  const yr=mi<6?parseInt((v('fTA').split('/')[0])||2026):parseInt((v('fTA').split('/')[1])||2027);
-  const monthNum=BULAN_IDX_JS[bln];
-  const totalDays=new Date(yr,monthNum+1,0).getDate();
+  const rom=ST.activeDocRombel||ST.rombel;
   const ie=isEdit();
-  
-  const scheduleByDay={};
-  days.forEach(d=>scheduleByDay[d]=[]);
-  (D.jadwal||[]).forEach(r=>{
-    if(r.j==='ist'||!r.h)return;
-    days.forEach(d=>{
-      const val=r.h[d]||'';
-      const parts=val.split('\n');
-      const mp=(parts[0]||'').toLowerCase();
-      const rb=(parts[1]||'').trim();
-      if(mp.includes(mapelLC)){
-        scheduleByDay[d].push({jp:r.j,rombel:rb,waktu:r.w||''});
-      }
+  if(!rom){
+    $('jrContent').innerHTML='<p class="text-center py-6 text-slate-400 text-xs">Pilih rombel dari tab di atas</p>';
+    return;
+  }
+  if(!D.jurnal[rom])D.jurnal[rom]={};
+  if(!D.jurnal[rom][bln])D.jurnal[rom][bln]=[];
+
+  const mapelLC=ST.mapel.toLowerCase();
+  const teachingSchedule=[];
+  if(D.jadwal){
+    getDays().forEach(day=>{
+      D.jadwal.forEach(row=>{
+        if(row.j==='ist'||!row.h)return;
+        const val=row.h[day]||'';
+        const parts=val.split('\n');
+        if((parts[0]||'').toLowerCase().includes(mapelLC)&&(parts[1]||'').trim()===rom){
+          teachingSchedule.push({day,jp:row.j,waktu:row.w});
+        }
+      });
     });
-  });
+  }
+
+  // Generate Hari Kerja Pembelajaran
+  const mi=BULAN.indexOf(bln);
+  const monthNum=BULAN_IDX_JS[bln];
+  const yr=mi<6?parseInt((v('fTA').split('/')[0])||2026):parseInt((v('fTA').split('/')[1])||2027);
+  const totalDays=new Date(yr,monthNum+1,0).getDate();
+  const daysName=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
   
   const entries=[];
-  const tpList=D.cp.map(c=>c.T).filter(Boolean);
-  let tpIdx=0;
-  
-  if(!D.jurnal)D.jurnal={};
-  if(!D.jurnal[bln])D.jurnal[bln]={};
-  
-  for(let date=1;date<=totalDays;date++){
-    const dt=new Date(yr,monthNum,date);
-    const dow=dt.getDay();
-    const dayName=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][dow];
-    if(scheduleByDay[dayName]&&scheduleByDay[dayName].length>0){
-      const tglStr=`${dayName}, ${date} ${bln} ${yr}`;
-      const slots=scheduleByDay[dayName];
-      
-      const byRombel={};
-      slots.forEach(s=>{
-        const rb=s.rombel||'Utama';
-        if(!byRombel[rb])byRombel[rb]=[];
-        byRombel[rb].push(s);
-      });
-      
-      Object.entries(byRombel).forEach(([rb,sList])=>{
-        const key=`${date}_${rb}`;
-        const saved=D.jurnal[bln][key]||{};
-        
-        let jamText='';
-        if(sList.length===1){
-          jamText=`Jam ke-${sList[0].jp}`;
-        }else{
-          const minJ=Math.min(...sList.map(s=>parseInt(s.jp)));
-          const maxJ=Math.max(...sList.map(s=>parseInt(s.jp)));
-          if(minJ === maxJ) {
-            jamText=`Jam ke-${minJ}`;
-          } else {
-            jamText=`Jam ke-${minJ} - ke-${maxJ}`;
-          }
-        }
-        
-        const autoTP=saved.tp||(tpList.length?tpList[tpIdx%tpList.length]:'Materi Pembelajaran');
-        if(!saved.tp)tpIdx++;
-        
-        entries.push({
-          key,
-          tgl:tglStr,
-          rombel:rb,
-          jam:jamText,
-          jpCount:sList.length,
-          tp:autoTP,
-          kegiatan:saved.kegiatan||'Pendahuluan, Kegiatan Inti (Deep Learning), Penutup',
-          hambatan:saved.hambatan||'-',
-          pemecahan:saved.pemecahan||'-',
-          absensi:saved.absensi||'Hadir Semua'
-        });
+  for(let d=1;d<=totalDays;d++){
+    const dt=new Date(yr,monthNum,d);
+    const dayName=daysName[dt.getDay()];
+    const matches=teachingSchedule.filter(s=>s.day===dayName);
+    if(matches.length>0){
+      entries.push({
+        tgl:`${d} ${bln} ${yr}`,
+        hari:dayName,
+        slots:matches
       });
     }
   }
-  
+
+  const rombelKelas=getRombelKelas();
+  const tps=D.cp.filter(c=>!c.K||c.K===rombelKelas);
+
   let html=`<div class="text-center mb-3">
     <h2 class="text-sm font-bold uppercase">JURNAL PELAKSANAAN PEMBELAJARAN</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • Bulan ${bln} ${yr} TA ${v('fTA')}</p>
-  </div>`;
-  
-  if(!entries.length){
-    html+=`<div class="p-6 text-center text-slate-400 text-xs border rounded-lg">
-      <i class="fa-solid fa-calendar-xmark text-2xl mb-2 text-slate-300"></i><br>
-      Tidak ada jadwal mata pelajaran <b>${ST.mapel}</b> pada bulan ${bln}.<br>
-      Pastikan jadwal pelajaran sudah diisi dengan benar di menu <b>Jadwal Pelajaran</b>.
-    </div>`;
-  }else{
-    html+=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-      <th class="border p-1 w-6">No</th>
-      <th class="border p-1 min-w-[90px]">Hari, Tanggal</th>
-      <th class="border p-1 w-12">Rombel</th>
-      <th class="border p-1 w-20">Jam Ke</th>
-      <th class="border p-1 min-w-[130px]">Tujuan Pembelajaran (TP) / Materi</th>
-      <th class="border p-1 min-w-[120px]">Kegiatan Pembelajaran</th>
-      <th class="border p-1 min-w-[90px]">Hambatan</th>
-      <th class="border p-1 min-w-[90px]">Pemecahan Masalah</th>
-      <th class="border p-1 w-16">Absensi</th>
-    </tr></thead><tbody>`;
-    
-    entries.forEach((e,i)=>{
-      html+=`<tr>
-        <td class="border p-1 text-center font-semibold">${i+1}</td>
-        <td class="border p-1 font-semibold text-slate-700">${e.tgl}</td>
-        <td class="border p-1 text-center font-bold text-blue-600">${e.rombel}</td>
-        <td class="border p-1 text-center font-semibold text-slate-600">${e.jam}</td>
-        <td class="border p-0.5"><textarea onchange="saveJrField('${bln}','${e.key}','tp',this.value)" class="w-full border-0 p-0.5 text-[9px] outline-none bg-transparent" rows="2" ${ie?'':'disabled'}>${e.tp}</textarea></td>
-        <td class="border p-0.5"><textarea onchange="saveJrField('${bln}','${e.key}','kegiatan',this.value)" class="w-full border-0 p-0.5 text-[9px] outline-none bg-transparent" rows="2" ${ie?'':'disabled'}>${e.kegiatan}</textarea></td>
-        <td class="border p-0.5"><textarea onchange="saveJrField('${bln}','${e.key}','hambatan',this.value)" class="w-full border-0 p-0.5 text-[9px] outline-none bg-transparent" rows="2" ${ie?'':'disabled'}>${e.hambatan}</textarea></td>
-        <td class="border p-0.5"><textarea onchange="saveJrField('${bln}','${e.key}','pemecahan',this.value)" class="w-full border-0 p-0.5 text-[9px] outline-none bg-transparent" rows="2" ${ie?'':'disabled'}>${e.pemecahan}</textarea></td>
-        <td class="border p-0.5"><input value="${e.absensi}" onchange="saveJrField('${bln}','${e.key}','absensi',this.value)" class="w-full border-0 p-0.5 text-[9px] outline-none bg-transparent text-center" ${ie?'':'disabled'}></td>
-      </tr>`;
+    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • Rombel ${rom} • Bulan ${bln} TA ${v('fTA')}</p>
+  </div>
+  <table class="w-full text-[9px]">
+    <thead class="bg-slate-100">
+      <tr>
+        <th class="border p-1 w-6">No</th>
+        <th class="border p-1 w-24">Hari / Tanggal</th>
+        <th class="border p-1 w-24">Jam ke / Waktu</th>
+        <th class="border p-1 min-w-[120px]">Materi / Tujuan Pembelajaran</th>
+        <th class="border p-1 w-20">Absensi</th>
+        <th class="border p-1 min-w-[100px]">Catatan / Refleksi</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  if(entries.length===0){
+    html+=`<tr><td colspan="6" class="border p-4 text-center text-slate-400">Tidak ada jadwal mengajar ${ST.mapel} di Rombel ${rom} untuk bulan ${bln}.</td></tr>`;
+  } else {
+    let entryIdx=0;
+    entries.forEach((e)=>{
+      // RINGKAS JAM BERURUTAN
+      let i=0;
+      while(i<e.slots.length){
+        let startSlot=e.slots[i];
+        let endSlot=e.slots[i];
+        let j=i+1;
+        
+        while(j<e.slots.length && typeof startSlot.jp==='number' && e.slots[j].jp===endSlot.jp+1){
+          endSlot=e.slots[j];
+          j++;
+        }
+        
+        entryIdx++;
+        const curData=D.jurnal[rom][bln][entryIdx-1]||{};
+        
+        let jamLabel='', waktuLabel='';
+        if(startSlot.jp===endSlot.jp){
+          jamLabel=`Jam ke ${startSlot.jp}`;
+          waktuLabel=startSlot.waktu;
+        } else {
+          jamLabel=`Jam ke ${startSlot.jp} - ${endSlot.jp}`;
+          const startTime=(startSlot.waktu||'').split('-')[0]||'';
+          const endTime=(endSlot.waktu||'').split('-')[1]||'';
+          waktuLabel=`${startTime}-${endTime}`;
+        }
+
+        const tpOpt=tps.map(t=>`<option value="${t.T}" ${curData.tp===t.T?'selected':''}>${t.T}</option>`).join('');
+
+        html+=`<tr>
+          <td class="border p-1 text-center font-bold">${entryIdx}</td>
+          <td class="border p-1"><b>${e.hari}</b>,<br>${e.tgl}</td>
+          <td class="border p-1 text-center"><b class="text-blue-600">${jamLabel}</b><br><span class="text-[8px] text-slate-500">(${waktuLabel})</span></td>
+          <td class="border p-1">
+            <select onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'tp',this.value)" class="w-full border rounded p-1 text-[8px] ef mb-1" ${ie?'':'disabled'}>
+              <option value="">-- Pilih TP --</option>${tpOpt}
+            </select>
+            <textarea onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'materi',this.value)" class="w-full border rounded p-1 text-[8px] ef" placeholder="Materi / Kegiatan..." rows="2" ${ie?'':'disabled'}>${curData.materi||''}</textarea>
+          </td>
+          <td class="border p-1">
+            <input value="${curData.absen||'Nihil'}" onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'absen',this.value)" class="w-full border rounded p-1 text-[8px] text-center ef" ${ie?'':'disabled'}>
+          </td>
+          <td class="border p-1">
+            <textarea onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'catatan',this.value)" class="w-full border rounded p-1 text-[8px] ef" placeholder="Catatan/Refleksi..." rows="2" ${ie?'':'disabled'}>${curData.catatan||'Pembelajaran berjalan lancar.'}</textarea>
+          </td>
+        </tr>`;
+
+        i=j;
+      }
     });
-    html+=`</tbody></table>`;
   }
-  
-  html+=`<div class="mt-4">${makeTTD(getTTDPelaporan(bln))}</div>`;
+
+  html+=`</tbody></table>${makeTTD(getTTDPelaporan(bln))}`;
   $('jrContent').innerHTML=html;
 }
 
-function saveJrField(bln,key,field,val){
-  if(!D.jurnal)D.jurnal={};
-  if(!D.jurnal[bln])D.jurnal[bln]={};
-  if(!D.jurnal[bln][key])D.jurnal[bln][key]={};
-  D.jurnal[bln][key][field]=val;
+function setJurnalData(rom,bln,idx,field,val){
+  if(!D.jurnal[rom])D.jurnal[rom]={};
+  if(!D.jurnal[rom][bln])D.jurnal[rom][bln]=[];
+  if(!D.jurnal[rom][bln][idx])D.jurnal[rom][bln][idx]={};
+  D.jurnal[rom][bln][idx][field]=val;
 }
 
-// ============ PROMPTS AI GENERATOR ============
-function genPrompts(){
-  const sc=v('fS'),kls=getRombelKelas(),fase=getFase(kls),mp=ST.mapel;
-  const ta=v('fTA'),dur=getJPDur(v('fJn'));
-  
-  $('prCP').textContent=`Buatkan data CP dan TP untuk mata pelajaran ${mp} ${kls} (${fase}) Kurikulum Merdeka ${sc} Tahun Ajaran ${ta}.
-Format output WAJIB CSV dengan header berikut:
-Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan
-
-Petunjuk:
-- Kelas: ${kls}
-- Semester: Semester 1 / Semester 2
-- Elemen: Sesuaikan elemen resmi ${mp}
-- CP: Capaian Pembelajaran resmi
-- TP: Tujuan Pembelajaran yang terukur dan operasional
-- Dimensi Profil Lulusan: pilih dari (${DIMEN})
-- Metode: pilih dari (${METODE.join(', ')})
-- Pertemuan: jumlah pertemuan (angka, mis: 2 atau 3)
-
-HANYA BERIKAN TEKS CSV SAJA TANPA PENJELASAN TAMBAHAN ATAU CODE BLOCK MARKDOWN.`;
-
-  $('prKl').textContent=`Buatkan Kalender Pendidikan untuk Tahun Ajaran ${ta} di ${sc}.
-Format output WAJIB CSV dengan header berikut:
-Semester,Tanggal,Agenda,Kategori
-
-Petunjuk:
-- Semester: Semester 1 / Semester 2
-- Tanggal: format DD/MM/YYYY atau rentang tanggal (mis: 15-20 Juli 2026)
-- Agenda: Nama kegiatan / libur / KBM / asesmen
-- Kategori: KBM / Libur / Asesmen / Kegiatan Sekolah / Rapor
-
-HANYA BERIKAN TEKS CSV SAJA TANPA PENJELASAN TAMBAHAN ATAU CODE BLOCK MARKDOWN.`;
-
-  const selTP=D.cp.length?D.cp[0].T:'-';
-  $('prLK').textContent=`Buatkan Modul Ajar Deep Learning + Lembar Kerja Peserta Didik (LKPD) Visual & Interaktif untuk:
-- Mata Pelajaran: ${mp}
-- Sekolah: ${sc} (${kls} / ${fase})
-- Tujuan Pembelajaran (TP): ${selTP}
-- Alokasi Waktu: 2 x ${dur} menit
-- Pendekatan: Deep Learning (Mindful, Meaningful, Joyful Learning)
-
-Sertakan:
-1. Identitas & Kompetensi Awal
-2. Dimensi Profil Pelajar Pancasila
-3. Sarana & Prasarana, Target Peserta Didik
-4. Langkah Pembelajaran (Pendahuluan, Inti Deep Learning, Penutup)
-5. Instrumen Asesmen (Formatif & Sumatif)
-6. LKPD Visual (Siap cetak, menarik, disertai petunjuk dan instruksi kerja siswa)`;
-}
-
-// ============ RENDER ALL DOCUMENTS ============
+// ============ DOKUMEN GENERATORS ============
 function renderAll(){
-  rKalDoc();rAcpDoc();rAtpDoc();rProtaDoc();rPromesDoc();rModulDoc();rKktpDoc();
+  rDKal();rDAcp();rDAtp();rDProta();rDPromes();rDModul();rDKktp();
 }
 
-function rKalDoc(){
-  let html=`<div class="text-center mb-3">
+function rDKal(){
+  $('dKalContent').innerHTML=`<div class="text-center mb-3">
     <h2 class="text-sm font-bold uppercase">KALENDER PENDIDIKAN DAN AGENDA KEGIATAN</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • Tahun Ajaran ${v('fTA')}</p>
+    <p class="text-[10px] font-semibold">${v('fS')} • TA ${v('fTA')}</p>
   </div>
   <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-8">No</th><th class="border p-1 w-20">Semester</th>
-    <th class="border p-1 w-32">Tanggal</th><th class="border p-1">Agenda Kegiatan</th>
-    <th class="border p-1 w-24">Kategori</th>
-  </tr></thead><tbody>`;
-  if(!D.kal.length){
-    html+=`<tr><td colspan="5" class="text-center py-4 text-slate-400">Belum ada data kalender. Isi di tab Kalender.</td></tr>`;
-  }else{
-    D.kal.forEach((k,i)=>{
-      html+=`<tr><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${k.S||'-'}</td><td class="border p-1 font-semibold">${k.T||'-'}</td><td class="border p-1">${k.A||'-'}</td><td class="border p-1 text-center">${k.K||'-'}</td></tr>`;
-    });
-  }
-  html+=`</tbody></table><div class="mt-4">${makeTTD(getTTDPerencanaan())}</div>`;
-  $('dKalContent').innerHTML=html;
+    <th class="border p-1">Semester</th><th class="border p-1">Tanggal</th>
+    <th class="border p-1">Agenda / Kegiatan</th><th class="border p-1">Kategori</th>
+  </tr></thead><tbody>`+
+  (D.kal.length?D.kal.map(k=>`<tr>
+    <td class="border p-1 text-center font-semibold">${k.S||'-'}</td>
+    <td class="border p-1 text-center">${k.T||'-'}</td>
+    <td class="border p-1">${k.A||'-'}</td>
+    <td class="border p-1 text-center"><span class="sb bg-blue-100 text-blue-700">${k.K||'Umum'}</span></td>
+  </tr>`).join(''):`<tr><td colspan="4" class="text-center p-4 text-slate-400">Belum ada data kalender</td></tr>`)+
+  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
 }
 
-function rAcpDoc(){
-  const kls=getRombelKelas(),fase=getFase(kls);
-  let html=`<div class="text-center mb-3">
+function rDAcp(){
+  const k=getRombelKelas();
+  const list=D.cp.filter(c=>!c.K||c.K===k);
+  $('dAcpContent').innerHTML=`<div class="text-center mb-3">
     <h2 class="text-sm font-bold uppercase">ANALISIS CAPAIAN PEMBELAJARAN (ACP)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${kls} (Fase ${fase}) • TA ${v('fTA')}</p>
+    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • Fase ${getFase(k)}</p>
   </div>
   <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 w-24">Elemen</th>
-    <th class="border p-1">Capaian Pembelajaran (CP)</th>
-    <th class="border p-1">Tujuan Pembelajaran (TP)</th>
-  </tr></thead><tbody>`;
-  const list=D.cp.filter(c=>!c.K||c.K===kls);
-  if(!list.length){
-    html+=`<tr><td colspan="4" class="text-center py-4 text-slate-400">Belum ada data CP/TP untuk ${kls}. Isi di tab CP/TP.</td></tr>`;
-  }else{
-    list.forEach((c,i)=>{
-      html+=`<tr><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E||'-'}</td><td class="border p-1">${c.C||'-'}</td><td class="border p-1">${c.T||'-'}</td></tr>`;
-    });
-  }
-  html+=`</tbody></table><div class="mt-4">${makeTTD(getTTDPerencanaan())}</div>`;
-  $('dAcpContent').innerHTML=html;
+    <th class="border p-1 w-6">No</th><th class="border p-1">Elemen</th>
+    <th class="border p-1 min-w-[150px]">Capaian Pembelajaran (CP)</th>
+    <th class="border p-1 min-w-[150px]">Tujuan Pembelajaran (TP)</th>
+    <th class="border p-1">Dimensi Profil Lulusan</th>
+  </tr></thead><tbody>`+
+  (list.length?list.map((c,i)=>`<tr>
+    <td class="border p-1 text-center">${i+1}</td>
+    <td class="border p-1 font-semibold">${c.E||'-'}</td>
+    <td class="border p-1">${c.C||'-'}</td>
+    <td class="border p-1">${c.T||'-'}</td>
+    <td class="border p-1 text-[8px] text-slate-600">${c.Di||DIMEN}</td>
+  </tr>`).join(''):`<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada CP/TP untuk ${k}</td></tr>`)+
+  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
 }
 
-function rAtpDoc(){
-  const kls=getRombelKelas(),fase=getFase(kls);
-  let html=`<div class="text-center mb-3">
+function rDAtp(){
+  const k=getRombelKelas();
+  const list=D.cp.filter(c=>!c.K||c.K===k);
+  $('dAtpContent').innerHTML=`<div class="text-center mb-3">
     <h2 class="text-sm font-bold uppercase">ALUR TUJUAN PEMBELAJARAN (ATP)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${kls} (Fase ${fase}) • TA ${v('fTA')}</p>
+    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • Fase ${getFase(k)} • TA ${v('fTA')}</p>
   </div>
   <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 w-16">Semester</th>
-    <th class="border p-1 w-20">Elemen</th><th class="border p-1">Tujuan Pembelajaran (TP)</th>
-    <th class="border p-1 min-w-[100px]">Dimensi Profil Lulusan</th>
-    <th class="border p-1 w-24">Metode</th><th class="border p-1 w-10">Prt</th>
-  </tr></thead><tbody>`;
-  const list=D.cp.filter(c=>!c.K||c.K===kls);
-  if(!list.length){
-    html+=`<tr><td colspan="7" class="text-center py-4 text-slate-400">Belum ada data ATP. Isi di tab CP/TP.</td></tr>`;
-  }else{
-    list.forEach((c,i)=>{
-      html+=`<tr><td class="border p-1 text-center">${i+1}</td><td class="border p-1 text-center">${c.S||'Smt 1'}</td><td class="border p-1 font-semibold">${c.E||'-'}</td><td class="border p-1">${c.T||'-'}</td><td class="border p-1 text-[8px]">${c.Di||'-'}</td><td class="border p-1 text-[8px]">${c.M||'-'}</td><td class="border p-1 text-center font-bold">${c.P||1}</td></tr>`;
-    });
-  }
-  html+=`</tbody></table><div class="mt-4">${makeTTD(getTTDPerencanaan())}</div>`;
-  $('dAtpContent').innerHTML=html;
+    <th class="border p-1 w-6">No</th><th class="border p-1 w-10">Smt</th>
+    <th class="border p-1">Elemen</th><th class="border p-1 min-w-[180px]">Tujuan Pembelajaran</th>
+    <th class="border p-1">Metode</th><th class="border p-1 w-8">JP</th>
+  </tr></thead><tbody>`+
+  (list.length?list.map((c,i)=>`<tr>
+    <td class="border p-1 text-center">${i+1}</td>
+    <td class="border p-1 text-center">${c.S==='Semester 2'?'2':'1'}</td>
+    <td class="border p-1 font-semibold">${c.E||'-'}</td>
+    <td class="border p-1">${c.T||'-'}</td>
+    <td class="border p-1 text-center">${c.M||METODE[0]}</td>
+    <td class="border p-1 text-center font-bold">${c.P||2}</td>
+  </tr>`).join(''):`<tr><td colspan="6" class="text-center p-4 text-slate-400">Belum ada TP untuk ${k}</td></tr>`)+
+  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
 }
 
-function rProtaDoc(){
-  const kls=getRombelKelas(),fase=getFase(kls);
-  let html=`<div class="text-center mb-3">
+function rDProta(){
+  const k=getRombelKelas();
+  const list=D.cp.filter(c=>!c.K||c.K===k);
+  let tot1=0,tot2=0;
+  list.forEach(c=>{if(c.S==='Semester 2')tot2+=c.P||2;else tot1+=c.P||2});
+  $('dProtaContent').innerHTML=`<div class="text-center mb-3">
     <h2 class="text-sm font-bold uppercase">PROGRAM TAHUNAN (PROTA)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${kls} (Fase ${fase}) • TA ${v('fTA')}</p>
+    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • TA ${v('fTA')}</p>
   </div>
   <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 w-20">Semester</th>
-    <th class="border p-1 w-24">Elemen</th><th class="border p-1">Tujuan Pembelajaran (TP)</th>
-    <th class="border p-1 w-12">Prt</th><th class="border p-1 w-14">Alokasi JP</th>
-  </tr></thead><tbody>`;
-  const list=D.cp.filter(c=>!c.K||c.K===kls);
-  const jpPerPrt=getJPPerWeekForRombel(ST.activeDocRombel||ST.rombel)||2;
-  let totJP=0;
-  if(!list.length){
-    html+=`<tr><td colspan="6" class="text-center py-4 text-slate-400">Belum ada data Prota. Isi di tab CP/TP.</td></tr>`;
-  }else{
-    list.forEach((c,i)=>{
-      const prt=c.P||1;
-      const jp=prt*jpPerPrt;
-      totJP+=jp;
-      html+=`<tr><td class="border p-1 text-center">${i+1}</td><td class="border p-1 text-center">${c.S||'Smt 1'}</td><td class="border p-1 font-semibold">${c.E||'-'}</td><td class="border p-1">${c.T||'-'}</td><td class="border p-1 text-center">${prt}</td><td class="border p-1 text-center font-bold text-blue-600">${jp} JP</td></tr>`;
-    });
-    html+=`<tr class="bg-slate-100 font-bold"><td colspan="5" class="border p-1 text-right">TOTAL ALOKASI WAKTU TAHUNAN:</td><td class="border p-1 text-center text-blue-700">${totJP} JP</td></tr>`;
-  }
-  html+=`</tbody></table><div class="mt-4">${makeTTD(getTTDPerencanaan())}</div>`;
-  $('dProtaContent').innerHTML=html;
+    <th class="border p-1 w-6">No</th><th class="border p-1 w-12">Smt</th>
+    <th class="border p-1">Elemen</th><th class="border p-1 min-w-[200px]">Tujuan Pembelajaran</th>
+    <th class="border p-1 w-12">Alokasi Waktu</th>
+  </tr></thead><tbody>`+
+  (list.length?list.map((c,i)=>`<tr>
+    <td class="border p-1 text-center">${i+1}</td>
+    <td class="border p-1 text-center font-semibold">${c.S==='Semester 2'?'2':'1'}</td>
+    <td class="border p-1 font-semibold">${c.E||'-'}</td>
+    <td class="border p-1">${c.T||'-'}</td>
+    <td class="border p-1 text-center font-bold">${c.P||2} JP</td>
+  </tr>`).join(''):`<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada TP</td></tr>`)+
+  `<tr class="bg-slate-50 font-bold">
+    <td colspan="4" class="border p-1 text-right">Total Semester 1:</td>
+    <td class="border p-1 text-center text-blue-600">${tot1} JP</td>
+  </tr>
+  <tr class="bg-slate-50 font-bold">
+    <td colspan="4" class="border p-1 text-right">Total Semester 2:</td>
+    <td class="border p-1 text-center text-blue-600">${tot2} JP</td>
+  </tr>
+  <tr class="bg-blue-50 font-bold text-xs">
+    <td colspan="4" class="border p-1 text-right text-blue-800">TOTAL ALOKASI WAKTU 1 TAHUN:</td>
+    <td class="border p-1 text-center text-blue-800">${tot1+tot2} JP</td>
+  </tr></tbody></table>${makeTTD(getTTDPerencanaan())}`;
 }
 
-function rPromesDoc(){
-  const kls=getRombelKelas(),fase=getFase(kls);
-  const smt=ST.ps===1?'Semester 1':'Semester 2';
-  const months=ST.ps===1?['Juli','Agustus','September','Oktober','November','Desember']:['Januari','Februari','Maret','April','Mei','Juni'];
+function rDPromes(){
+  const smt=ST.ps===2?'Semester 2':'Semester 1';
+  const blns=ST.ps===2?['Januari','Februari','Maret','April','Mei','Juni']:['Juli','Agustus','September','Oktober','November','Desember'];
+  const k=getRombelKelas();
+  const list=D.cp.filter(c=>(!c.K||c.K===k)&&c.S===smt);
   
   let html=`<div class="text-center mb-3">
     <h2 class="text-sm font-bold uppercase">PROGRAM SEMESTER (PROMES)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${kls} (Fase ${fase}) • ${smt} TA ${v('fTA')}</p>
+    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • ${smt} TA ${v('fTA')}</p>
   </div>
-  <div class="overflow-x-auto"><table class="w-full text-[8px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-5" rowspan="2">No</th>
-    <th class="border p-1 min-w-[120px]" rowspan="2">Tujuan Pembelajaran (TP)</th>
-    <th class="border p-1 w-8" rowspan="2">JP</th>`;
-  months.forEach(m=>html+=`<th class="border p-0.5 text-center" colspan="4">${m}</th>`);
+  <div class="overflow-x-auto"><table class="w-full text-[8px]"><thead class="bg-slate-100">
+  <tr><th class="border p-1" rowspan="2">No</th><th class="border p-1" rowspan="2">Elemen</th>
+  <th class="border p-1 min-w-[120px]" rowspan="2">Tujuan Pembelajaran</th>
+  <th class="border p-1" rowspan="2">JP</th>`;
+  blns.forEach(b=>html+=`<th class="border p-0.5 text-center" colspan="4">${b.substr(0,3)}</th>`);
   html+=`</tr><tr>`;
-  months.forEach(()=>for(let w=1;w<=4;w++)html+=`<th class="border p-0.5 w-4 text-center">${w}</th>`);
+  blns.forEach(()=>html+=`<th class="border p-0.5 w-3">1</th><th class="border p-0.5 w-3">2</th><th class="border p-0.5 w-3">3</th><th class="border p-0.5 w-3">4</th>`);
   html+=`</tr></thead><tbody>`;
-  
-  const list=D.cp.filter(c=>(!c.K||c.K===kls)&&(c.S||'Semester 1')===smt);
-  const jpPerPrt=getJPPerWeekForRombel(ST.activeDocRombel||ST.rombel)||2;
-  let wIdx=0;
+
   if(!list.length){
-    html+=`<tr><td colspan="${3+24}" class="text-center py-4 text-slate-400">Belum ada data Promes untuk ${smt}. Isi di tab CP/TP.</td></tr>`;
-  }else{
+    html+=`<tr><td colspan="${4+24}" class="border p-4 text-center text-slate-400">Belum ada TP untuk ${smt}</td></tr>`;
+  } else {
     list.forEach((c,i)=>{
-      const prt=c.P||1;
-      const jp=prt*jpPerPrt;
-      html+=`<tr><td class="border p-0.5 text-center">${i+1}</td><td class="border p-0.5">${c.T||'-'}</td><td class="border p-0.5 text-center font-bold">${jp}</td>`;
-      for(let w=0;w<24;w++){
-        const isActive=w>=wIdx&&w<wIdx+prt;
-        html+=`<td class="border p-0 text-center ${isActive?'bg-blue-500 text-white font-bold':''}">${isActive?'✓':''}</td>`;
-      }
-      wIdx+=prt;
+      html+=`<tr><td class="border p-0.5 text-center">${i+1}</td>
+        <td class="border p-0.5 font-semibold">${c.E||'-'}</td>
+        <td class="border p-0.5">${c.T||'-'}</td>
+        <td class="border p-0.5 text-center font-bold">${c.P||2}</td>`;
+      const targetBlnIdx=i%blns.length;
+      blns.forEach((b,bi)=>{
+        for(let w=1;w<=4;w++){
+          const active=bi===targetBlnIdx&&(w===1||w===2);
+          html+=`<td class="border p-0 text-center ${active?'bg-blue-200 font-bold text-blue-800':''}">${active?'✓':''}</td>`;
+        }
+      });
       html+=`</tr>`;
     });
   }
-  html+=`</tbody></table></div><div class="mt-4">${makeTTD(getTTDPerencanaan())}</div>`;
+  html+=`</tbody></table></div>${makeTTD(getTTDPerencanaan())}`;
   $('dPromesContent').innerHTML=html;
 }
 
-function rModulDoc(){
-  const kls=getRombelKelas(),fase=getFase(kls);
-  const list=D.cp.filter(c=>!c.K||c.K===kls);
-  
+function rDModul(){
+  const k=getRombelKelas();
+  const list=D.cp.filter(c=>!c.K||c.K===k);
   const sel=$('modulTPSelect');
-  if(sel&&list.length){
-    sel.innerHTML=list.map((c,i)=>`<option value="${i}" ${i===ST.modulTPIdx?'selected':''}>TP ${i+1}: ${c.T?.substring(0,60)}...</option>`).join('');
+  if(sel){
+    sel.innerHTML=list.map((c,i)=>`<option value="${i}" ${i===ST.modulTPIdx?'selected':''}>TP ${i+1}: ${(c.T||'').substr(0,60)}...</option>`).join('');
   }
+  const tp=list[ST.modulTPIdx]||list[0]||{};
   
-  const tpObj=list[ST.modulTPIdx]||list[0]||{T:'Tujuan Pembelajaran belum diisi',E:'Elemen',Di:DIMEN,M:METODE[0],P:2};
-  const dur=getJPDur(v('fJn'));
-  
-  let html=`<div class="text-center mb-4 border-b pb-3">
-    <h2 class="text-base font-bold uppercase text-blue-900">MODUL AJAR DEEP LEARNING</h2>
-    <p class="text-xs font-semibold text-slate-600">${ST.mapel} • ${kls} (Fase ${fase}) • ${v('fS')}</p>
-  </div>
-  
-  <div class="space-y-3 text-[10px]">
-    <div class="bg-blue-50/60 p-2.5 rounded-lg border border-blue-100">
-      <h3 class="section-title text-blue-800 bg-blue-100"><i class="fa-solid fa-circle-info mr-1"></i>I. INFORMASI UMUM</h3>
-      <div class="grid grid-cols-2 gap-1.5 mt-1">
-        <div><b>Penyusun:</b> ${v('fG')}</div>
-        <div><b>Sekolah:</b> ${v('fS')}</div>
-        <div><b>Tahun Ajaran:</b> ${v('fTA')}</div>
-        <div><b>Jenjang / Kelas:</b> ${v('fJn')} / ${kls} (Fase ${fase})</div>
-        <div><b>Mata Pelajaran:</b> ${ST.mapel}</div>
-        <div><b>Alokasi Waktu:</b> ${tpObj.P||2} Pertemuan (${(tpObj.P||2)*getJPPerWeekForRombel(ST.activeDocRombel||ST.rombel)} JP x ${dur} menit)</div>
-        <div><b>Elemen:</b> ${tpObj.E||'-'}</div>
-        <div><b>Pendekatan:</b> Deep Learning (Mindful, Meaningful, Joyful Learning)</div>
-      </div>
-      <div class="mt-1.5"><b>Dimensi Profil Lulusan:</b> ${tpObj.Di||DIMEN}</div>
+  $('dModulContent').innerHTML=`<div class="border-2 border-slate-800 p-4 space-y-3 text-[10px]">
+    <div class="text-center border-b pb-2">
+      <h2 class="text-sm font-bold uppercase">MODUL AJAR DEEP LEARNING (MIND, HEART, HAND)</h2>
+      <p class="font-semibold">${v('fS')} • TA ${v('fTA')}</p>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2 border rounded">
+      <div><b>Mata Pelajaran:</b> ${ST.mapel}</div><div><b>Kelas / Fase:</b> ${k} / Fase ${getFase(k)}</div>
+      <div><b>Alokasi Waktu:</b> ${tp.P||2} JP (${(tp.P||2)*getJPDur(v('fJn'))} Menit)</div><div><b>Metode:</b> ${tp.M||METODE[0]}</div>
+      <div><b>Elemen:</b> ${tp.E||'-'}</div><div><b>Dimensi PL:</b> ${tp.Di||DIMEN}</div>
     </div>
 
-    <div class="bg-emerald-50/60 p-2.5 rounded-lg border border-emerald-100">
-      <h3 class="section-title text-emerald-800 bg-emerald-100"><i class="fa-solid fa-bullseye mr-1"></i>II. KOMPONEN INTI</h3>
-      <div class="space-y-1.5 mt-1">
-        <div><b>A. Tujuan Pembelajaran (TP):</b><p class="mt-0.5 bg-white p-1.5 rounded border text-slate-700">${tpObj.T||'-'}</p></div>
-        <div><b>B. Pemahaman Bermakna (Meaningful):</b> Peserta didik memahami relevansi materi ini dalam kehidupan sehari-hari dan mampu menerapkannya secara kritis.</div>
-        <div><b>C. Pertanyaan Pemantik (Mindful):</b> Apakah kamu pernah mengalami/melihat hal yang berkaitan dengan materi ini? Bagaimana perasaan dan tindakanmu?</div>
-        <div><b>D. Model Pembelajaran (Joyful):</b> ${tpObj.M||METODE[0]} dengan aktivitas interaktif & kolaboratif.</div>
-      </div>
+    <div>
+      <h4 class="section-title bg-blue-100 text-blue-800">I. TUJUAN PEMBELAJARAN (TP)</h4>
+      <p class="p-1.5 border rounded bg-white">${tp.T||'Belum ada TP terpilih'}</p>
     </div>
 
-    <div class="bg-amber-50/60 p-2.5 rounded-lg border border-amber-100">
-      <h3 class="section-title text-amber-800 bg-amber-100"><i class="fa-solid fa-person-chalkboard mr-1"></i>III. KEGIATAN PEMBELAJARAN (DEEP LEARNING)</h3>
-      <div class="space-y-2 mt-1">
-        <div class="bg-white p-2 rounded border">
-          <b class="text-amber-700">1. Kegiatan Pendahuluan — Mindful (10-15 Menit):</b>
-          <ul class="list-disc ml-4 space-y-0.5 mt-0.5 text-slate-600">
-            <li>Guru membuka kelas dengan salam, doa bersama, dan pembiasaan positif.</li>
-            <li>Apersepsi & Kesadaran Diri (Mindful Check-in): Peserta didik diajak menyadari kesiapan belajar dan fokus hari ini.</li>
-            <li>Guru menyampaikan Tujuan Pembelajaran dan pertanyaan pemantik.</li>
+    <div>
+      <h4 class="section-title bg-emerald-100 text-emerald-800">II. KEGIATAN PEMBELAJARAN (DEEP LEARNING)</h4>
+      <div class="space-y-1.5">
+        <div class="border p-2 rounded">
+          <b class="text-blue-700">A. Pendahuluan (Mindful Engagement - 10 menit):</b>
+          <ul class="list-disc pl-4 text-slate-600">
+            <li>Guru membuka pelajaran dengan salam, doa, dan apersepsi kontekstual.</li>
+            <li>Orientasi bermakna untuk mengunggah minat dan keterlibatan emosional siswa.</li>
           </ul>
         </div>
-        <div class="bg-white p-2 rounded border">
-          <b class="text-amber-700">2. Kegiatan Inti — Meaningful & Joyful (50-60 Menit):</b>
-          <ul class="list-disc ml-4 space-y-0.5 mt-0.5 text-slate-600">
-            <li><b>Eksplorasi Konsep (Meaningful):</b> Peserta didik mengamati tayangan/media/cerita pemantik dan mendiskusikan maknanya.</li>
-            <li><b>Kolaborasi Kelompok (Joyful):</b> Siswa bekerja dalam kelompok kecil menggunakan LKPD interaktif, berdiskusi aktif, dan memecahkan masalah.</li>
-            <li><b>Konstruksi Pengetahuan:</b> Setiap kelompok menyusun hasil karya / kesimpulan dan mempresentasikannya di depan kelas.</li>
-            <li><b>Umpan Balik konstruktif:</b> Guru memberikan penguatan dan apresiasi atas kerja keras seluruh kelompok.</li>
+        <div class="border p-2 rounded">
+          <b class="text-purple-700">B. Kegiatan Inti (Deep Processing & Heart Connection - ${((tp.P||2)*getJPDur(v('fJn')))-20} menit):</b>
+          <ul class="list-disc pl-4 text-slate-600">
+            <li><b>Mind (Pemahaman Konsep):</b> Siswa mengamati, menganalisis, dan memecahkan masalah terkait ${tp.E||'materi'}.</li>
+            <li><b>Heart (Internalisasi Nilai):</b> Diskusi kelompok dan refleksi nilai-nilai karakter dalam kehidupan sehari-hari.</li>
+            <li><b>Hand (Aksi & Karya):</b> Praktik/Pengerjaan proyek kolaboratif berbasis ${tp.M||METODE[0]}.</li>
           </ul>
         </div>
-        <div class="bg-white p-2 rounded border">
-          <b class="text-amber-700">3. Kegiatan Penutup — Refleksi (10-15 Menit):</b>
-          <ul class="list-disc ml-4 space-y-0.5 mt-0.5 text-slate-600">
-            <li>Refleksi Pembelajaran: Siswa mengungkapkan pengalaman dan perasaan belajar hari ini (Joyful feeling).</li>
-            <li>Rangkuman & Doa Penutup.</li>
+        <div class="border p-2 rounded">
+          <b class="text-amber-700">C. Penutup (Reflection & Joyful Closing - 10 menit):</b>
+          <ul class="list-disc pl-4 text-slate-600">
+            <li>Siswa dan guru menyimpulkan poin-poin utama pembelajaran.</li>
+            <li>Refleksi diri (perasaan dan pemahaman baru) serta tindak lanjut tugas mandiri.</li>
           </ul>
         </div>
       </div>
     </div>
 
-    <div class="bg-purple-50/60 p-2.5 rounded-lg border border-purple-100">
-      <h3 class="section-title text-purple-800 bg-purple-100"><i class="fa-solid fa-clipboard-check mr-1"></i>IV. ASESMEN & PENILAIAN</h3>
-      <div class="grid grid-cols-3 gap-1.5 mt-1">
-        <div class="bg-white p-1.5 rounded border"><b>1. Asesmen Awal:</b> Pertanyaan pemantik & kuis singkat kesiapan belajar.</div>
-        <div class="bg-white p-1.5 rounded border"><b>2. Asesmen Formatif:</b> Observasi sikap kolaborasi & penilaian keaktifan di LKPD.</div>
-        <div class="bg-white p-1.5 rounded border"><b>3. Asesmen Sumatif:</b> Tes tertulis / produk hasil belajar siswa.</div>
+    <div>
+      <h4 class="section-title bg-slate-100 text-slate-800">III. ASESMEN PEMBELAJARAN</h4>
+      <div class="grid grid-cols-3 gap-1 text-center">
+        <div class="border p-1 bg-slate-50"><b class="block border-b mb-1">Diagnostik</b>Kuis Awal / Tanya Jawab</div>
+        <div class="border p-1 bg-slate-50"><b class="block border-b mb-1">Formatif</b>Observasi & Performa Unjuk Kerja</div>
+        <div class="border p-1 bg-slate-50"><b class="block border-b mb-1">Sumatif</b>Tes Tulis / Penilaian Produk</div>
       </div>
     </div>
-  </div>
-  
-  <div class="mt-4">${makeTTD(getTTDPerencanaan())}</div>`;
-  $('dModulContent').innerHTML=html;
+
+    ${makeTTD(getTTDPerencanaan())}
+  </div>`;
 }
 
-function rKktpDoc(){
-  const kls=getRombelKelas(),fase=getFase(kls);
-  let html=`<div class="text-center mb-3">
+function rDKktp(){
+  const k=getRombelKelas();
+  const list=D.cp.filter(c=>!c.K||c.K===k);
+  $('dKktpContent').innerHTML=`<div class="text-center mb-3">
     <h2 class="text-sm font-bold uppercase">KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${kls} (Fase ${fase}) • TA ${v('fTA')}</p>
+    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • TA ${v('fTA')}</p>
   </div>
   <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th>
-    <th class="border p-1">Tujuan Pembelajaran (TP)</th>
-    <th class="border p-1 w-20 bg-red-50">Perlu Bimbingan (0-60)</th>
-    <th class="border p-1 w-20 bg-amber-50">Cukup (61-70)</th>
-    <th class="border p-1 w-20 bg-blue-50">Baik (71-85)</th>
-    <th class="border p-1 w-20 bg-emerald-50">Sangat Baik (86-100)</th>
-  </tr></thead><tbody>`;
-  const list=D.cp.filter(c=>!c.K||c.K===kls);
-  if(!list.length){
-    html+=`<tr><td colspan="6" class="text-center py-4 text-slate-400">Belum ada data KKTP. Isi di tab CP/TP.</td></tr>`;
-  }else{
-    list.forEach((c,i)=>{
-      html+=`<tr>
-        <td class="border p-1 text-center">${i+1}</td>
-        <td class="border p-1 font-semibold">${c.T||'-'}</td>
-        <td class="border p-1 text-[8px] text-slate-600">Belum mencapai TP, perlu remedial di seluruh bagian</td>
-        <td class="border p-1 text-[8px] text-slate-600">Mencapai sebagian TP, perlu bimbingan di bagian tertentu</td>
-        <td class="border p-1 text-[8px] text-slate-600">Mencapai seluruh TP dengan baik</td>
-        <td class="border p-1 text-[8px] text-slate-600">Mencapai seluruh TP dengan sangat baik & perlu pengayaan</td>
-      </tr>`;
-    });
-  }
-  html+=`</tbody></table><div class="mt-4">${makeTTD(getTTDPerencanaan())}</div>`;
-  $('dKktpContent').innerHTML=html;
+    <th class="border p-1 w-6">No</th><th class="border p-1 min-w-[150px]">Tujuan Pembelajaran (TP)</th>
+    <th class="border p-1 w-20">Perlu Bimbingan (0-60)</th>
+    <th class="border p-1 w-20">Cukup (61-70)</th>
+    <th class="border p-1 w-20">Baik (71-85)</th>
+    <th class="border p-1 w-20">Sangat Baik (86-100)</th>
+  </tr></thead><tbody>`+
+  (list.length?list.map((c,i)=>`<tr>
+    <td class="border p-1 text-center font-bold">${i+1}</td>
+    <td class="border p-1">${c.T||'-'}</td>
+    <td class="border p-1 text-[8px] bg-red-50 text-red-700">Belum mencapai TP, perlu remedial di seluruh bagian</td>
+    <td class="border p-1 text-[8px] bg-amber-50 text-amber-700">Belum mencapai TP, perlu remedial di bagian tertentu</td>
+    <td class="border p-1 text-[8px] bg-blue-50 text-blue-700">Sudah mencapai TP, tidak perlu remedial</td>
+    <td class="border p-1 text-[8px] bg-emerald-50 text-emerald-700">Sudah mencapai TP, perlu pengayaan/tantangan lebih</td>
+  </tr>`).join(''):`<tr><td colspan="6" class="text-center p-4 text-slate-400">Belum ada TP</td></tr>`)+
+  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
+}
+
+// ============ PROMPT GENERATOR ============
+function genPrompts(){
+  const k=getRombelKelas();
+  $('prCP').innerText=`Buatkan CSV untuk Capaian Pembelajaran (CP) dan Tujuan Pembelajaran (TP) Kurikulum Merdeka dengan header tepat sebagai berikut:
+Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan
+
+Ketentuan:
+- Mata Pelajaran: ${ST.mapel}
+- Kelas: ${k}
+- Gunakan bahasa Indonesia baku dan sesuai standar Kemendikbudristek terbaru.`;
+
+  $('prKl').innerText=`Buatkan CSV Kalender Pendidikan untuk Tahun Ajaran ${v('fTA')} dengan format header:
+Semester,Tanggal,Agenda,Kategori
+
+Sertakan hari libur nasional, PTS, PAS, dan agenda penting sekolah lainnya.`;
+
+  $('prLK').innerText=`Buatkan Modul Ajar Deep Learning (Mind, Heart, Hand) dan LKPD Visual untuk Mata Pelajaran ${ST.mapel} Kelas ${k}. Lengkap dengan langkah pembelajaran bermakna, instruksi diskusi, dan rubrik asesmen.`;
 }
 
 // ============ ADMIN PANEL ============
@@ -1912,46 +1845,55 @@ async function loadAdmin(){
   $('aLoad').classList.remove('hidden');
   try{
     const snap=await db.collection('users').get();
-    const users=[];
-    snap.forEach(d=>users.push({id:d.id,...d.data()}));
-    
-    const total=users.length;
-    const app=users.filter(u=>u.status==='approved').length;
-    const pen=users.filter(u=>u.status==='pending').length;
-    const adm=users.filter(u=>u.role==='admin').length;
-    
+    let total=0,app=0,pend=0;
+    let html='';
+    snap.docs.forEach(doc=>{
+      total++;
+      const u=doc.data();
+      if(u.status==='approved')app++;else pend++;
+      html+=`<tr class="border-b">
+        <td class="p-2"><b class="text-xs">${u.name||'-'}</b><br><span class="text-[9px] text-slate-400">${u.email}</span></td>
+        <td class="p-2 text-center">${u.school||'-'}<br><span class="text-[8px] text-slate-400">NPSN: ${u.npsn||'-'}</span></td>
+        <td class="p-2 text-center uppercase font-semibold text-[9px]">${u.guruType||'mapel'}</td>
+        <td class="p-2 text-center">${u.status==='approved'?'<span class="sb bg-emerald-100 text-emerald-700">Approved</span>':'<span class="sb bg-amber-100 text-amber-700">Pending</span>'}</td>
+        <td class="p-2 text-center">
+          ${u.status==='pending'?`<button onclick="setAppr('${doc.id}',true)" class="bg-emerald-600 text-white text-[9px] px-2 py-1 rounded font-bold mr-1">Setujui</button>`:`<button onclick="setAppr('${doc.id}',false)" class="bg-amber-600 text-white text-[9px] px-2 py-1 rounded font-bold mr-1">Cabut</button>`}
+          <button onclick="delUsr('${doc.id}')" class="bg-red-600 text-white text-[9px] px-2 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>`;
+    });
     $('aSt').innerHTML=`
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-500 font-semibold">Total User</p><p class="text-lg font-extrabold text-blue-600">${total}</p></div>
-      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-500 font-semibold">Disetujui</p><p class="text-lg font-extrabold text-emerald-600">${app}</p></div>
-      <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-500 font-semibold">Menunggu</p><p class="text-lg font-extrabold text-amber-600">${pen}</p></div>
-      <div class="bg-red-50 border border-red-200 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-500 font-semibold">Admin</p><p class="text-lg font-extrabold text-red-600">${adm}</p></div>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center"><p class="text-[9px] text-blue-600 font-bold">TOTAL USER</p><p class="text-lg font-black text-blue-800">${total}</p></div>
+      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center"><p class="text-[9px] text-emerald-600 font-bold">DISETUJUI</p><p class="text-lg font-black text-emerald-800">${app}</p></div>
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center"><p class="text-[9px] text-amber-600 font-bold">PENDING</p><p class="text-lg font-black text-amber-800">${pend}</p></div>
+      <div class="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center"><p class="text-[9px] text-purple-600 font-bold">ADMIN</p><p class="text-lg font-black text-purple-800">1</p></div>
     `;
-    
-    $('aBody').innerHTML=users.map(u=>`<tr class="border-b">
-      <td class="p-2"><b class="text-xs">${u.name||'-'}</b><br><span class="text-[9px] text-slate-400">${u.email}</span></td>
-      <td class="p-2 text-center">${u.school||'-'}<br><span class="text-[9px] text-slate-400">NPSN: ${u.npsn||'-'}</span></td>
-      <td class="p-2 text-center">${u.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}</td>
-      <td class="p-2 text-center">
-        <span class="sb ${u.status==='approved'?'bg-emerald-100 text-emerald-700':u.status==='pending'?'bg-amber-100 text-amber-700':'bg-red-100 text-red-700'}">${u.status||'pending'}</span>
-      </td>
-      <td class="p-2 text-center space-x-1">
-        ${u.email!==ADMIN_EMAIL?`
-          ${u.status!=='approved'?`<button onclick="setUStatus('${u.id}','approved')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[9px] font-bold"><i class="fa-solid fa-check mr-0.5"></i>Setujui</button>`:''}
-          ${u.status!=='pending'?`<button onclick="setUStatus('${u.id}','pending')" class="bg-amber-500 text-white px-2 py-1 rounded text-[9px] font-bold"><i class="fa-solid fa-clock mr-0.5"></i>Pending</button>`:''}
-        `:'<span class="text-[9px] text-slate-400 italic">Superadmin</span>'}
-      </td>
-    </tr>`).join('');
-  }catch(e){toast('error','Admin Error',e.message)}
+    $('aBody').innerHTML=html;
+  }catch(e){toast('error','Admin Load Failed',e.message)}
   $('aLoad').classList.add('hidden');
 }
 
-async function setUStatus(uid,st){
+async function setAppr(uid,appr){
   try{
-    await db.collection('users').doc(uid).update({status:st});
-    toast('success','Berhasil','Status user diperbarui');
+    await db.collection('users').doc(uid).update({status:appr?'approved':'pending'});
+    toast('success','Updated','Status user diperbarui');
     loadAdmin();
-  }catch(e){toast('error','Gagal',e.message)}
+  }catch(e){toast('error','',e.message)}
 }
+
+async function delUsr(uid){
+  if(!confirm('Hapus user ini?'))return;
+  try{
+    await db.collection('users').doc(uid).delete();
+    toast('success','Deleted','User dihapus');
+    loadAdmin();
+  }catch(e){toast('error','',e.message)}
+}
+
+// INITIALIZATION
+window.onload=()=>{
+  updKelas();updJPDuration();
+};
 </script>
 </body>
 </html>
