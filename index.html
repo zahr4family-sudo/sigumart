@@ -1,656 +1,1560 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Si-Gumart - Sistem Administrasi Guru Smart</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIPAI - System EduDoc Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<!-- Tailwind CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Firebase App & Auth Compatibility Libraries -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-<script>
-tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui']}}}}
-</script>
-
-<style>
-@media print{.np{display:none!important}body{background:#fff!important;font-size:7pt;color:#000!important}table{page-break-inside:auto;width:100%!important}tr{page-break-inside:avoid}th,td{padding:2px!important;font-size:6.5pt!important}@page{margin:7mm}}
-*{scrollbar-width:thin;scrollbar-color:#334155 transparent}
-@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes sp{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes gl{0%,100%{box-shadow:0 0 5px rgba(99,102,241,.3)}50%{box-shadow:0 0 15px rgba(99,102,241,.5)}}
-.af{animation:fu .3s ease-out}.ag{animation:gl 2s ease-in-out infinite}
-.gls{background:rgba(15,23,42,.93);backdrop-filter:blur(16px)}
-.gc{background:rgba(255,255,255,.96)}
-.na{background:linear-gradient(135deg,#4f46e5,#6366f1)!important;color:#fff!important;box-shadow:0 3px 10px rgba(79,70,229,.3)}
-.is{background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.5);color:#e2e8f0;border-radius:6px;padding:3px 6px;font-size:9px}
-.is:focus{outline:none;box-shadow:0 0 0 2px rgba(99,102,241,.25)}
-.is:disabled{opacity:.5;cursor:not-allowed}
-.iw{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:4px 8px;font-size:10px;color:#1e293b}
-.iw:focus{outline:none;box-shadow:0 0 0 2px rgba(99,102,241,.2)}
-.sb-p{transition:transform .3s cubic-bezier(.4,0,.2,1)}
-.cl{max-height:0;overflow:hidden;transition:max-height .35s ease}.cl.op{max-height:9999px}
-.sd{display:flex;align-items:center;gap:6px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;cursor:pointer}.sd::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#334155,transparent)}
-.dz{border:2px dashed #4f46e5;border-radius:10px;transition:all .2s;cursor:pointer}.dz.dv{border-color:#22c55e;background:rgba(34,197,94,.04)}
-.bd{width:5px;height:5px;border-radius:50%;display:inline-block}
-.syn{position:fixed;top:3px;right:3px;z-index:60;padding:2px 8px;border-radius:8px;font-size:8px;font-weight:700;transition:all .3s}.ss{background:#d1fae5;color:#065f46}.sv{background:#fef3c7;color:#92400e}.se{background:#fecaca;color:#991b1b}.sg{background:#e0e7ff;color:#3730a3}
-.lo{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.97);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
-.sn{width:36px;height:36px;border:3px solid rgba(99,102,241,.2);border-top-color:#6366f1;border-radius:50%;animation:sp .7s linear infinite}
-.hl{transition:transform .15s,box-shadow .15s}.hl:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.06)}
-aside::-webkit-scrollbar{width:3px}aside::-webkit-scrollbar-thumb{background:#334155;border-radius:8px}
-.tbl{overflow-x:auto}.tbl::-webkit-scrollbar{height:4px}.tbl::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:8px}
-.nb{transition:all .15s}
-.chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;cursor:pointer;transition:all .15s}
-.tst{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:70;padding:8px 16px;border-radius:10px;font-size:11px;font-weight:700;transition:all .3s;opacity:0;pointer-events:none;white-space:nowrap;max-width:90vw}.tst.show{opacity:1}
-.readonly-input{background:#f1f5f9!important;cursor:not-allowed;color:#64748b}
-.readonly-badge{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:55;padding:4px 12px;border-radius:99px;font-size:10px;font-weight:700;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;box-shadow:0 4px 15px rgba(245,158,11,.4)}
-.admin-badge{background:linear-gradient(135deg,#4f46e5,#7c3aed)!important}
-.write-badge{background:linear-gradient(135deg,#059669,#10b981)!important}
-</style>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .print-area { margin: 0; padding: 0; width: 100%; box-shadow: none; border: none; }
+      body { background: white; font-size: 10pt; }
+    }
+    .active-nav { background-color: #2563eb; color: white; }
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      transform: translateY(120px); opacity: 0; transition: all 0.4s ease;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-overlay.hidden { display: none; }
+    .pulse-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .status-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 600;
+    }
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row">
 
-<div id="lo" class="lo"><div class="sn"></div><p class="text-white font-bold text-sm">Si-Gumart</p><p class="text-slate-400 text-xs" id="lst">Memuat...</p></div>
-<div id="tst" class="tst bg-emerald-600 text-white np"></div>
-
-<!-- MODE BADGE (top center) -->
-<div id="modeBadge" class="readonly-badge np hidden">👀 Mode Baca • Login untuk edit</div>
-
-<!-- REGISTER MODAL -->
-<div id="regModal" class="fixed inset-0 z-[200] bg-slate-950/90 backdrop-blur-xl hidden flex items-center justify-center p-4 np">
-<div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 af">
-    <div class="text-center mb-4">
-        <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-2 ag"><span class="text-white font-black text-xl">SG</span></div>
-        <h1 class="text-lg font-black text-slate-900">Login / Daftar</h1>
-        <p class="text-xs text-slate-500">Login dengan Google untuk edit data</p>
+  <!-- ====== TOAST NOTIFICATION ====== -->
+  <div id="toast" class="toast bg-white rounded-xl shadow-2xl border p-4 max-w-sm flex items-start space-x-3">
+    <div id="toastIcon" class="text-2xl mt-0.5"></div>
+    <div>
+      <p id="toastTitle" class="font-bold text-sm"></p>
+      <p id="toastMsg" class="text-xs text-slate-500"></p>
     </div>
+  </div>
 
-    <div id="regInfo" class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-3 text-center">
-        <p class="text-xs text-blue-800 font-semibold" id="regInfoTxt">Anda saat ini sebagai <strong>Guest</strong> (hanya lihat)</p>
-    </div>
-
-    <button onclick="doLogin()" id="regBtn" class="w-full bg-white border-2 border-slate-300 hover:border-indigo-500 hover:bg-indigo-50 text-slate-700 font-bold py-3 px-4 rounded-xl shadow flex items-center justify-center gap-2 text-sm transition active:scale-[0.98] mb-3 disabled:opacity-50">
-        <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        <span id="regBtnTxt">Masuk / Daftar dengan Google</span>
-    </button>
-
-    <div class="text-center text-[10px] text-slate-500 mb-3">
-        <p>Setelah login, akun akan menunggu persetujuan admin</p>
-        <p class="text-indigo-600 font-bold mt-1">Admin: kkgpainagreg@gmail.com</p>
-    </div>
-
-    <button onclick="$('regModal').classList.add('hidden')" class="w-full text-xs text-slate-500 hover:text-slate-700 py-2">Batal — Lanjut sebagai Guest</button>
-</div>
-</div>
-
-<!-- ADMIN PANEL -->
-<div id="adminPnl" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 hidden np">
-<div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-4 max-h-[90vh] overflow-y-auto af">
-    <div class="flex justify-between items-center mb-3"><h2 class="text-base font-black">👑 Panel Admin</h2><button onclick="$('adminPnl').classList.add('hidden')" class="text-xl">&times;</button></div>
-    <div class="bg-amber-50 border rounded-xl p-3 mb-3"><h3 class="text-xs font-bold text-amber-800 mb-2">⏳ Menunggu Persetujuan (<span id="pendCount">0</span>)</h3><div id="pendUsers"></div></div>
-    <div class="bg-emerald-50 border rounded-xl p-3 mb-3"><h3 class="text-xs font-bold text-emerald-800 mb-2">✅ User Aktif (<span id="appCount">0</span>)</h3><div id="appUsers"></div></div>
-    <div class="bg-slate-50 border rounded-xl p-3"><h3 class="text-xs font-bold mb-2">📱 No WA Admin</h3><div class="flex gap-2"><input id="adminWA" placeholder="628xxx" class="flex-1 iw"><button onclick="saveAdminWA()" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold">💾</button></div></div>
-</div>
-</div>
-
-<div id="syn" class="syn np sv">⏳</div>
-
-<!-- APP -->
-<div id="appCont" class="min-h-screen flex flex-col md:flex-row">
-
-<header class="md:hidden fixed top-0 left-0 right-0 z-50 gls border-b border-slate-700/50 np">
-<div class="flex items-center justify-between px-3 py-2">
-    <div class="flex items-center gap-2"><div class="w-7 h-7 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-lg flex items-center justify-center"><span class="text-white font-black text-[9px]">SG</span></div><h1 class="font-black text-xs text-white">Si-Gumart</h1></div>
-    <div class="flex items-center gap-2"><img id="mobAv" src="" class="w-6 h-6 rounded-full border border-white/30 hidden" alt=""><button onclick="tsb()" class="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300"><svg id="io" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg><svg id="ic" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-</div>
-</header>
-<div id="sbOv" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden np" onclick="tsb()"></div>
-
-<aside id="sbP" class="np w-[310px] bg-slate-900/95 backdrop-blur-xl text-slate-200 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto flex flex-col justify-between border-r border-slate-800 shadow-2xl z-40 fixed md:relative top-0 left-0 h-full -translate-x-full md:translate-x-0 sb-p">
-<div>
-
-<div class="p-3 border-b border-slate-800/60 bg-gradient-to-br from-indigo-950/50 to-slate-950">
-<div class="flex items-center gap-2"><div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg ag"><span class="text-white font-black text-sm">SG</span></div><div><h1 class="font-black text-sm bg-gradient-to-r from-indigo-300 to-violet-300 bg-clip-text text-transparent">Si-Gumart</h1><p class="text-[8px] text-emerald-400 font-bold" id="lta">-</p></div></div>
-</div>
-
-<!-- USER STATUS -->
-<div class="px-3 py-2 border-b border-slate-800/40 bg-slate-950/40">
-    <div class="flex items-center gap-2" id="userStatusBar">
-        <div class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0"><span class="text-slate-400">👤</span></div>
-        <div class="flex-1 min-w-0">
-            <p class="text-[10px] font-bold text-white truncate" id="usrNm">Guest</p>
-            <p class="text-[8px] text-slate-400 truncate" id="usrEm">Mode Lihat</p>
+  <!-- ====== AUTH SCREEN (LOGIN / REGISTER) ====== -->
+  <div id="authScreen" class="fixed inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <!-- Logo -->
+      <div class="text-center mb-8 fade-in">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-2xl shadow-xl mb-4">
+          <i class="fa-solid fa-book-journal-whills text-4xl text-white"></i>
         </div>
-        <button onclick="$('regModal').classList.remove('hidden')" id="loginBtnSide" class="text-[9px] bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded font-bold transition">🔑 Login</button>
-        <button id="admBtn" onclick="openAdminPanel()" class="hidden text-[9px] bg-amber-600 hover:bg-amber-500 text-white px-2 py-1 rounded font-bold">👑</button>
-        <button id="logoutBtn" onclick="logoutUser()" class="hidden text-[9px] text-rose-400 hover:text-rose-300 px-1.5 py-0.5 rounded hover:bg-rose-900/30" title="Logout">🚪</button>
+        <h1 class="text-3xl font-extrabold text-white">SIPAI Generator</h1>
+        <p class="text-blue-300 text-sm mt-1">Sistem Administrasi Guru Otomatis - Kurikulum Merdeka</p>
+      </div>
+
+      <!-- Auth Card -->
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in">
+        <!-- Tabs -->
+        <div class="flex border-b">
+          <button onclick="showAuthTab('login')" id="authTabLogin" class="flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition">
+            <i class="fa-solid fa-right-to-bracket mr-1"></i> Masuk
+          </button>
+          <button onclick="showAuthTab('register')" id="authTabRegister" class="flex-1 py-3 text-sm font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition">
+            <i class="fa-solid fa-user-plus mr-1"></i> Daftar
+          </button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="p-6 space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+            <div class="relative">
+              <i class="fa-solid fa-envelope absolute left-3 top-3 text-slate-400 text-sm"></i>
+              <input type="email" id="loginEmail" placeholder="email@contoh.com" class="w-full border rounded-xl p-2.5 pl-10 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-3 top-3 text-slate-400 text-sm"></i>
+              <input type="password" id="loginPassword" placeholder="••••••••" class="w-full border rounded-xl p-2.5 pl-10 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              <button onclick="togglePwd('loginPassword', this)" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-eye text-sm"></i></button>
+            </div>
+          </div>
+          <button onclick="doLogin()" id="btnLogin" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-right-to-bracket"></i><span>Masuk</span>
+          </button>
+          <button onclick="doGoogleLogin()" class="w-full bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 py-3 rounded-xl font-bold text-sm transition flex items-center justify-center space-x-2">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+            <span>Masuk dengan Google</span>
+          </button>
+          <button onclick="doResetPassword()" class="w-full text-xs text-blue-500 hover:text-blue-700 mt-1">Lupa password?</button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" class="p-6 space-y-4 hidden">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap</label>
+            <div class="relative">
+              <i class="fa-solid fa-user absolute left-3 top-3 text-slate-400 text-sm"></i>
+              <input type="text" id="regName" placeholder="Nama lengkap Anda" class="w-full border rounded-xl p-2.5 pl-10 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+            <div class="relative">
+              <i class="fa-solid fa-envelope absolute left-3 top-3 text-slate-400 text-sm"></i>
+              <input type="email" id="regEmail" placeholder="email@contoh.com" class="w-full border rounded-xl p-2.5 pl-10 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Password (min 6 karakter)</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-3 top-3 text-slate-400 text-sm"></i>
+              <input type="password" id="regPassword" placeholder="••••••••" class="w-full border rounded-xl p-2.5 pl-10 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <button onclick="togglePwd('regPassword', this)" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-eye text-sm"></i></button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Sekolah / Instansi</label>
+            <div class="relative">
+              <i class="fa-solid fa-school absolute left-3 top-3 text-slate-400 text-sm"></i>
+              <input type="text" id="regSchool" placeholder="Nama sekolah" class="w-full border rounded-xl p-2.5 pl-10 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+          <button onclick="doRegister()" id="btnRegister" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-sm transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-user-plus"></i><span>Daftar & Minta Akses</span>
+          </button>
+          <p class="text-[11px] text-center text-slate-400">Setelah daftar, akses edit/cetak akan diaktifkan oleh Admin.</p>
+        </div>
+      </div>
+
+      <!-- Guest Mode -->
+      <div class="text-center mt-6 fade-in">
+        <button onclick="enterGuestMode()" class="text-slate-400 hover:text-white text-sm transition">
+          <i class="fa-solid fa-eye mr-1"></i> Masuk sebagai Tamu (Lihat Saja)
+        </button>
+      </div>
     </div>
-    <div id="statusInfo" class="mt-1.5"></div>
-</div>
+  </div>
 
-<div class="p-2 border-b border-slate-800/50">
-<div class="sd text-violet-400" onclick="tc('pMap')">📚 Mata Pelajaran</div>
-<div id="pMap" class="cl op mt-1.5 space-y-1">
-    <div id="mapChips" class="flex flex-wrap gap-1 mb-1"></div>
-    <div class="flex gap-1"><input id="nmMap" placeholder="Mapel baru..." class="flex-1 is text-[8px]"><button onclick="addMapel()" class="bg-violet-600 text-white px-2 py-0.5 rounded text-[8px] font-bold need-write">＋</button></div>
-</div>
-</div>
-
-<div class="p-2 border-b border-slate-800/50 grid grid-cols-4 gap-1">
-<button onclick="doPrint()" class="need-write bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold py-1 rounded text-[8px]">🖨️</button>
-<button onclick="pAI('soal')" class="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-1 rounded text-[8px]">📝</button>
-<button onclick="pAI('lkpd')" class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-1 rounded text-[8px]">✨</button>
-<button onclick="openShare()" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-1 rounded text-[8px]">🔗</button>
-</div>
-
-<div class="p-2 border-b border-slate-800/50">
-<div class="sd text-indigo-400" onclick="tc('pInp')">📂 Input & Import</div>
-<div id="pInp" class="cl op mt-1.5 space-y-1.5">
-<div class="bg-slate-800/40 rounded-lg p-2 space-y-1">
-    <p class="text-[8px] text-emerald-400 font-bold">⚡ Input TP Cepat</p>
-    <div class="grid grid-cols-2 gap-1"><select id="qKls" class="is text-[8px]"></select><select id="qSmt" class="is text-[8px]"><option>Semester 1</option><option>Semester 2</option></select></div>
-    <input id="qElem" placeholder="Elemen" class="w-full is text-[8px]">
-    <textarea id="qCP" placeholder="CP" rows="2" class="w-full is text-[8px] resize-none"></textarea>
-    <textarea id="qTP" placeholder="TP* wajib" rows="2" class="w-full is text-[8px] resize-none"></textarea>
-    <div class="grid grid-cols-2 gap-1"><input id="qDim" placeholder="Dimensi" class="is text-[8px]"><input type="number" id="qPrt" value="2" min="1" class="is text-[8px]"></div>
-    <button onclick="quickTP()" class="w-full bg-emerald-600 text-white font-bold py-1.5 rounded text-[10px] need-write">＋ Tambah TP</button>
-</div>
-<div class="bg-slate-800/40 rounded-lg p-2 space-y-1">
-    <p class="text-[8px] text-indigo-400 font-bold">📄 CSV / Google Sheets</p>
-    <div class="grid grid-cols-2 gap-1">
-        <div class="dz p-1.5 text-center need-write" onclick="tryClickFile('cfTP')" id="dzTP"><input type="file" id="cfTP" accept=".csv" class="hidden" onchange="hcsv(event,'tp')"><p class="text-[8px] text-indigo-300 font-bold">📄 CSV TP</p></div>
-        <div class="dz p-1.5 text-center need-write" onclick="tryClickFile('cfSW')"><input type="file" id="cfSW" accept=".csv" class="hidden" onchange="hcsv(event,'siswa')"><p class="text-[8px] text-violet-300 font-bold">👨‍🎓 CSV Siswa</p></div>
+  <!-- ====== PENDING APPROVAL SCREEN ====== -->
+  <div id="pendingScreen" class="fixed inset-0 bg-gradient-to-br from-amber-50 to-orange-50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center space-y-4">
+      <div class="inline-flex items-center justify-center w-20 h-20 bg-amber-100 rounded-full mb-2">
+        <i class="fa-solid fa-clock text-4xl text-amber-500"></i>
+      </div>
+      <h2 class="text-xl font-bold text-slate-800">Menunggu Persetujuan Admin</h2>
+      <p class="text-sm text-slate-500">Akun Anda telah terdaftar. Saat ini Anda hanya dapat melihat dokumen. Akses edit & cetak akan diaktifkan setelah Admin menyetujui permintaan Anda.</p>
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
+        <i class="fa-solid fa-info-circle mr-1"></i>
+        Hubungi admin di <b>kkgpainagreg@gmail.com</b> untuk mempercepat proses.
+      </div>
+      <div class="flex space-x-3 pt-2">
+        <button onclick="enterViewOnlyMode()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-bold text-sm">
+          <i class="fa-solid fa-eye mr-1"></i> Masuk Mode Lihat
+        </button>
+        <button onclick="doLogout()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 rounded-xl font-bold text-sm">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+        </button>
+      </div>
     </div>
-    <input id="gsUrl" placeholder="URL Google Sheet..." class="w-full is text-[7px]">
-    <div class="flex gap-1"><button onclick="loadGS('tp')" class="need-write flex-1 bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 py-0.5 rounded text-[7px] font-bold">📥 TP</button><button onclick="loadGS('siswa')" class="need-write flex-1 bg-violet-600/30 text-violet-300 border border-violet-500/30 py-0.5 rounded text-[7px] font-bold">📥 Siswa</button></div>
-    <div class="flex gap-1"><button onclick="dlTpl('tp')" class="flex-1 bg-slate-700/40 text-slate-300 py-0.5 rounded text-[7px]">📥 Tpl TP</button><button onclick="dlTpl('siswa')" class="flex-1 bg-slate-700/40 text-slate-300 py-0.5 rounded text-[7px]">📥 Tpl Siswa</button></div>
-</div>
-<div id="csvSt" class="hidden p-1 bg-emerald-950/40 border border-emerald-500/30 rounded text-[8px] text-emerald-300">✅ <span id="csvStT">-</span></div>
-<div class="flex gap-1"><button onclick="pAI('csv_tp')" class="flex-1 bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 py-0.5 rounded text-[7px] font-bold">✨ AI TP</button><button onclick="pAI('csv_siswa')" class="flex-1 bg-violet-600/20 text-violet-300 border border-violet-500/30 py-0.5 rounded text-[7px] font-bold">✨ AI Siswa</button></div>
-<div class="flex gap-1"><button onclick="clearTP()" class="need-write flex-1 bg-rose-950/20 text-rose-400 border border-rose-800/30 py-0.5 rounded text-[7px]">🗑️ TP</button><button onclick="clearSW()" class="need-write flex-1 bg-rose-950/20 text-rose-400 border border-rose-800/30 py-0.5 rounded text-[7px]">🗑️ Siswa</button></div>
-</div>
-</div>
+  </div>
 
-<div class="p-2 border-b border-slate-800/50">
-<div class="sd text-violet-400" onclick="tc('pJdw')">📅 Jadwal & Rombel</div>
-<div id="pJdw" class="cl op mt-1.5 space-y-1">
-    <div class="grid grid-cols-4 gap-1">
-        <select id="iHari" onchange="debS()" class="is text-[7px]"><option value="5">5hr</option><option value="6">6hr</option></select>
-        <select id="iIst" onchange="debS()" class="is text-[7px]"><option value="1">1ist</option><option value="2">2ist</option></select>
-        <input type="number" id="iI1" value="4" min="1" max="10" onchange="debS()" class="is text-[7px]">
-        <input type="number" id="iI2" value="6" min="1" max="10" onchange="debS()" class="is text-[7px]">
+  <!-- ====== ADMIN APPROVAL MODAL ====== -->
+  <div id="adminModal" class="modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col mx-4">
+      <div class="bg-gradient-to-r from-slate-900 to-blue-900 text-white p-5 flex justify-between items-center">
+        <div>
+          <h3 class="font-bold text-lg"><i class="fa-solid fa-shield-halved mr-2"></i>Panel Admin - Kelola Akses User</h3>
+          <p class="text-blue-300 text-xs">Kelola permintaan akses dan hak pengguna</p>
+        </div>
+        <button onclick="closeAdminModal()" class="text-white/70 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <!-- Stats -->
+      <div class="grid grid-cols-3 gap-3 p-4 bg-slate-50 border-b">
+        <div class="bg-white rounded-xl p-3 border text-center">
+          <div class="text-2xl font-bold text-blue-600" id="statTotal">0</div>
+          <div class="text-[10px] text-slate-500 font-semibold uppercase">Total User</div>
+        </div>
+        <div class="bg-white rounded-xl p-3 border text-center">
+          <div class="text-2xl font-bold text-amber-500" id="statPending">0</div>
+          <div class="text-[10px] text-slate-500 font-semibold uppercase">Pending</div>
+        </div>
+        <div class="bg-white rounded-xl p-3 border text-center">
+          <div class="text-2xl font-bold text-emerald-500" id="statApproved">0</div>
+          <div class="text-[10px] text-slate-500 font-semibold uppercase">Approved</div>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4">
+        <table class="w-full text-xs">
+          <thead class="bg-slate-100 sticky top-0">
+            <tr>
+              <th class="p-2 text-left rounded-l-lg">User</th>
+              <th class="p-2 text-left">Sekolah</th>
+              <th class="p-2 text-center">Status</th>
+              <th class="p-2 text-center">Role</th>
+              <th class="p-2 text-center rounded-r-lg">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="adminUserList" class="divide-y"></tbody>
+        </table>
+        <div id="adminLoading" class="text-center py-8 text-slate-400">
+          <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+          <p class="text-xs mt-2">Memuat data pengguna...</p>
+        </div>
+      </div>
     </div>
-    <div id="rbBox" class="space-y-1 max-h-36 overflow-y-auto"></div>
-    <button onclick="addR()" class="w-full bg-violet-600/20 text-violet-300 border border-violet-500/30 font-bold py-1 rounded text-[9px] need-write">＋ Rombel</button>
-</div>
-</div>
+  </div>
 
-<div class="p-2 border-b border-slate-800/50">
-<div class="sd text-slate-400" onclick="tc('pID')">🏫 Identitas</div>
-<div id="pID" class="cl mt-1.5 space-y-1">
-    <div class="bg-indigo-950/30 border border-indigo-500/20 rounded-lg p-1.5 space-y-1">
-        <p class="text-[7px] text-indigo-400 font-bold uppercase">Sekolah (NPSN)</p>
-        <div class="grid grid-cols-3 gap-1"><input id="iSek" value="SDN Nagreg 05" oninput="debS()" class="col-span-2 is text-[8px]"><input id="iNpsn" value="20254321" oninput="debS()" class="is text-[8px]"></div>
-        <div class="grid grid-cols-2 gap-1"><input id="iKep" value="Aep Sudrajat, S.Pd" oninput="debS()" class="is text-[8px]"><input id="iNkep" value="197508121998031002" oninput="debS()" class="is text-[8px]"></div>
-        <div class="grid grid-cols-2 gap-1"><select id="iJnj" onchange="popK();debS()" class="is text-[8px]"><option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option><option>MA</option><option>SMK</option></select><input id="iTA" value="2026/2027" oninput="debS()" class="is text-[8px]"></div>
+  <!-- ====== USER PROFILE MODAL ====== -->
+  <div id="profileModal" class="modal-overlay hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 text-center">
+        <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fa-solid fa-user text-3xl"></i>
+        </div>
+        <h3 id="profileName" class="font-bold text-lg"></h3>
+        <p id="profileEmail" class="text-blue-200 text-xs"></p>
+      </div>
+      <div class="p-5 space-y-3">
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-500">Status Akses:</span>
+          <span id="profileStatus"></span>
+        </div>
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-500">Role:</span>
+          <span id="profileRole" class="font-semibold"></span>
+        </div>
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-500">Sekolah:</span>
+          <span id="profileSchool" class="font-semibold"></span>
+        </div>
+        <div class="flex justify-between items-center text-sm">
+          <span class="text-slate-500">Terdaftar:</span>
+          <span id="profileDate" class="font-semibold"></span>
+        </div>
+        <div class="pt-3 space-y-2">
+          <button onclick="doLogout()" class="w-full bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl font-bold text-sm">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+          </button>
+          <button onclick="closeProfileModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 py-2.5 rounded-xl font-bold text-sm">Tutup</button>
+        </div>
+      </div>
     </div>
-    <div class="bg-emerald-950/30 border border-emerald-500/20 rounded-lg p-1.5 space-y-1">
-        <p class="text-[7px] text-emerald-400 font-bold uppercase">Guru</p>
-        <div class="grid grid-cols-2 gap-1"><input id="iGuru" oninput="debS()" class="is text-[8px]"><input id="iNg" oninput="debS()" class="is text-[8px]" placeholder="NIP"></div>
-        <input id="iMet" value="Talaqqi" oninput="debS()" class="w-full is text-[8px]">
-        <input id="iKtgl" value="Bandung, 13 Juli 2026" oninput="debS()" class="w-full is text-[8px]">
-        <div class="grid grid-cols-3 gap-1"><input type="date" id="iT1" value="2026-07-13" onchange="debS()" class="is text-[7px]"><input type="date" id="iT2" value="2027-01-11" onchange="debS()" class="is text-[7px]"><input type="number" id="iMgg" value="24" min="16" max="30" onchange="debS()" class="is text-[7px]"></div>
+  </div>
+
+  <!-- ====== MOBILE TOP BAR ====== -->
+  <div class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center no-print">
+    <div class="flex items-center space-x-2">
+      <i class="fa-solid fa-book-journal-whills text-blue-400 text-2xl"></i>
+      <span class="font-bold">SIPAI Generator</span>
     </div>
-</div>
-</div>
+    <div class="flex items-center space-x-3">
+      <span id="mobileUserBadge" class="text-xs bg-slate-700 px-2 py-1 rounded-full hidden"></span>
+      <button onclick="document.getElementById('sidebar').classList.toggle('hidden')"><i class="fa-solid fa-bars text-2xl"></i></button>
+    </div>
+  </div>
 
-<div class="p-2 border-b border-slate-800/50">
-<div class="sd text-amber-400" onclick="tc('pNl')">📊 Nilai</div>
-<div id="pNl" class="cl mt-1.5 space-y-1"><div id="kBox"></div><button onclick="addKrit()" class="w-full bg-amber-600/20 text-amber-300 border border-amber-500/30 py-0.5 rounded text-[8px] need-write">＋</button></div>
-</div>
+  <!-- ====== SIDEBAR ====== -->
+  <aside id="sidebar" class="w-full md:w-72 bg-slate-900 text-slate-200 p-4 hidden md:block no-print shrink-0">
+    <div class="flex items-center space-x-3 pb-4 border-b border-slate-700 mb-4">
+      <div class="bg-blue-600 p-2 rounded-xl"><i class="fa-solid fa-book-journal-whills text-xl text-white"></i></div>
+      <div>
+        <h1 class="font-bold text-white">SIPAI Generator</h1>
+        <p class="text-xs text-slate-400">Administrasi Guru Otomatis</p>
+      </div>
+    </div>
 
-<div class="p-2">
-<div class="sd text-emerald-400 mb-1"><span>🎯 Filter</span></div>
-<div class="grid grid-cols-3 gap-1 mb-2">
-    <select id="fKls" onchange="ra()" class="is text-[8px]"><option value="">Kelas</option></select>
-    <select id="fSmt" onchange="ra()" class="is text-[8px]"><option value="">Smt</option><option>Semester 1</option><option>Semester 2</option></select>
-    <select id="fRbl" onchange="ra()" class="is text-[8px]"><option value="">Rombel</option></select>
-</div>
-<div class="sd text-slate-500 mb-1"><span>📑 Menu</span></div>
-<nav class="space-y-0.5" id="navBox"></nav>
-</div>
-</div>
-<div class="p-2 border-t border-slate-800/50"><button onclick="resetAll()" class="w-full bg-rose-950/30 text-rose-400 border border-rose-800/40 py-1 rounded text-[8px] need-write">🔄 Reset Data</button></div>
-</aside>
+    <!-- User Info Bar -->
+    <div id="sidebarUserInfo" class="bg-slate-800 rounded-xl p-3 mb-4 hidden">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold" id="sidebarAvatar">?</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-white truncate" id="sidebarName">-</p>
+          <div class="flex items-center space-x-1">
+            <div id="sidebarStatusDot" class="pulse-dot bg-amber-400"></div>
+            <p class="text-[10px] text-slate-400" id="sidebarRole">-</p>
+          </div>
+        </div>
+        <button onclick="openProfileModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </div>
+    </div>
 
-<main class="flex-1 overflow-y-auto min-h-screen pt-14 md:pt-6">
-<div class="p-2 md:p-4 pb-14 md:pb-4" id="mc"></div>
-</main>
+    <nav class="space-y-4 text-sm">
+      <div>
+        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2">1. Input Data</div>
+        <div class="space-y-1">
+          <button onclick="switchTab('input-profil')" id="btn-input-profil" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 active-nav"><i class="fa-solid fa-school w-5"></i> Profil Guru & Sekolah</button>
+          <button onclick="switchTab('input-kalender')" id="btn-input-kalender" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-calendar-days w-5"></i> Input Kalender</button>
+          <button onclick="switchTab('input-cp')" id="btn-input-cp" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-database w-5"></i> Input CP / ATP</button>
+          <button onclick="switchTab('prompt-ai')" id="btn-prompt-ai" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-amber-400"><i class="fa-solid fa-robot w-5"></i> Prompt AI Generator</button>
+        </div>
+      </div>
+      <div>
+        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2">2. Dokumen Result</div>
+        <div class="space-y-1">
+          <button onclick="switchTab('doc-kalender')" id="btn-doc-kalender" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-regular fa-calendar-check w-5"></i> Kalender Pendidikan</button>
+          <button onclick="switchTab('doc-jadwal')" id="btn-doc-jadwal" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-clock w-5"></i> Jadwal Pelajaran</button>
+          <button onclick="switchTab('doc-acp')" id="btn-doc-acp" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-chart-pie w-5"></i> ACP (Analisis CP)</button>
+          <button onclick="switchTab('doc-atp')" id="btn-doc-atp" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-route w-5"></i> ATP / Silabus</button>
+          <button onclick="switchTab('doc-prota')" id="btn-doc-prota" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-calendar-week w-5"></i> Prota</button>
+          <button onclick="switchTab('doc-promes')" id="btn-doc-promes" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-table-cells w-5"></i> Promes</button>
+          <button onclick="switchTab('doc-modul')" id="btn-doc-modul" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-brain w-5"></i> Modul Deep Learning</button>
+          <button onclick="switchTab('doc-kktp')" id="btn-doc-kktp" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-emerald-400"><i class="fa-solid fa-list-check w-5"></i> KKTP</button>
+        </div>
+      </div>
 
-<div class="md:hidden fixed bottom-0 left-0 right-0 z-45 np">
-<div class="gls border-t border-slate-700/50 px-1 py-0.5">
-<div class="flex items-center justify-around">
-    <button onclick="sw('jadwal');cm()" class="mn flex flex-col items-center text-indigo-400" data-t="jadwal"><span class="text-sm">📅</span><span class="text-[5px] font-bold">Jadwal</span></button>
-    <button onclick="sw('nilai');cm()" class="mn flex flex-col items-center text-slate-400" data-t="nilai"><span class="text-sm">📝</span><span class="text-[5px] font-bold">Nilai</span></button>
-    <button onclick="sw('absen');cm()" class="mn flex flex-col items-center text-slate-400" data-t="absen"><span class="text-sm">📋</span><span class="text-[5px] font-bold">Absen</span></button>
-    <button onclick="sw('jurnal');cm()" class="mn flex flex-col items-center text-slate-400" data-t="jurnal"><span class="text-sm">📔</span><span class="text-[5px] font-bold">Jurnal</span></button>
-    <button onclick="tsb()" class="flex flex-col items-center text-slate-400"><span class="text-sm">⚙️</span><span class="text-[5px] font-bold">Menu</span></button>
-</div>
-</div>
-</div>
-</div>
+      <!-- Admin Panel Button -->
+      <div id="adminNavSection" class="hidden">
+        <div class="text-[11px] font-semibold text-red-400 uppercase tracking-wider mb-2 px-2">3. Admin Panel</div>
+        <div class="space-y-1">
+          <button onclick="switchTab('admin-panel')" id="btn-admin-panel" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-red-400"><i class="fa-solid fa-shield-halved w-5"></i> Kelola Akses User</button>
+          <button onclick="switchTab('admin-data')" id="btn-admin-data" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-red-400"><i class="fa-solid fa-database w-5"></i> Kelola Data Global</button>
+        </div>
+      </div>
+    </nav>
 
-<div id="shareModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-3 hidden np">
-<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-4 max-h-[90vh] overflow-y-auto af">
-<div class="flex justify-between items-center mb-3"><h3 class="text-base font-black">🔗 Berbagi</h3><button onclick="$('shareModal').classList.add('hidden')" class="text-xl">&times;</button></div>
-<div class="bg-indigo-50 border rounded-xl p-3 mb-3"><h4 class="text-xs font-bold text-indigo-800 mb-2">🏫 Data Sekolah (NPSN)</h4><div class="flex gap-2"><input id="srNpsn" placeholder="NPSN..." class="flex-1 iw"><button onclick="srByNpsn()" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs font-bold">🔍</button></div><div id="npsnRes" class="mt-2 hidden"></div></div>
-<div class="bg-violet-50 border rounded-xl p-3"><h4 class="text-xs font-bold text-violet-800 mb-2">📚 CP/TP</h4><div class="flex gap-2 mb-2"><input id="srMap" class="flex-1 iw"><select id="srJnj" class="iw w-20"><option>SD</option><option>MI</option><option>SMP</option><option>MTs</option><option>SMA</option></select></div><button onclick="srByMap()" class="w-full bg-violet-600 text-white py-1 rounded text-xs font-bold">🔍 Cari</button><div id="mapRes" class="mt-2 hidden"></div></div>
-</div>
-</div>
+    <!-- Sidebar Footer -->
+    <div class="mt-6 pt-4 border-t border-slate-700 space-y-2">
+      <div id="guestLoginBtn" class="hidden">
+        <button onclick="showAuthScreen()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-xs font-bold">
+          <i class="fa-solid fa-right-to-bracket mr-1"></i> Login / Daftar
+        </button>
+      </div>
+      <div id="logoutBtn" class="hidden">
+        <button onclick="doLogout()" class="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 py-2 rounded-lg text-xs font-bold">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+        </button>
+      </div>
+      <p class="text-[10px] text-slate-600 text-center">SIPAI v2.0 • Firebase Edition</p>
+    </div>
+  </aside>
 
-<div id="mdl" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xl z-50 flex items-center justify-center p-2 hidden np">
-<div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-3 border flex flex-col max-h-[94vh] af">
-<div class="flex justify-between items-center border-b pb-2 mb-2"><h3 class="text-sm font-black" id="mdlT">Prompt AI</h3><button onclick="$('mdl').classList.add('hidden')" class="text-slate-400 text-lg">&times;</button></div>
-<div id="mdlX" class="mb-2 np"></div>
-<textarea id="pta" readonly class="flex-1 w-full bg-slate-50 border rounded-lg p-2 text-[10px] font-mono focus:outline-none resize-none min-h-[140px]"></textarea>
-<div class="flex justify-end mt-2 pt-2 border-t gap-2"><span id="cpFb" class="text-[10px] text-emerald-600 font-bold hidden">✓ Disalin!</span><button onclick="$('mdl').classList.add('hidden')" class="px-3 py-1 bg-slate-100 text-xs font-bold rounded-lg">Tutup</button><button onclick="cpx()" class="px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-lg">📋 Salin</button></div>
-</div>
-</div>
+  <!-- ====== MAIN CONTENT ====== -->
+  <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <!-- Top Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+      <div>
+        <h2 id="pageTitle" class="text-xl font-bold">Profil Guru & Sekolah</h2>
+        <p class="text-xs text-slate-500" id="pageSubtitle">Kelola identitas dasar dokumen</p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <!-- Access Level Badge -->
+        <span id="accessBadge" class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-slate-100 text-slate-500">
+          <i class="fa-solid fa-eye mr-1"></i> MODE LIHAT
+        </span>
+        <!-- Save to Cloud -->
+        <button onclick="saveToCloud()" id="btnSaveCloud" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium hidden">
+          <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Simpan
+        </button>
+        <!-- Print -->
+        <button onclick="handlePrint()" id="btnPrint" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+          <i class="fa-solid fa-print mr-2"></i>Cetak / PDF
+        </button>
+      </div>
+    </div>
 
-<script>
-// FIREBASE INIT
-const fbCfg = {
-    apiKey: "AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",
-    authDomain: "si-gumart.firebaseapp.com",
-    projectId: "si-gumart",
-    storageBucket: "si-gumart.firebasestorage.app"
-};
-firebase.initializeApp(fbCfg);
-const db = firebase.firestore();
-const auth = firebase.auth();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+    <!-- ACCESS DENIED OVERLAY (for locked inputs) -->
+    <div id="editOverlay" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center no-print">
+      <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm text-center space-y-3 mx-4">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+          <i class="fa-solid fa-lock text-3xl text-red-500"></i>
+        </div>
+        <h3 class="font-bold text-lg">Akses Terbatas</h3>
+        <p class="text-sm text-slate-500">Anda perlu login dan mendapat persetujuan admin untuk mengedit dan mencetak dokumen.</p>
+        <div class="flex space-x-2">
+          <button onclick="showAuthScreen()" class="flex-1 bg-blue-600 text-white py-2 rounded-xl text-sm font-bold">Login / Daftar</button>
+          <button onclick="document.getElementById('editOverlay').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 py-2 rounded-xl text-sm font-bold">Tutup</button>
+        </div>
+      </div>
+    </div>
 
-const gProvider = new firebase.auth.GoogleAuthProvider();
-gProvider.addScope('email');
-gProvider.addScope('profile');
-gProvider.setCustomParameters({ prompt: 'select_account' });
+    <!-- ====== TAB: PROFIL ====== -->
+    <div id="tab-input-profil" class="tab-content bg-white p-6 rounded-xl shadow-sm border border-slate-200 fade-in">
+      <h3 class="text-lg font-bold mb-4 border-b pb-2"><i class="fa-solid fa-school text-blue-500 mr-2"></i>Data Identitas Sekolah & Guru</h3>
+      <form id="formProfil" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm editable-area">
+        <div><label class="block text-xs font-semibold mb-1">Nama Sekolah</label><input type="text" id="namaSekolah" value="SDN Nagreg 05" class="w-full border rounded-lg p-2 editable-field"></div>
+        <div><label class="block text-xs font-semibold mb-1">Nama Guru</label><input type="text" id="namaGuru" value="Apipudin, S.Pd.I." class="w-full border rounded-lg p-2 editable-field"></div>
+        <div><label class="block text-xs font-semibold mb-1">NIP Guru</label><input type="text" id="nipGuru" value="19880520 201212 2 004" class="w-full border rounded-lg p-2 editable-field"></div>
+        <div><label class="block text-xs font-semibold mb-1">Kepala Sekolah</label><input type="text" id="namaKepsek" value="Aep Sudrajat, S.Pd" class="w-full border rounded-lg p-2 editable-field"></div>
+        <div><label class="block text-xs font-semibold mb-1">NIP Kepsek</label><input type="text" id="nipKepsek" value="19750812 199803 1 002" class="w-full border rounded-lg p-2 editable-field"></div>
+        <div><label class="block text-xs font-semibold mb-1">Mata Pelajaran</label><input type="text" id="namaMapel" value="PAI dan Budi Pekerti" class="w-full border rounded-lg p-2 editable-field"></div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Fase & Kelas</label>
+          <select id="pilihanFaseKelas" onchange="renderAllDocs()" class="w-full border rounded-lg p-2 editable-field">
+            <option value="Kelas 6 - Fase C" selected>Kelas 6 - Fase C</option>
+            <option value="Kelas 1 - Fase A">Kelas 1 - Fase A</option>
+            <option value="Kelas 2 - Fase A">Kelas 2 - Fase A</option>
+            <option value="Kelas 3 - Fase B">Kelas 3 - Fase B</option>
+            <option value="Kelas 4 - Fase B">Kelas 4 - Fase B</option>
+            <option value="Kelas 5 - Fase C">Kelas 5 - Fase C</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Tahun Ajaran & TTD</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="tahunAjaran" value="2026/2027" class="border rounded-lg p-2 editable-field">
+            <input type="text" id="tglTtd" value="Bandung, 13 Juli 2026" class="border rounded-lg p-2 editable-field">
+          </div>
+        </div>
+      </form>
+      <div id="viewOnlyNotice" class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700 hidden">
+        <i class="fa-solid fa-lock mr-1"></i>
+        <b>Mode Lihat Saja.</b> Login dan dapatkan persetujuan admin untuk mengedit data.
+      </div>
+    </div>
 
-const $ = id => document.getElementById(id);
-const ADMIN_EMAIL = 'kkgpainagreg@gmail.com';
-let ADMIN_WA = '6282118521765';
-let CU = null;
-let userMode = 'guest'; 
-let isAdmin = false;
-let canWrite = false;
-let dataOwnerId = 'PUBLIC_DEMO';
-let SHARED_DATA_ID = 'PUBLIC_DEMO';
+    <!-- ====== TAB: KALENDER INPUT ====== -->
+    <div id="tab-input-kalender" class="tab-content hidden space-y-4 fade-in">
+      <div class="bg-white p-4 rounded-xl border editable-area">
+        <h3 class="font-bold text-sm mb-1"><i class="fa-solid fa-file-csv text-emerald-500 mr-1"></i>Option A: CSV Kalender</h3>
+        <textarea id="csvKalenderInput" rows="3" placeholder="Semester,Tanggal,Agenda,Kategori" class="w-full border rounded p-2 text-xs font-mono bg-slate-50 editable-field"></textarea>
+        <button onclick="checkEditAccess() && processCSV('kalender')" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded mt-2">Proses CSV</button>
+      </div>
+      <div class="bg-white p-4 rounded-xl border overflow-x-auto editable-area">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-bold text-sm"><i class="fa-solid fa-table text-blue-500 mr-1"></i>Option B: Manual Kalender</h3>
+          <button onclick="checkEditAccess() && addRow('kalender')" class="bg-emerald-600 text-white text-xs px-2 py-1 rounded">+ Agenda</button>
+        </div>
+        <table class="w-full text-xs text-left border-collapse"><thead class="bg-slate-100"><tr class="border"><th class="p-2">Semester</th><th class="p-2">Tanggal</th><th class="p-2">Agenda</th><th class="p-2">Kategori</th><th class="p-2 text-center">Aksi</th></tr></thead><tbody id="tbodyKalender"></tbody></table>
+      </div>
+    </div>
 
-const toast = msg => { const t=$('tst'); if(!t)return; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); };
-const syn = (t,x) => { const e=$('syn'); if(!e)return; e.className='syn np '+t; e.textContent=x; };
+    <!-- ====== TAB: CP & ATP INPUT ====== -->
+    <div id="tab-input-cp" class="tab-content hidden space-y-4 fade-in">
+      <div class="bg-white p-4 rounded-xl border editable-area">
+        <h3 class="font-bold text-sm mb-1"><i class="fa-solid fa-file-csv text-emerald-500 mr-1"></i>Option A: CSV CP & ATP</h3>
+        <textarea id="csvCPInput" rows="3" placeholder="Elemen,ATP,Smt,JP,Metode,Dimensi,CP_Fase,Dates_Promes" class="w-full border rounded p-2 text-xs font-mono bg-slate-50 editable-field"></textarea>
+        <button onclick="checkEditAccess() && processCSV('cp')" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded mt-2">Proses CSV</button>
+      </div>
+      <div class="bg-white p-4 rounded-xl border overflow-x-auto editable-area">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-bold text-sm"><i class="fa-solid fa-table text-blue-500 mr-1"></i>Option B: Manual CP</h3>
+          <button onclick="checkEditAccess() && addRow('cp')" class="bg-emerald-600 text-white text-xs px-2 py-1 rounded">+ ATP</button>
+        </div>
+        <table class="w-full text-xs text-left border-collapse"><thead class="bg-slate-100"><tr class="border"><th class="p-2">Elemen</th><th class="p-2">ATP</th><th class="p-2">Smt</th><th class="p-2">JP</th><th class="p-2">Metode</th><th class="p-2">Dimensi</th><th class="p-2">Dates Promes</th><th class="p-2 text-center">Aksi</th></tr></thead><tbody id="tbodyCP"></tbody></table>
+      </div>
+    </div>
 
-function requireAuth(action='melakukan aksi ini') {
-    if (isAdmin || userMode === 'admin' || canWrite) return true;
-    if (userMode === 'guest') {
-        toast(`🔒 Silakan login untuk ${action}`);
-        $('regModal').classList.remove('hidden');
-    } else if (userMode === 'pending') {
-        toast(`⏳ Menunggu persetujuan admin untuk ${action}`);
-    } else {
-        toast(`❌ Anda tidak memiliki izin ${action}`);
-    }
-    return false;
-}
+    <!-- ====== TAB: PROMPT AI ====== -->
+    <div id="tab-prompt-ai" class="tab-content hidden bg-white p-6 rounded-xl border fade-in">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold text-sm"><i class="fa-solid fa-robot text-amber-500 mr-1"></i>Prompt AI CSV Generator</h3>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('aiPromptText').innerText); showToast('success','Disalin!','Prompt berhasil disalin ke clipboard.')" class="bg-amber-500 text-white text-xs px-3 py-1 rounded"><i class="fa-solid fa-copy mr-1"></i>Salin Prompt</button>
+      </div>
+      <pre id="aiPromptText" class="bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono whitespace-pre-wrap leading-relaxed">Buatkan data CSV untuk aplikasi administrasi guru Kurikulum Merdeka:
 
-function tryClickFile(id) { 
-    if (!requireAuth('mengimpor file')) return; 
-    $(id)?.click(); 
-}
+1. FORMAT CP DAN ATP (header pertama, lalu data):
+   Elemen,ATP,Smt,JP,Metode,Dimensi,CP_Fase,Dates_Promes
+   
+   Keterangan:
+   - Elemen: Elemen CP (contoh: Al-Qur'an Hadis, Akidah, Akhlak, Fikih, SPI)
+   - ATP: Alur Tujuan Pembelajaran detail
+   - Smt: "Smt 1" atau "Smt 2"
+   - JP: Jumlah jam pelajaran (angka)
+   - Metode: Metode pembelajaran (contoh: Talaqqi; Drill; PBL)
+   - Dimensi: Dimensi Profil Pelajar Pancasila
+   - CP_Fase: Capaian Pembelajaran per Fase
+   - Dates_Promes: Jadwal mingguan dipisah titik koma (;)
 
-function doPrint() { if (!requireAuth('mencetak dokumen')) return; window.print(); }
+2. FORMAT KALENDER PENDIDIKAN:
+   Semester,Tanggal,Agenda,Kategori
+   
+   Kategori: Libur Nasional / Kegiatan Sekolah / Asesmen / Libur Semester
 
-async function doLogin() {
-    if ($('regBtn')) $('regBtn').disabled = true;
-    if ($('regBtnTxt')) $('regBtnTxt').textContent = 'Membuka Google Sign-in...';
-    try {
-        try {
-            const result = await auth.signInWithPopup(gProvider);
-            if (result && result.user) {
-                await result.user.reload();
-                await handleUserLogin(auth.currentUser || result.user);
-                return;
-            }
-        } catch (pe) {
-            console.warn('Popup failed:', pe.code);
-            if (pe.code === 'auth/popup-blocked' || pe.code === 'auth/popup-closed-by-user') {
-                toast('Popup diblokir, menggunakan redirect...');
-                await auth.signInWithRedirect(gProvider);
-                return;
-            }
-            throw pe;
-        }
-    } catch (e) {
-        console.error(e);
-        if ($('regBtn')) $('regBtn').disabled = false;
-        if ($('regBtnTxt')) $('regBtnTxt').textContent = 'Masuk / Daftar dengan Google';
-        toast('Error: ' + e.message);
-    }
-}
+Buatkan data lengkap untuk:
+- Mata Pelajaran: PAI dan Budi Pekerti
+- Kelas: 6 (Fase C)
+- Tahun Ajaran: 2026/2027
+- Kurikulum Merdeka
 
-async function handleUserLogin(user) {
-    if (!user) return;
-    CU = user;
-    const email = user.email || '';
-    const uid = user.uid;
-    const isAdminUser = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    
-    try {
-        if (isAdminUser) {
-            isAdmin = true; canWrite = true; userMode = 'admin'; dataOwnerId = SHARED_DATA_ID;
-            await db.collection('approved_users').doc(uid).set({
-                email, name: user.displayName || 'Admin', photo: user.photoURL || '',
-                status: 'approved', role: 'admin', uid, ts: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-            toast('👑 Login sebagai Admin!');
-        } else {
-            const doc = await db.collection('approved_users').doc(uid).get();
-            if (doc.exists && doc.data().status === 'approved') {
-                canWrite = true; userMode = 'user'; dataOwnerId = uid;
-                toast('✅ Login berhasil!');
-            } else {
-                canWrite = false; userMode = 'pending'; dataOwnerId = SHARED_DATA_ID;
-                if (!doc.exists) {
-                    await db.collection('approved_users').doc(uid).set({
-                        email, name: user.displayName || '', photo: user.photoURL || '',
-                        status: 'pending', role: 'user', uid, ts: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    sendWANotif(user);
-                }
-                toast('⏳ Akun Anda menunggu persetujuan admin');
-            }
-        }
-        $('regModal').classList.add('hidden');
-        updateUserUI(); updateModeBadge(); applyReadOnlyMode(); await loadData();
-    } catch (e) { console.error(e); toast('Error: ' + e.message); }
-}
+Pastikan minimal 10 ATP untuk Semester 1 dan 10 ATP untuk Semester 2.</pre>
+    </div>
 
-function sendWANotif(user) {
-    const msg = encodeURIComponent(`🔔 *Si-Gumart - Pendaftaran Baru*\n\n👤 ${user.displayName||'-'}\n📧 ${user.email||'-'}\n\nBuka aplikasi Si-Gumart → Admin untuk approve.`);
-    try { window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank', 'noopener'); } catch(e) {}
-}
+    <!-- ====== OUTPUT DOCUMENTS ====== -->
+    <div id="tab-doc-kalender" class="tab-content hidden bg-white p-6 rounded-xl border print-area fade-in">
+      <h2 class="text-xl font-bold text-center uppercase" id="outKaldikJudul"></h2>
+      <p class="text-sm text-center font-semibold text-slate-600 mb-4" id="outKaldikSub"></p>
+      <table class="w-full text-xs border-collapse border"><thead class="bg-slate-100"><tr class="border"><th class="p-1">No</th><th class="p-1">Semester</th><th class="p-1">Tanggal</th><th class="p-1">Agenda</th><th class="p-1">Kategori</th></tr></thead><tbody id="outKaldikTbody"></tbody></table>
+      <div class="mt-8 ttd-box"></div>
+    </div>
 
-function logoutUser() {
-    if (!confirm('Logout dan kembali ke mode Guest?')) return;
-    auth.signOut().then(() => location.reload()).catch(() => location.reload());
-}
-
-function updateUserUI() {
-    const bar = $('userStatusBar'); if (!bar) return;
-    if (userMode === 'guest') {
-        $('usrNm').textContent = 'Guest'; $('usrEm').textContent = 'Mode Lihat Saja';
-        $('loginBtnSide').classList.remove('hidden'); $('logoutBtn').classList.add('hidden'); $('admBtn').classList.add('hidden');
-    } else if (userMode === 'pending') {
-        $('usrNm').textContent = CU?.displayName || CU?.email || 'User'; $('usrEm').textContent = '⏳ Menunggu Persetujuan';
-        $('loginBtnSide').classList.add('hidden'); $('logoutBtn').classList.remove('hidden'); $('admBtn').classList.add('hidden');
-    } else if (userMode === 'user' || userMode === 'admin') {
-        $('usrNm').textContent = CU?.displayName || 'User'; $('usrEm').textContent = (userMode==='admin'?'👑 ':'✅ ') + (CU?.email || '');
-        $('loginBtnSide').classList.add('hidden'); $('logoutBtn').classList.remove('hidden');
-        if (userMode==='admin') $('admBtn').classList.remove('hidden'); else $('admBtn').classList.add('hidden');
-    }
-    if (CU?.photoURL) {
-        const avEls = bar.querySelectorAll('.w-7');
-        if (avEls[0]) avEls[0].innerHTML = `<img src="${CU.photoURL}" class="w-full h-full rounded-full">`;
-        if ($('mobAv')) { $('mobAv').src = CU.photoURL; $('mobAv').classList.remove('hidden'); }
-    }
-}
-
-function updateModeBadge() {
-    const badge = $('modeBadge'); if (!badge) return;
-    if (userMode === 'guest') {
-        badge.className = 'readonly-badge np'; badge.textContent = '👀 Mode Baca • Klik "Login" untuk edit'; badge.classList.remove('hidden');
-    } else if (userMode === 'pending') {
-        badge.className = 'readonly-badge np'; badge.textContent = '⏳ Menunggu approval admin'; badge.classList.remove('hidden');
-    } else if (userMode === 'admin') {
-        badge.className = 'readonly-badge admin-badge np'; badge.textContent = '👑 Admin Mode • Akses Penuh'; badge.classList.remove('hidden');
-    } else {
-        badge.className = 'readonly-badge write-badge np'; badge.textContent = '✅ Mode Edit Aktif'; badge.classList.remove('hidden');
-        setTimeout(() => badge.classList.add('hidden'), 3000);
-    }
-}
-
-function applyReadOnlyMode() {
-    const disable = !canWrite && !isAdmin && userMode !== 'admin';
-    document.querySelectorAll('.is, .iw').forEach(el => {
-        if (['INPUT','SELECT','TEXTAREA'].includes(el.tagName)) {
-            el.disabled = disable;
-            if (disable) el.classList.add('readonly-input'); else el.classList.remove('readonly-input');
-        }
-    });
-    document.querySelectorAll('.need-write').forEach(el => {
-        el.style.opacity = disable ? '0.5' : '';
-        el.style.cursor = disable ? 'not-allowed' : '';
-    });
-    ra();
-}
-
-// ADMIN PANEL LOGIC
-async function openAdminPanel() {
-    if (!isAdmin && userMode !== 'admin') { toast('Akses ditolak'); return; }
-    $('adminPnl').classList.remove('hidden');
-    await loadAdminPanel();
-}
-
-async function loadAdminPanel() {
-    try {
-        const snap = await db.collection('approved_users').get();
-        let pend = [], appr = [];
-        snap.forEach(doc => { const d = doc.data(); if (d.status === 'pending') pend.push({id:doc.id,...d}); else if (d.status === 'approved') appr.push({id:doc.id,...d}); });
-        if ($('pendCount')) $('pendCount').textContent = pend.length;
-        if ($('appCount')) $('appCount').textContent = appr.length;
-        if ($('pendUsers')) $('pendUsers').innerHTML = pend.length ? pend.map(u => `<div class="flex items-center justify-between bg-white rounded-lg p-2 border border-amber-200 mb-1"><div class="flex items-center gap-2 min-w-0"><img src="${u.photo||''}" class="w-8 h-8 rounded-full flex-shrink-0 bg-slate-200" onerror="this.style.display='none'"><div class="min-w-0"><p class="text-[10px] font-bold truncate">${u.name||'-'}</p><p class="text-[8px] text-slate-500 truncate">${u.email}</p></div></div><div class="flex gap-1 flex-shrink-0"><button onclick="approveU('${u.id}')" class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[9px] font-bold">✅ Setujui</button><button onclick="rejectU('${u.id}')" class="bg-rose-600 text-white px-2 py-0.5 rounded text-[9px] font-bold">❌</button></div></div>`).join('') : '<p class="text-xs text-slate-400">Tidak ada</p>';
-        if ($('appUsers')) $('appUsers').innerHTML = appr.length ? appr.map(u => `<div class="flex items-center justify-between bg-white rounded-lg p-1.5 border border-emerald-200 mb-1"><div class="flex items-center gap-2 min-w-0"><img src="${u.photo||''}" class="w-6 h-6 rounded-full flex-shrink-0 bg-slate-200" onerror="this.style.display='none'"><div class="min-w-0"><p class="text-[9px] font-bold truncate">${u.name||'-'} ${u.role==='admin'?'👑':''}</p><p class="text-[7px] text-slate-500 truncate">${u.email}</p></div></div>${u.role!=='admin'?`<button onclick="revokeU('${u.id}')" class="text-rose-400 text-[8px] px-1">✕</button>`:''}</div>`).join('') : '<p class="text-xs text-slate-400">-</p>';
-    } catch(e) { console.error(e); }
-}
-
-async function approveU(uid) { try { await db.collection('approved_users').doc(uid).update({status:'approved'}); toast('✅ Disetujui!'); loadAdminPanel(); } catch(e) { toast('Error'); } }
-async function rejectU(uid) { if(!confirm('Tolak user?'))return; try { await db.collection('approved_users').doc(uid).delete(); toast('Ditolak'); loadAdminPanel(); } catch(e) {} }
-async function revokeU(uid) { if(!confirm('Cabut akses?'))return; try { await db.collection('approved_users').doc(uid).update({status:'pending'}); toast('Dicabut'); loadAdminPanel(); } catch(e) {} }
-async function saveAdminWA() { const wa=$('adminWA')?.value?.trim(); if(!wa)return; ADMIN_WA=wa; try { await db.collection('config').doc('admin').set({wa:ADMIN_WA},{merge:true}); toast('✅ Tersimpan'); } catch(e) { toast('Error'); } }
-
-// DATA MANAGEMENT
-let D = {
-    mapelList: ['Pendidikan Agama Islam dan Budi Pekerti'],
-    activeMapel: 'Pendidikan Agama Islam dan Budi Pekerti',
-    tp: {}, rombel: [], siswa: [], nilai: {}, absen: {}, jurnal: [],
-    krit: [{n:'NH1',b:15},{n:'NH2',b:15},{n:'NH3',b:15},{n:'ATS',b:20},{n:'ASSAS',b:35}],
-    rc: 0, sc: 0, hpm: 5, ist: 1, ist1: 4, ist2: 6
-};
-let sT = null;
-const HR = ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-const BL = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-const WR = [{bg:'bg-indigo-600',hx:'#4f46e5'},{bg:'bg-emerald-600',hx:'#059669'},{bg:'bg-violet-600',hx:'#7c3aed'},{bg:'bg-amber-600',hx:'#d97706'},{bg:'bg-rose-600',hx:'#e11d48'},{bg:'bg-cyan-600',hx:'#0891b2'},{bg:'bg-teal-600',hx:'#0d9488'},{bg:'bg-pink-600',hx:'#db2777'}];
-const libNas = ["2026-08-17","2026-08-25","2026-12-25","2027-01-01","2027-02-06","2027-02-17","2027-03-09","2027-03-10","2027-03-11","2027-03-12","2027-03-26","2027-05-01","2027-05-06","2027-05-20","2027-06-01"];
-
-const dRef = () => db.collection('users').doc(dataOwnerId);
-const fase = k => { const n=parseInt(k.replace(/\D/g,'')); return n<=2?'A':n<=4?'B':n<=6?'C':n<=8?'D':n<=10?'E':'F'; };
-const durJP = () => { const j=gv('iJnj'); return['SMP','MTs'].includes(j)?40:['SMA','MA','SMK'].includes(j)?45:35; };
-const getHL = () => HR.slice(0, D.hpm||5);
-const aTP = () => D.tp[D.activeMapel] = D.tp[D.activeMapel] || [];
-const setATP = a => D.tp[D.activeMapel] = a;
-const gv = id => $(id)?.value || '';
-const getRbs = () => { const fR=gv('fRbl'); return fR?D.rombel.filter(r=>r.id==parseInt(fR)):[...D.rombel]; };
-
-function sfs() {
-    if (!canWrite && !isAdmin) return;
-    syn('sv','💾');
-    const data = { ...D, set: gS(), ts: firebase.firestore.FieldValue.serverTimestamp() };
-    window._sk = true;
-    dRef().set(data, {merge:true}).then(() => {
-        syn('ss', userMode === 'admin' ? '☁️ Public' : '☁️');
-        setTimeout(() => window._sk = false, 2000);
-    }).catch(e => { console.error(e); syn('se','❌'); window._sk=false; });
-}
-
-const debS = () => { if (!canWrite && !isAdmin) return; clearTimeout(sT); sT=setTimeout(()=>{sfs();ra();},600); };
-
-// HELPER DUMMY UNTUK KRITERIA PENILAIAN AI & CSV
-const rKrit = () => {
-    const box = $('kBox'); if (!box) return;
-    box.innerHTML = (D.krit || []).map((k, i) => `<div class="flex items-center gap-1 mb-1"><input value="${k.n}" class="is text-[8px] w-14" disabled><input type="number" value="${k.b}" class="is text-[8px] w-10" disabled><span class="text-[8px] text-slate-400">%</span></div>`).join('');
-};
-const addKrit = () => { if(!requireAuth('menambah kriteria')) return; D.krit.push({n:`NH${D.krit.length+1}`, b:10}); rKrit(); sfs(); };
-const pAI = type => { toast(`Prompt AI '${type}' disiapkan`); };
-const openShare = () => { $('shareModal')?.classList.remove('hidden'); };
-const loadGS = type => { toast(`Fitur Google Sheets (${type}) aktif`); };
-const hcsv = (e, type) => { toast(`Membaca file CSV (${type})`); };
-const dlTpl = type => { toast(`Mengunduh Template CSV ${type}`); };
-const clearTP = () => { if(confirm('Hapus seluruh TP?')){ D.tp[D.activeMapel]=[]; sfs(); ra(); } };
-const clearSW = () => { if(confirm('Hapus seluruh Siswa?')){ D.siswa=[]; sfs(); ra(); } };
-const resetAll = () => { if(confirm('Reset semua data aplikasi?')){ localStorage.clear(); location.reload(); } };
-
-async function loadData() {
-    try {
-        if ($('lst')) $('lst').textContent = 'Memuat data...';
-        const doc = await dRef().get();
-        if (doc.exists) {
-            const d = doc.data();
-            if (d.mapelList) D.mapelList=d.mapelList;
-            if (d.activeMapel) D.activeMapel=d.activeMapel;
-            if (d.tp) D.tp=d.tp;
-            if (d.rombel) D.rombel=d.rombel;
-            if (d.siswa) D.siswa=d.siswa;
-            if (d.nilai) D.nilai=d.nilai;
-            if (d.absen) D.absen=d.absen;
-            if (d.jurnal) D.jurnal=d.jurnal;
-            if (d.krit) D.krit=d.krit;
-            D.rc=d.rc||0; D.sc=d.sc||0; D.hpm=d.hpm||5; D.ist=d.ist||1; D.ist1=d.ist1||4; D.ist2=d.ist2||6;
-            if (d.set) aS(d.set);
-        }
-    } catch(e) { console.error('loadData:', e); }
-
-    if (!D.rombel.length) { D.rc=2; D.rombel=[{id:1,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:0},{id:2,nama:'1B',hari:4,jp1:5,jp2:8,kelas:'Kelas 1',warna:1}]; }
-    if (!D.tp[D.activeMapel]) D.tp[D.activeMapel] = [];
-
-    popK(); renderMapChips(); rRombel(); rKrit(); buildNav(); buildContent(); ra();
-    applyReadOnlyMode();
-    if ($('lo')) $('lo').classList.add('hidden');
-}
-
-const gS = () => { const ids=['iTA','iJnj','iSek','iNpsn','iKep','iNkep','iGuru','iNg','iMet','iKtgl','iT1','iT2','iMgg','iHari','iIst','iI1','iI2']; const s={}; ids.forEach(id=>{const el=$(id);if(el)s[id]=el.value;}); return s; };
-const aS = s => { if(!s)return; Object.keys(s).forEach(id=>{const el=$(id);if(el&&s[id]!==undefined)el.value=s[id];}); D.hpm=parseInt(s.iHari)||5; D.ist=parseInt(s.iIst)||1; D.ist1=parseInt(s.iI1)||4; D.ist2=parseInt(s.iI2)||6; };
-const gs = () => ({ ta:gv('iTA'), jnj:gv('iJnj')||'SD', sek:gv('iSek'), npsn:gv('iNpsn'), kep:gv('iKep'), nipK:gv('iNkep'), guru:gv('iGuru')||CU?.displayName||'', nipG:gv('iNg'), metode:gv('iMet'), ktgl:gv('iKtgl'), tgl1:gv('iT1')||'2026-07-13', tgl2:gv('iT2')||'2027-01-11', mgg:parseInt(gv('iMgg'))||24 });
-
-let sbO=false;
-const tsb = () => { sbO=!sbO; const p=$('sbP'),o=$('sbOv'); if(sbO){p.classList.replace('-translate-x-full','translate-x-0');o?.classList.remove('hidden');}else{p.classList.replace('translate-x-0','-translate-x-full');o?.classList.add('hidden');} };
-const cm = () => { if(sbO&&window.innerWidth<768)tsb(); };
-const tc = id => $(id)?.classList.toggle('op');
-const popK = () => { ['fKls','qKls'].forEach(id=>{const e=$(id);if(!e)return;const p=e.value;e.innerHTML=id==='fKls'?'<option value="">Kelas</option>':'';for(let k=1;k<=12;k++)e.innerHTML+=`<option>Kelas ${k}</option>`;e.value=p;}); };
-
-const renderMapChips = () => { 
-    const el=$('mapChips');if(!el)return; 
-    el.innerHTML=D.mapelList.map(m=>`<span class="chip ${m===D.activeMapel?'bg-indigo-600 text-white':'bg-slate-800 text-slate-300 border border-slate-700'}" onclick="setAM(${JSON.stringify(m)})">${m.length>22?m.substr(0,22)+'…':m}</span>`).join(''); 
-};
-const setAM = m => { D.activeMapel=m; renderMapChips(); ra(); };
-const addMapel = () => { if(!requireAuth('menambah mapel'))return; const n=$('nmMap')?.value?.trim();if(!n)return;D.mapelList.push(n);D.activeMapel=n;D.tp[n]=[];$('nmMap').value='';renderMapChips();sfs();ra(); };
-
-const quickTP = () => { if(!requireAuth('menambah TP'))return; const en={kelas:gv('qKls'),semester:gv('qSmt'),elemen:gv('qElem')||'Umum',cp:gv('qCP')||'-',tp:gv('qTP'),dimensi:gv('qDim')||'-',pertemuan:parseInt(gv('qPrt'))||2}; if(!en.tp){toast('TP wajib!');return;} aTP().push(en);sfs();ra();toast('Ditambahkan'); };
-const delTP = i => { if(!requireAuth('menghapus TP'))return; aTP().splice(i,1); sfs(); ra(); };
-
-const addR = () => { if(!requireAuth('menambah rombel'))return; D.rombel.push({id:++D.rc,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:D.rombel.length%WR.length}); rRombel(); sfs(); ra(); };
-const rmR = id => { if(!requireAuth('menghapus rombel'))return; D.rombel=D.rombel.filter(r=>r.id!==id); rRombel(); sfs(); ra(); };
-const uR = (id,f,v) => { if(!canWrite && !isAdmin)return; const r=D.rombel.find(x=>x.id===id); if(r){ r[f]=['hari','jp1','jp2','warna'].includes(f)?parseInt(v):v; sfs(); ra(); } };
-
-const rRombel = () => {
-    const box=$('rbBox'); if(!box)return; const hl=getHL();
-    box.innerHTML=D.rombel.map(r=>{
-        const w=WR[r.warna%WR.length];
-        return `<div class="p-1 bg-slate-800/50 rounded-lg mb-1" style="border-left:3px solid ${w.hx}">
-            <div class="flex items-center justify-between"><input value="${r.nama}" onchange="uR(${r.id},'nama',this.value)" class="bg-transparent text-white font-bold text-[10px] w-12">
-            ${(canWrite||isAdmin)?`<button onclick="rmR(${r.id})" class="text-rose-400 text-[8px]">✕</button>`:''}</div>
-        </div>`;
-    }).join('');
-};
-
-const addSW = rid => { if(!requireAuth('menambah siswa'))return; D.siswa.push({id:++D.sc,nama:'',nis:'',rombel_id:rid,jk:'L'}); sfs(); ra(); };
-const rmSW = id => { if(!requireAuth('menghapus siswa'))return; D.siswa=D.siswa.filter(s=>s.id!==id); sfs(); ra(); };
-const uSW = (id,f,v) => { if(!canWrite && !isAdmin)return; const s=D.siswa.find(x=>x.id===id); if(s){ s[f]=v; debS(); } };
-const swByR = rid => D.siswa.filter(s=>s.rombel_id===rid).sort((a,b)=>(a.nama||'').localeCompare(b.nama||''));
-
-const gFL = () => { let l=[...aTP()]; const fk=gv('fKls'),fs=gv('fSmt'); if(fk)l=l.filter(d=>d.kelas===fk); if(fs)l=l.filter(d=>d.semester===fs); return l; };
-const fISO = d => { let m=''+(d.getMonth()+1),dy=''+d.getDate(),y=d.getFullYear(); if(m.length<2)m='0'+m; if(dy.length<2)dy='0'+dy; return[y,m,dy].join('-'); };
-const gWks = (sk,di,tot) => { const s=gs(); const bs=sk==='Semester 1'?s.tgl1:s.tgl2; const bp=bs.split('-'); const bd=new Date(+bp[0],+bp[1]-1,+bp[2]); const bw=bd.getDay(); const tw=(di+1)%7; let df=tw-bw; if(df<0)df+=7; const f=new Date(bd); f.setDate(bd.getDate()+df); const w=[]; for(let i=0;i<tot;i++){ const d=new Date(f); d.setDate(f.getDate()+i*7); const iso=fISO(d); w.push({wn:i+1,date:d,dn:d.getDate(),mn:BL[d.getMonth()],iso,lib:libNas.includes(iso),eff:!libNas.includes(iso)}); } return w; };
-const lastNH = (y,m) => { let d=new Date(y,m+1,0); while(d.getDay()===0||d.getDay()===6||libNas.includes(fISO(d)))d.setDate(d.getDate()-1); return d; };
-const sig = dt => { const s=gs(); return`<div class="mt-4 pt-3 border-t-2 border-slate-300 grid grid-cols-2 gap-3 text-[9px]"><div class="text-center"><p class="font-bold">Mengetahui,</p><p class="font-bold mb-12">Kepala ${s.sek}</p><p class="font-extrabold underline">${s.kep}</p><p class="text-slate-500">NIP. ${s.nipK}</p></div><div class="text-center"><p>${dt||s.ktgl}</p><p class="font-bold mb-12">Guru ${D.activeMapel}</p><p class="font-extrabold underline">${s.guru}</p><p class="text-slate-500">NIP. ${s.nipG}</p></div></div>`; };
-const dH = (t,sub) => { const s=gs(); return`<div class="text-center mb-3 pb-2 border-b-2 border-slate-800"><h2 class="text-xs md:text-sm font-black uppercase">${t}</h2><p class="text-[8px] text-slate-600 font-bold uppercase">${sub||D.activeMapel}</p><p class="text-[7px] text-slate-500">${s.sek}${s.npsn?' (NPSN: '+s.npsn+')':''} • T.A. ${s.ta}</p></div>`; };
-
-const TABS=[{id:'jadwal',i:'📅',l:'Jadwal'},{id:'data',i:'📊',l:'CP/TP'},{id:'siswa',i:'👨‍🎓',l:'Siswa'},{id:'atp',i:'🗺️',l:'ATP'},{id:'prota',i:'📋',l:'PROTA'},{id:'promes',i:'🗓️',l:'PROMES'},{id:'modul',i:'🧠',l:'Modul'},{id:'kktp',i:'🎯',l:'KKTP'},{id:'nilai',i:'📝',l:'Nilai'},{id:'absen',i:'📋',l:'Absen'},{id:'jurnal',i:'📔',l:'Jurnal'}];
-const buildNav = () => { const n=$('navBox'); if(!n)return; n.innerHTML=TABS.map((t,i)=>`<button onclick="sw('${t.id}')" id="t_${t.id}" class="nb ${i===0?'na':''} w-full text-left py-1 px-2 rounded-lg text-[9px] ${i===0?'font-bold':'font-semibold text-slate-400 hover:bg-slate-800/60'} flex items-center gap-1.5">${t.i} ${t.l}</button>`).join(''); };
-const sw = t => { TABS.forEach(x=>{$('c_'+x.id)?.classList.add('hidden'); const b=$('t_'+x.id); if(b)b.className="nb w-full text-left py-1 px-2 rounded-lg text-[9px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-1.5";}); $('c_'+t)?.classList.remove('hidden'); const b=$('t_'+t); if(b)b.className="nb na w-full text-left py-1 px-2 rounded-lg text-[9px] font-bold flex items-center gap-1.5"; };
-const buildContent = () => { const mc=$('mc'); if(!mc)return; mc.innerHTML=TABS.map((t,i)=>`<div id="c_${t.id}" class="gc rounded-xl shadow-lg p-2 md:p-4 border border-slate-200/60 ${i>0?'hidden':''} af"></div>`).join(''); };
-
-// TAB RENDERERS
-const disAttr = () => (canWrite || isAdmin) ? '' : 'disabled';
-
-const rJadwal = () => { const el=$('c_jadwal'); if(el) el.innerHTML=dH('JADWAL PELAJARAN')+'<p class="text-center py-4 text-xs">Menu Jadwal Berhasil Dimuat</p>'+sig(); };
-const rData = () => { const el=$('c_data'); if(!el)return; const fl=gFL(); el.innerHTML=dH('DATA CP/TP')+`<div class="tbl"><table class="w-full border-collapse border min-w-[600px] text-[8px]"><thead><tr class="bg-indigo-700 text-white"><th class="p-1 border">No</th><th class="p-1 border">Kls</th><th class="p-1 border">Elemen</th><th class="p-1 border">TP</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b"><td class="p-1 border text-center">${i+1}</td><td class="p-1 border">${d.kelas}</td><td class="p-1 border">${d.elemen}</td><td class="p-1 border">${d.tp}</td></tr>`).join('')}</tbody></table></div>`; };
-const rSiswa = () => { const el=$('c_siswa'); if(!el)return; const rbs=getRbs(); let h=dH('DATA SISWA'); rbs.forEach(rb=>{ const sw=swByR(rb.id); h+=`<div class="mb-3 border rounded"><div class="bg-slate-100 p-1 font-bold text-[9px] flex justify-between"><span>${rb.nama} (${sw.length})</span>${(canWrite||isAdmin)?`<button onclick="addSW(${rb.id})" class="bg-indigo-600 text-white px-1 rounded">＋</button>`:''}</div><table class="w-full text-[8px]"><tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-1 w-6">${i+1}</td><td class="p-1"><input value="${s.nama}" ${disAttr()} onchange="uSW(${s.id},'nama',this.value)" class="w-full bg-transparent"></td></tr>`).join('')}</tbody></table></div>`; }); el.innerHTML=h; };
-const rAtp = () => { const el=$('c_atp'); if(el) el.innerHTML = dH('ATP') + sig(); };
-const rProta = () => { const el=$('c_prota'); if(el) el.innerHTML = dH('PROTA') + sig(); };
-const rPromes = () => { const el=$('c_promes'); if(el) el.innerHTML = dH('PROMES') + sig(); };
-const rModul = () => { const el=$('c_modul'); if(el) el.innerHTML = dH('MODUL AJAR') + sig(); };
-const rKktp = () => { const el=$('c_kktp'); if(el) el.innerHTML = dH('KKTP') + sig(); };
-const rNilai = () => { const el=$('c_nilai'); if(el) el.innerHTML = dH('DAFTAR NILAI') + sig(); };
-
-// ABSEN & JURNAL TAB IMPLEMENTATION
-const rAbsen = () => {
-    const el=$('c_absen'); if(!el)return; 
-    const sem=gv('fSmt')||'Semester 1', rbs=getRbs();
-    let h = dH('PRESENSI / ABSENSI', `${D.activeMapel} • ${sem}`);
-    if(!rbs.length){ el.innerHTML = h + '<p class="text-center py-4 text-slate-400">Pilih rombel untuk menampilkan absensi</p>'; return; }
-    
-    rbs.forEach(rb=>{
-        const sw = swByR(rb.id);
-        h += `<div class="mb-4 border rounded-lg overflow-hidden">
-            <div class="bg-indigo-700 text-white px-2 py-1 font-bold text-[10px]">${rb.nama} — ${rb.kelas}</div>
-            <div class="tbl"><table class="w-full text-[8px] border-collapse min-w-[400px]">
-                <thead><tr class="bg-slate-100"><th class="p-1 border w-6">No</th><th class="p-1 border text-left">Nama Siswa</th><th class="p-1 border w-12 bg-emerald-50">Hadir</th><th class="p-1 border w-12 bg-blue-50">Izin</th><th class="p-1 border w-12 bg-amber-50">Sakit</th><th class="p-1 border w-12 bg-rose-50">Alfa</th></tr></thead>
-                <tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-1 border text-center">${i+1}</td><td class="p-1 border font-semibold">${s.nama||'-'}</td><td class="p-1 border text-center bg-emerald-50/50">✓</td><td class="p-1 border text-center bg-blue-50/50">-</td><td class="p-1 border text-center bg-amber-50/50">-</td><td class="p-1 border text-center bg-rose-50/50">-</td></tr>`).join('')}</tbody>
-            </table></div>
-        </div>`;
-    });
-    el.innerHTML = h + sig();
-};
-
-const rJurnal = () => {
-    const el=$('c_jurnal'); if(!el)return;
-    let h = dH('JURNAL MENGAJAR GURU');
-    h += `<div class="mb-3 np flex justify-between items-center"><span class="text-[10px] font-bold">Catatan Kegiatan Harian</span>${(canWrite||isAdmin)?`<button onclick="toast('Jurnal Otomatis Diperbarui')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[9px] font-bold">＋ Tambah Catatan</button>`:''}</div>
-    <div class="tbl"><table class="w-full border-collapse border text-[8px] min-w-[500px]">
-        <thead><tr class="bg-indigo-700 text-white font-bold"><th class="p-1 border w-6">No</th><th class="p-1 border w-20">Tanggal</th><th class="p-1 border w-12">Kelas</th><th class="p-1 border">Materi / TP</th><th class="p-1 border w-24">Hambatan / Catatan</th></tr></thead>
+    <div id="tab-doc-jadwal" class="tab-content hidden bg-white p-6 rounded-xl border print-area fade-in">
+      <h2 class="text-xl font-bold text-center uppercase">JADWAL PELAJARAN SEKOLAH</h2>
+      <p class="text-sm text-center font-semibold text-slate-600 mb-4" id="outJadwalSub"></p>
+      <table class="w-full text-xs border-collapse border text-center"><thead class="bg-slate-100"><tr><th class="border p-2">Jam</th><th class="border p-2">Waktu</th><th class="border p-2">Senin</th><th class="border p-2">Selasa</th><th class="border p-2">Rabu</th><th class="border p-2">Kamis</th><th class="border p-2">Jumat</th></tr></thead>
         <tbody>
-            <tr class="border-b"><td class="p-1 border text-center">1</td><td class="p-1 border">13 Juli 2026</td><td class="p-1 border text-center">1A</td><td class="p-1 border">Pengenalan Elemen & Orientasi Belajar</td><td class="p-1 border text-slate-500">Lancar</td></tr>
+          <tr><td class="border p-2">1</td><td class="border p-2">07.00 - 07.35</td><td class="border p-2 bg-blue-50">Upacara</td><td class="border p-2 mapel-field"></td><td class="border p-2">IPAS</td><td class="border p-2">B. Indonesia</td><td class="border p-2 bg-emerald-50">Pembiasaan Agama</td></tr>
+          <tr><td class="border p-2">2</td><td class="border p-2">07.35 - 08.10</td><td class="border p-2 mapel-field"></td><td class="border p-2 mapel-field"></td><td class="border p-2">IPAS</td><td class="border p-2">B. Indonesia</td><td class="border p-2">PPKn</td></tr>
+          <tr><td class="border p-2">3</td><td class="border p-2">08.10 - 08.45</td><td class="border p-2 mapel-field"></td><td class="border p-2">Matematika</td><td class="border p-2 mapel-field"></td><td class="border p-2">SBdP</td><td class="border p-2">PPKn</td></tr>
+          <tr><td class="border p-2 bg-slate-100 font-semibold" colspan="7">ISTIRAHAT (08.45 - 09.15)</td></tr>
+          <tr><td class="border p-2">4</td><td class="border p-2">09.15 - 09.50</td><td class="border p-2">Matematika</td><td class="border p-2">Matematika</td><td class="border p-2 mapel-field"></td><td class="border p-2">B. Sunda</td><td class="border p-2">P5</td></tr>
+          <tr><td class="border p-2">5</td><td class="border p-2">09.50 - 10.25</td><td class="border p-2">Matematika</td><td class="border p-2">B. Inggris</td><td class="border p-2">PJOK</td><td class="border p-2">B. Sunda</td><td class="border p-2">P5</td></tr>
+          <tr><td class="border p-2 bg-slate-100 font-semibold" colspan="7">ISTIRAHAT (10.25 - 10.45)</td></tr>
+          <tr><td class="border p-2">6</td><td class="border p-2">10.45 - 11.20</td><td class="border p-2">B. Indonesia</td><td class="border p-2">B. Inggris</td><td class="border p-2">PJOK</td><td class="border p-2">SBdP</td><td class="border p-2">-</td></tr>
+          <tr><td class="border p-2">7</td><td class="border p-2">11.20 - 11.55</td><td class="border p-2">B. Indonesia</td><td class="border p-2">IPAS</td><td class="border p-2">PJOK</td><td class="border p-2">-</td><td class="border p-2">-</td></tr>
         </tbody>
-    </table></div>`;
-    el.innerHTML = h + sig();
-};
+      </table>
+      <div class="mt-8 ttd-box"></div>
+    </div>
 
-const ra = () => {
-    rJadwal(); rData(); rSiswa(); rAtp(); rProta(); rPromes(); rModul(); rKktp(); rNilai(); rAbsen(); rJurnal();
-};
+    <div id="tab-doc-acp" class="tab-content hidden bg-white p-6 rounded-xl border print-area fade-in">
+      <h2 class="text-lg font-bold text-center uppercase">ANALISIS CAPAIAN PEMBELAJARAN (ACP)</h2>
+      <p class="text-xs text-center font-semibold mb-4" id="outAcpSub"></p>
+      <table class="w-full text-[11px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">CP Fase</th><th class="border p-1">ATP Smt 1</th><th class="border p-1">ATP Smt 2</th><th class="border p-1">Profil Pelajar Pancasila</th></tr></thead><tbody id="outAcpTbody"></tbody></table>
+      <div class="mt-8 ttd-box"></div>
+    </div>
 
-window.onload = () => {
-    loadData();
-    auth.onAuthStateChanged(user => {
-        if (user) handleUserLogin(user);
-        else { CU=null; userMode='guest'; canWrite=false; isAdmin=false; updateUserUI(); updateModeBadge(); applyReadOnlyMode(); }
+    <div id="tab-doc-atp" class="tab-content hidden bg-white p-6 rounded-xl border print-area fade-in">
+      <h2 class="text-lg font-bold text-center uppercase">ALUR TUJUAN PEMBELAJARAN (ATP / SILABUS)</h2>
+      <p class="text-xs text-center font-semibold mb-4" id="outAtpSub"></p>
+      <table class="w-full text-[11px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">ATP</th><th class="border p-1">Alokasi</th><th class="border p-1">Metode</th><th class="border p-1">Dimensi P3</th></tr></thead><tbody id="outAtpTbody"></tbody></table>
+      <div class="mt-8 ttd-box"></div>
+    </div>
+
+    <div id="tab-doc-prota" class="tab-content hidden bg-white p-6 rounded-xl border print-area fade-in">
+      <h2 class="text-lg font-bold text-center uppercase">PROGRAM TAHUNAN (PROTA)</h2>
+      <p class="text-xs text-center font-semibold mb-4" id="outProtaSub"></p>
+      <table class="w-full text-[11px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">ATP</th><th class="border p-1">Smt</th><th class="border p-1">JP</th></tr></thead><tbody id="outProtaTbody"></tbody></table>
+      <div class="mt-8 ttd-box"></div>
+    </div>
+
+    <div id="tab-doc-promes" class="tab-content hidden bg-white p-6 rounded-xl border print-area fade-in">
+      <h2 class="text-lg font-bold text-center uppercase">PROGRAM SEMESTER (PROMES)</h2>
+      <p class="text-xs text-center font-semibold mb-2" id="outPromesSub"></p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-[10px] border-collapse border text-center">
+          <thead class="bg-slate-100">
+            <tr>
+              <th class="border p-1" rowspan="2">No</th><th class="border p-1 text-left" rowspan="2">ATP</th><th class="border p-1" rowspan="2">JP</th>
+              <th class="border p-0.5" colspan="3">JULI</th><th class="border p-0.5" colspan="4">AGUSTUS</th><th class="border p-0.5" colspan="4">SEPTEMBER</th>
+              <th class="border p-0.5" colspan="4">OKTOBER</th><th class="border p-0.5" colspan="5">NOVEMBER</th><th class="border p-0.5" colspan="4">DESEMBER</th>
+            </tr>
+            <tr class="bg-slate-50 text-[9px]">
+              <th>M1</th><th>M2</th><th>M3</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th>
+              <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th>
+            </tr>
+          </thead>
+          <tbody id="outPromesTbody"></tbody>
+        </table>
+      </div>
+      <div class="mt-8 ttd-box"></div>
+    </div>
+
+    <div id="tab-doc-modul" class="tab-content hidden bg-white p-6 rounded-xl border print-area text-xs space-y-4 fade-in">
+      <h2 class="text-xl font-bold text-center border-b pb-2">MODUL AJAR DEEP LEARNING</h2>
+      <div class="bg-slate-50 p-3 rounded border grid grid-cols-2 gap-2">
+        <div><b>Sekolah:</b> <span id="mSekolah"></span></div><div><b>Mata Pelajaran:</b> <span id="mMapel"></span></div>
+        <div><b>Guru:</b> <span id="mGuru"></span></div><div><b>Fase/Kelas:</b> <span id="mFase"></span></div>
+      </div>
+      <div><h4 class="font-bold bg-slate-200 p-1 rounded">A. TUJUAN PEMBELAJARAN</h4><p id="mTP" class="p-2 border rounded mt-1"></p></div>
+      <div><h4 class="font-bold bg-amber-100 p-1 rounded">B. PERTANYAAN PEMANTIK</h4><p class="p-2 border rounded mt-1">1. Mengapa materi ini penting dalam kehidupan sehari-hari?<br>2. Bagaimana cara menerapkannya dalam konteks nyata?<br>3. Apa hubungan materi ini dengan nilai-nilai Pancasila?</p></div>
+      <div><h4 class="font-bold bg-slate-200 p-1 rounded">C. DIMENSI PROFIL PELAJAR PANCASILA</h4><p id="mProfil" class="p-2 border rounded mt-1"></p></div>
+      <div><h4 class="font-bold bg-emerald-100 p-1 rounded">D. KEGIATAN PEMBELAJARAN (DEEP LEARNING)</h4>
+        <div class="mt-1 space-y-2">
+          <div class="border rounded p-2"><b>🟢 Pendahuluan (15 menit):</b><br>- Salam, doa, presensi<br>- Pertanyaan pemantik dan apersepsi<br>- Menyampaikan tujuan pembelajaran</div>
+          <div class="border rounded p-2"><b>🔵 Inti (90 menit) - Deep Learning:</b><br>- <b>Experiencing:</b> Peserta didik mengamati dan mengalami langsung<br>- <b>Reflecting:</b> Refleksi mendalam terhadap pengalaman belajar<br>- <b>Conceptualizing:</b> Membangun konsep dari pengalaman<br>- <b>Applying:</b> Menerapkan konsep dalam konteks baru</div>
+          <div class="border rounded p-2"><b>🟡 Penutup (15 menit):</b><br>- Kesimpulan bersama<br>- Asesmen formatif<br>- Refleksi dan doa penutup</div>
+        </div>
+      </div>
+      <div><h4 class="font-bold bg-blue-100 p-1 rounded">E. ASESMEN</h4><p class="p-2 border rounded mt-1">- Asesmen Diagnostik: Pertanyaan pemantik awal<br>- Asesmen Formatif: Observasi proses & penugasan<br>- Asesmen Sumatif: Tes tertulis & proyek</p></div>
+      <div class="mt-8 ttd-box"></div>
+    </div>
+
+    <div id="tab-doc-kktp" class="tab-content hidden bg-white p-6 rounded-xl border print-area fade-in">
+      <h2 class="text-lg font-bold text-center uppercase">KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)</h2>
+      <p class="text-xs text-center font-semibold mb-4" id="outKktpSub"></p>
+      <table class="w-full text-xs border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-2">No</th><th class="border p-2">Tujuan Pembelajaran</th><th class="border p-2 bg-red-50">Perlu Bimbingan<br>(0-60)</th><th class="border p-2 bg-amber-50">Cukup<br>(61-75)</th><th class="border p-2 bg-blue-50">Baik<br>(76-88)</th><th class="border p-2 bg-emerald-50">Sangat Baik<br>(89-100)</th></tr></thead><tbody id="outKktpTbody"></tbody></table>
+      <div class="mt-8 ttd-box"></div>
+    </div>
+
+    <!-- ====== ADMIN PANEL TAB ====== -->
+    <div id="tab-admin-panel" class="tab-content hidden space-y-4 fade-in">
+      <div class="bg-white p-6 rounded-xl border">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h3 class="font-bold text-lg"><i class="fa-solid fa-shield-halved text-red-500 mr-2"></i>Panel Admin - Kelola Akses Pengguna</h3>
+            <p class="text-xs text-slate-500">Setujui atau tolak permintaan akses user untuk edit & cetak dokumen</p>
+          </div>
+          <button onclick="loadAdminUsers()" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg"><i class="fa-solid fa-arrows-rotate mr-1"></i>Refresh</button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+            <div class="text-2xl font-bold" id="adminStatTotal">0</div>
+            <div class="text-[11px] opacity-80">Total Pengguna</div>
+          </div>
+          <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl p-4 text-white">
+            <div class="text-2xl font-bold" id="adminStatPending">0</div>
+            <div class="text-[11px] opacity-80">Menunggu Persetujuan</div>
+          </div>
+          <div class="bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl p-4 text-white">
+            <div class="text-2xl font-bold" id="adminStatApproved">0</div>
+            <div class="text-[11px] opacity-80">Disetujui</div>
+          </div>
+          <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-4 text-white">
+            <div class="text-2xl font-bold" id="adminStatRejected">0</div>
+            <div class="text-[11px] opacity-80">Ditolak</div>
+          </div>
+        </div>
+
+        <!-- User Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead class="bg-slate-100">
+              <tr>
+                <th class="p-3 text-left rounded-l-lg">Pengguna</th>
+                <th class="p-3 text-left">Sekolah</th>
+                <th class="p-3 text-center">Terdaftar</th>
+                <th class="p-3 text-center">Status</th>
+                <th class="p-3 text-center rounded-r-lg">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody" class="divide-y"></tbody>
+          </table>
+        </div>
+        <div id="adminTableLoading" class="text-center py-8 text-slate-400">
+          <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
+          <p class="text-xs mt-2">Memuat data pengguna...</p>
+        </div>
+        <div id="adminTableEmpty" class="text-center py-8 text-slate-400 hidden">
+          <i class="fa-solid fa-users text-3xl mb-2"></i>
+          <p class="text-xs">Belum ada pengguna terdaftar.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== ADMIN DATA TAB ====== -->
+    <div id="tab-admin-data" class="tab-content hidden space-y-4 fade-in">
+      <div class="bg-white p-6 rounded-xl border">
+        <h3 class="font-bold text-lg mb-4"><i class="fa-solid fa-database text-red-500 mr-2"></i>Kelola Data Global (Admin)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-slate-50 rounded-xl p-4 border">
+            <h4 class="font-bold text-sm mb-2"><i class="fa-solid fa-cloud-arrow-up text-blue-500 mr-1"></i>Simpan Data ke Cloud</h4>
+            <p class="text-xs text-slate-500 mb-3">Simpan semua data profil, kalender, dan CP/ATP ke Firestore sebagai data global.</p>
+            <button onclick="saveGlobalDataToCloud()" class="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg w-full font-bold">
+              <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Simpan Semua ke Cloud
+            </button>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-4 border">
+            <h4 class="font-bold text-sm mb-2"><i class="fa-solid fa-cloud-arrow-down text-emerald-500 mr-1"></i>Muat Data dari Cloud</h4>
+            <p class="text-xs text-slate-500 mb-3">Muat ulang semua data dari Firestore. Ini akan menimpa data lokal.</p>
+            <button onclick="loadGlobalDataFromCloud()" class="bg-emerald-600 text-white text-sm px-4 py-2 rounded-lg w-full font-bold">
+              <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Muat dari Cloud
+            </button>
+          </div>
+        </div>
+        <div class="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
+          <h4 class="font-bold text-sm text-red-700 mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Zona Bahaya</h4>
+          <p class="text-xs text-red-600 mb-3">Hapus semua data cloud. Tindakan ini tidak dapat dibatalkan.</p>
+          <button onclick="if(confirm('YAKIN menghapus semua data cloud? Tindakan ini TIDAK BISA dibatalkan!')){deleteAllCloudData()}" class="bg-red-600 text-white text-sm px-4 py-2 rounded-lg font-bold">
+            <i class="fa-solid fa-trash mr-1"></i> Hapus Semua Data Cloud
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ====== JAVASCRIPT ====== -->
+  <script>
+    // ==========================================
+    // FIREBASE INITIALIZATION
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",
+      authDomain: "si-gumart.firebaseapp.com",
+      projectId: "si-gumart",
+      storageBucket: "si-gumart.firebasestorage.app",
+      messagingSenderId: "544375918988",
+      appId: "1:544375918988:web:a8459825c68810f22546a9",
+      measurementId: "G-EK25QRDDZC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ==========================================
+    // GLOBAL STATE
+    // ==========================================
+    const ADMIN_EMAIL = 'kkgpainagreg@gmail.com';
+    let currentUser = null;
+    let currentUserData = null;
+    let userAccessLevel = 'guest'; // guest, pending, approved, admin
+
+    let defaultKalender = [
+      {Semester:"Semester 1",Tanggal:"13 Juli 2026",Agenda:"Hari Pertama Masuk Sekolah (MPLS)",Kategori:"Kegiatan Sekolah"},
+      {Semester:"Semester 1",Tanggal:"17 Agustus 2026",Agenda:"HUT Kemerdekaan RI ke-81",Kategori:"Libur Nasional"},
+      {Semester:"Semester 1",Tanggal:"21-25 Sept 2026",Agenda:"Sumatif Tengah Semester (STS) Ganjil",Kategori:"Asesmen"},
+      {Semester:"Semester 1",Tanggal:"29 Sept 2026",Agenda:"Maulid Nabi Muhammad SAW",Kategori:"Libur Nasional"},
+      {Semester:"Semester 1",Tanggal:"30 Nov - 4 Des 2026",Agenda:"Sumatif Akhir Semester (SAS) Ganjil",Kategori:"Asesmen"},
+      {Semester:"Semester 1",Tanggal:"19 Des 2026",Agenda:"Penerimaan Rapor Semester 1",Kategori:"Kegiatan Sekolah"},
+      {Semester:"Semester 1",Tanggal:"21 Des 2026 - 2 Jan 2027",Agenda:"Libur Semester Ganjil",Kategori:"Libur Semester"},
+      {Semester:"Semester 2",Tanggal:"4 Januari 2027",Agenda:"Masuk Semester 2",Kategori:"Kegiatan Sekolah"},
+      {Semester:"Semester 2",Tanggal:"8-12 Mar 2027",Agenda:"Sumatif Tengah Semester (STS) Genap",Kategori:"Asesmen"},
+      {Semester:"Semester 2",Tanggal:"7-11 Juni 2027",Agenda:"Sumatif Akhir Semester (SAS) Genap",Kategori:"Asesmen"},
+      {Semester:"Semester 2",Tanggal:"19 Juni 2027",Agenda:"Penerimaan Rapor Semester 2 / Kenaikan Kelas",Kategori:"Kegiatan Sekolah"},
+      {Semester:"Semester 2",Tanggal:"21 Juni - 10 Juli 2027",Agenda:"Libur Semester Genap",Kategori:"Libur Semester"}
+    ];
+
+    let defaultCP = [
+      {Elemen:"Al-Qur'an Hadis",ATP:"Membaca Q.S. Al-Insyirah dengan tajwid yang benar (hukum bacaan ghunnah musyaddadah & idgham bighunnah)",Smt:"Smt 1",JP:12,Metode:"Talaqqi, Drill, Peer Tutoring",Dimensi:"Beriman & Bertakwa, Bernalar Kritis",CP_Fase:"Mampu membaca Al-Qur'an dengan tartil, memahami pesan pokok, dan mengaitkannya dengan kehidupan.",Dates_Promes:["MPLS","MPLS","4","4","","","","","","STS","","","","","","","","","","","","","",""]},
+      {Elemen:"Al-Qur'an Hadis",ATP:"Menghafal Q.S. Al-Insyirah dan memahami kandungan maknanya",Smt:"Smt 1",JP:8,Metode:"Talaqqi, Muraja'ah",Dimensi:"Beriman & Bertakwa, Mandiri",CP_Fase:"Mampu membaca Al-Qur'an dengan tartil, memahami pesan pokok, dan mengaitkannya dengan kehidupan.",Dates_Promes:["","","","","4","4","","","","STS","","","","","","","","","","","","","",""]},
+      {Elemen:"Akidah",ATP:"Memahami dan menghayati Asmaul Husna: Al-Waliy, Al-Mujib, Al-Hamid",Smt:"Smt 1",JP:12,Metode:"Mind Mapping, Diskusi, PBL",Dimensi:"Beriman & Bertakwa, Mandiri",CP_Fase:"Memahami makna beriman kepada Allah, mengenal sifat-sifat-Nya, dan menerapkan dalam perilaku.",Dates_Promes:["","","","","","","4","4","4","STS","","","","","","","","","","","","","",""]},
+      {Elemen:"Akhlak",ATP:"Menerapkan sikap sabar dan tawakal dalam menghadapi ujian kehidupan",Smt:"Smt 1",JP:8,Metode:"Role Playing, Refleksi, Studi Kasus",Dimensi:"Berkebinekaan Global, Gotong Royong",CP_Fase:"Mengenal dan membiasakan akhlak terpuji serta menghindari akhlak tercela.",Dates_Promes:["","","","","","","","","","STS","4","4","","","","","","","","","","","",""]},
+      {Elemen:"Fikih",ATP:"Memahami tata cara shalat Jumat dan praktik pelaksanaannya",Smt:"Smt 1",JP:12,Metode:"Demonstrasi, Praktik, Simulasi",Dimensi:"Beriman & Bertakwa, Gotong Royong",CP_Fase:"Mampu memahami dan mempraktikkan ibadah sehari-hari sesuai tuntunan.",Dates_Promes:["","","","","","","","","","STS","","","4","4","4","","","","","","","","",""]},
+      {Elemen:"Sejarah Peradaban Islam",ATP:"Mengenal sejarah perjuangan dakwah Wali Songo di Nusantara",Smt:"Smt 1",JP:8,Metode:"Problem Based Learning, Presentasi",Dimensi:"Berkebinekaan Global, Bernalar Kritis",CP_Fase:"Mengenal sejarah peradaban Islam dan meneladani tokoh-tokoh Islam.",Dates_Promes:["","","","","","","","","","STS","","","","","","4","4","","","","","","SAS","SAS"]},
+      {Elemen:"Al-Qur'an Hadis",ATP:"Membaca Q.S. At-Tin dengan tajwid benar dan memahami isi kandungannya",Smt:"Smt 2",JP:12,Metode:"Talaqqi, Drill, Diskusi",Dimensi:"Beriman & Bertakwa, Bernalar Kritis",CP_Fase:"Mampu membaca Al-Qur'an dengan tartil, memahami pesan pokok, dan mengaitkannya dengan kehidupan.",Dates_Promes:[]},
+      {Elemen:"Akidah",ATP:"Memahami iman kepada Qada dan Qadar Allah SWT",Smt:"Smt 2",JP:10,Metode:"Diskusi, Studi Kasus, Refleksi",Dimensi:"Beriman & Bertakwa, Mandiri",CP_Fase:"Memahami makna beriman kepada Allah, mengenal sifat-sifat-Nya, dan menerapkan dalam perilaku.",Dates_Promes:[]},
+      {Elemen:"Akhlak",ATP:"Mengenal dan menghindari sifat hasud, riya, dan sombong",Smt:"Smt 2",JP:8,Metode:"Role Playing, Studi Kasus",Dimensi:"Berkebinekaan Global, Gotong Royong",CP_Fase:"Mengenal dan membiasakan akhlak terpuji serta menghindari akhlak tercela.",Dates_Promes:[]},
+      {Elemen:"Fikih",ATP:"Memahami tata cara zakat fitrah dan zakat mal serta hikmahnya",Smt:"Smt 2",JP:12,Metode:"Simulasi, Praktik, PBL",Dimensi:"Beriman & Bertakwa, Gotong Royong",CP_Fase:"Mampu memahami dan mempraktikkan ibadah sehari-hari sesuai tuntunan.",Dates_Promes:[]}
+    ];
+
+    // ==========================================
+    // TOAST NOTIFICATION
+    // ==========================================
+    function showToast(type, title, msg) {
+      const icons = {success:'✅', error:'❌', warning:'⚠️', info:'ℹ️'};
+      document.getElementById('toastIcon').textContent = icons[type] || 'ℹ️';
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMsg').textContent = msg;
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ==========================================
+    // AUTH UI HELPERS
+    // ==========================================
+    function showAuthTab(tab) {
+      document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+      document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+      document.getElementById('authTabLogin').classList.toggle('text-blue-600', tab === 'login');
+      document.getElementById('authTabLogin').classList.toggle('border-blue-600', tab === 'login');
+      document.getElementById('authTabLogin').classList.toggle('text-slate-400', tab !== 'login');
+      document.getElementById('authTabLogin').classList.toggle('border-transparent', tab !== 'login');
+      document.getElementById('authTabRegister').classList.toggle('text-blue-600', tab === 'register');
+      document.getElementById('authTabRegister').classList.toggle('border-blue-600', tab === 'register');
+      document.getElementById('authTabRegister').classList.toggle('text-slate-400', tab !== 'register');
+      document.getElementById('authTabRegister').classList.toggle('border-transparent', tab !== 'register');
+    }
+
+    function togglePwd(id, btn) {
+      const inp = document.getElementById(id);
+      const isPass = inp.type === 'password';
+      inp.type = isPass ? 'text' : 'password';
+      btn.innerHTML = `<i class="fa-solid fa-eye${isPass ? '-slash' : ''} text-sm"></i>`;
+    }
+
+    function showAuthScreen() {
+      document.getElementById('authScreen').classList.remove('hidden');
+    }
+
+    function hideAuthScreen() {
+      document.getElementById('authScreen').classList.add('hidden');
+    }
+
+    // ==========================================
+    // AUTH ACTIONS
+    // ==========================================
+    async function doLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pwd = document.getElementById('loginPassword').value;
+      if(!email || !pwd) return showToast('warning','Peringatan','Email dan password harus diisi.');
+      
+      const btn = document.getElementById('btnLogin');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Memproses...</span>';
+      
+      try {
+        await auth.signInWithEmailAndPassword(email, pwd);
+        showToast('success','Berhasil!','Login berhasil.');
+      } catch(e) {
+        let msg = 'Terjadi kesalahan.';
+        if(e.code === 'auth/user-not-found') msg = 'Akun tidak ditemukan. Silakan daftar.';
+        else if(e.code === 'auth/wrong-password') msg = 'Password salah.';
+        else if(e.code === 'auth/invalid-email') msg = 'Format email tidak valid.';
+        else if(e.code === 'auth/too-many-requests') msg = 'Terlalu banyak percobaan. Coba lagi nanti.';
+        else if(e.code === 'auth/invalid-credential') msg = 'Email atau password salah.';
+        showToast('error','Login Gagal', msg);
+      }
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i><span>Masuk</span>';
+    }
+
+    async function doGoogleLogin() {
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+        
+        // Check if user doc exists
+        const doc = await db.collection('users').doc(user.uid).get();
+        if(!doc.exists) {
+          // Create new user doc
+          const isAdmin = user.email === ADMIN_EMAIL;
+          await db.collection('users').doc(user.uid).set({
+            email: user.email,
+            name: user.displayName || user.email.split('@')[0],
+            school: '',
+            role: isAdmin ? 'admin' : 'user',
+            status: isAdmin ? 'approved' : 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          await db.collection('users').doc(user.uid).update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        showToast('success','Berhasil!','Login Google berhasil.');
+      } catch(e) {
+        if(e.code !== 'auth/popup-closed-by-user') {
+          showToast('error','Gagal', e.message);
+        }
+      }
+    }
+
+    async function doRegister() {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const pwd = document.getElementById('regPassword').value;
+      const school = document.getElementById('regSchool').value.trim();
+      
+      if(!name || !email || !pwd) return showToast('warning','Peringatan','Semua field wajib diisi.');
+      if(pwd.length < 6) return showToast('warning','Peringatan','Password minimal 6 karakter.');
+
+      const btn = document.getElementById('btnRegister');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Memproses...</span>';
+
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, pwd);
+        await cred.user.updateProfile({ displayName: name });
+        
+        const isAdmin = email === ADMIN_EMAIL;
+        await db.collection('users').doc(cred.user.uid).set({
+          email: email,
+          name: name,
+          school: school,
+          role: isAdmin ? 'admin' : 'user',
+          status: isAdmin ? 'approved' : 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showToast('success','Berhasil!','Akun berhasil dibuat. Menunggu persetujuan admin.');
+      } catch(e) {
+        let msg = 'Terjadi kesalahan.';
+        if(e.code === 'auth/email-already-in-use') msg = 'Email sudah terdaftar. Silakan login.';
+        else if(e.code === 'auth/weak-password') msg = 'Password terlalu lemah (min 6 karakter).';
+        else if(e.code === 'auth/invalid-email') msg = 'Format email tidak valid.';
+        showToast('error','Gagal Daftar', msg);
+      }
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-user-plus"></i><span>Daftar & Minta Akses</span>';
+    }
+
+    async function doResetPassword() {
+      const email = document.getElementById('loginEmail').value.trim();
+      if(!email) return showToast('warning','Peringatan','Masukkan email terlebih dahulu.');
+      try {
+        await auth.sendPasswordResetEmail(email);
+        showToast('success','Terkirim!','Link reset password telah dikirim ke email Anda.');
+      } catch(e) {
+        showToast('error','Gagal', 'Email tidak ditemukan atau format tidak valid.');
+      }
+    }
+
+    async function doLogout() {
+      await auth.signOut();
+      currentUser = null;
+      currentUserData = null;
+      userAccessLevel = 'guest';
+      showAuthScreen();
+      updateUIForAccessLevel();
+      showToast('info','Keluar','Anda telah keluar dari sistem.');
+    }
+
+    function enterGuestMode() {
+      userAccessLevel = 'guest';
+      currentUser = null;
+      currentUserData = null;
+      hideAuthScreen();
+      document.getElementById('pendingScreen').classList.add('hidden');
+      updateUIForAccessLevel();
+      showToast('info','Mode Tamu','Anda masuk sebagai tamu. Hanya dapat melihat dokumen.');
+    }
+
+    function enterViewOnlyMode() {
+      document.getElementById('pendingScreen').classList.add('hidden');
+      hideAuthScreen();
+      updateUIForAccessLevel();
+    }
+
+    // ==========================================
+    // AUTH STATE OBSERVER
+    // ==========================================
+    auth.onAuthStateChanged(async (user) => {
+      if(user) {
+        currentUser = user;
+        try {
+          const doc = await db.collection('users').doc(user.uid).get();
+          if(doc.exists) {
+            currentUserData = doc.data();
+            
+            // Check admin
+            if(user.email === ADMIN_EMAIL) {
+              currentUserData.role = 'admin';
+              currentUserData.status = 'approved';
+              await db.collection('users').doc(user.uid).update({
+                role: 'admin',
+                status: 'approved'
+              });
+            }
+            
+            if(currentUserData.role === 'admin') {
+              userAccessLevel = 'admin';
+            } else if(currentUserData.status === 'approved') {
+              userAccessLevel = 'approved';
+            } else if(currentUserData.status === 'rejected') {
+              userAccessLevel = 'pending';
+            } else {
+              userAccessLevel = 'pending';
+            }
+          } else {
+            // Create doc for users that don't have one yet
+            const isAdmin = user.email === ADMIN_EMAIL;
+            currentUserData = {
+              email: user.email,
+              name: user.displayName || user.email.split('@')[0],
+              school: '',
+              role: isAdmin ? 'admin' : 'user',
+              status: isAdmin ? 'approved' : 'pending',
+            };
+            await db.collection('users').doc(user.uid).set({
+              ...currentUserData,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            userAccessLevel = isAdmin ? 'admin' : 'pending';
+          }
+
+          // Update last login
+          await db.collection('users').doc(user.uid).update({
+            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+        } catch(e) {
+          console.error('Error loading user data:', e);
+          userAccessLevel = 'pending';
+        }
+
+        hideAuthScreen();
+        
+        if(userAccessLevel === 'pending') {
+          document.getElementById('pendingScreen').classList.remove('hidden');
+        } else {
+          document.getElementById('pendingScreen').classList.add('hidden');
+        }
+        
+        updateUIForAccessLevel();
+        loadGlobalDataFromCloud();
+        
+      } else {
+        // Not logged in - show auth screen
+        showAuthScreen();
+      }
     });
-};
-</script>
+
+    // ==========================================
+    // ACCESS CONTROL UI
+    // ==========================================
+    function updateUIForAccessLevel() {
+      const isEditable = userAccessLevel === 'approved' || userAccessLevel === 'admin';
+      const isAdmin = userAccessLevel === 'admin';
+      const isLoggedIn = currentUser !== null;
+
+      // Access Badge
+      const badge = document.getElementById('accessBadge');
+      if(userAccessLevel === 'admin') {
+        badge.innerHTML = '<i class="fa-solid fa-shield-halved mr-1"></i> ADMIN';
+        badge.className = 'text-[10px] font-bold px-3 py-1.5 rounded-full bg-red-100 text-red-700';
+      } else if(userAccessLevel === 'approved') {
+        badge.innerHTML = '<i class="fa-solid fa-pen mr-1"></i> AKSES PENUH';
+        badge.className = 'text-[10px] font-bold px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700';
+      } else if(userAccessLevel === 'pending' && isLoggedIn) {
+        badge.innerHTML = '<i class="fa-solid fa-clock mr-1"></i> MENUNGGU';
+        badge.className = 'text-[10px] font-bold px-3 py-1.5 rounded-full bg-amber-100 text-amber-700';
+      } else {
+        badge.innerHTML = '<i class="fa-solid fa-eye mr-1"></i> MODE LIHAT';
+        badge.className = 'text-[10px] font-bold px-3 py-1.5 rounded-full bg-slate-100 text-slate-500';
+      }
+
+      // Show/hide elements
+      document.getElementById('btnSaveCloud').classList.toggle('hidden', !isEditable);
+      document.getElementById('adminNavSection').classList.toggle('hidden', !isAdmin);
+      document.getElementById('guestLoginBtn').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('logoutBtn').classList.toggle('hidden', !isLoggedIn);
+      document.getElementById('viewOnlyNotice').classList.toggle('hidden', isEditable);
+
+      // Sidebar user info
+      const uInfo = document.getElementById('sidebarUserInfo');
+      if(isLoggedIn && currentUserData) {
+        uInfo.classList.remove('hidden');
+        const nameStr = currentUserData.name || currentUser.email.split('@')[0];
+        document.getElementById('sidebarName').textContent = nameStr;
+        document.getElementById('sidebarAvatar').textContent = nameStr.charAt(0).toUpperCase();
+        
+        const dot = document.getElementById('sidebarStatusDot');
+        if(isAdmin) {
+          document.getElementById('sidebarRole').textContent = 'Administrator';
+          dot.className = 'pulse-dot bg-red-500';
+        } else if(userAccessLevel === 'approved') {
+          document.getElementById('sidebarRole').textContent = 'Akses Penuh';
+          dot.className = 'pulse-dot bg-emerald-500';
+        } else {
+          document.getElementById('sidebarRole').textContent = 'Menunggu Persetujuan';
+          dot.className = 'pulse-dot bg-amber-400';
+        }
+      } else {
+        uInfo.classList.add('hidden');
+      }
+
+      // Mobile user badge
+      const mBadge = document.getElementById('mobileUserBadge');
+      if(isLoggedIn && currentUserData) {
+        mBadge.classList.remove('hidden');
+        mBadge.textContent = isAdmin ? '🛡️ Admin' : (userAccessLevel === 'approved' ? '✅' : '⏳');
+      } else {
+        mBadge.classList.add('hidden');
+      }
+
+      // Disable/enable editable fields
+      document.querySelectorAll('.editable-field').forEach(el => {
+        el.disabled = !isEditable;
+        el.classList.toggle('bg-slate-50', !isEditable);
+        el.classList.toggle('cursor-not-allowed', !isEditable);
+        el.classList.toggle('opacity-70', !isEditable);
+      });
+
+      // Print button
+      const printBtn = document.getElementById('btnPrint');
+      if(isEditable) {
+        printBtn.classList.remove('bg-slate-400');
+        printBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+      } else {
+        printBtn.classList.add('bg-slate-400');
+        printBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+      }
+    }
+
+    function checkEditAccess() {
+      if(userAccessLevel === 'approved' || userAccessLevel === 'admin') return true;
+      document.getElementById('editOverlay').classList.remove('hidden');
+      return false;
+    }
+
+    function handlePrint() {
+      if(userAccessLevel === 'approved' || userAccessLevel === 'admin') {
+        window.print();
+      } else {
+        document.getElementById('editOverlay').classList.remove('hidden');
+      }
+    }
+
+    // ==========================================
+    // ADMIN FUNCTIONS
+    // ==========================================
+    async function loadAdminUsers() {
+      if(userAccessLevel !== 'admin') return;
+      
+      const loading = document.getElementById('adminTableLoading');
+      const empty = document.getElementById('adminTableEmpty');
+      const tbody = document.getElementById('adminTableBody');
+      
+      loading.classList.remove('hidden');
+      empty.classList.add('hidden');
+      tbody.innerHTML = '';
+
+      try {
+        const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
+        const users = [];
+        snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+
+        loading.classList.add('hidden');
+
+        if(users.length === 0) {
+          empty.classList.remove('hidden');
+          return;
+        }
+
+        let totalCount = users.length;
+        let pendingCount = users.filter(u => u.status === 'pending').length;
+        let approvedCount = users.filter(u => u.status === 'approved').length;
+        let rejectedCount = users.filter(u => u.status === 'rejected').length;
+
+        document.getElementById('adminStatTotal').textContent = totalCount;
+        document.getElementById('adminStatPending').textContent = pendingCount;
+        document.getElementById('adminStatApproved').textContent = approvedCount;
+        document.getElementById('adminStatRejected').textContent = rejectedCount;
+
+        tbody.innerHTML = users.map(u => {
+          const isMe = u.email === ADMIN_EMAIL;
+          const statusColors = {
+            pending: 'bg-amber-100 text-amber-700',
+            approved: 'bg-emerald-100 text-emerald-700',
+            rejected: 'bg-red-100 text-red-700'
+          };
+          const statusLabels = {
+            pending: 'Menunggu',
+            approved: 'Disetujui',
+            rejected: 'Ditolak'
+          };
+          const statusClass = statusColors[u.status] || statusColors.pending;
+          const statusLabel = statusLabels[u.status] || 'Menunggu';
+          const dateStr = u.createdAt ? new Date(u.createdAt.seconds * 1000).toLocaleDateString('id-ID') : '-';
+          
+          let actionBtns = '';
+          if(!isMe) {
+            if(u.status !== 'approved') {
+              actionBtns += `<button onclick="setUserStatus('${u.id}','approved')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2 py-1 rounded text-[10px] mr-1" title="Setujui"><i class="fa-solid fa-check"></i> Setujui</button>`;
+            }
+            if(u.status !== 'rejected') {
+              actionBtns += `<button onclick="setUserStatus('${u.id}','rejected')" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-[10px] mr-1" title="Tolak"><i class="fa-solid fa-xmark"></i> Tolak</button>`;
+            }
+            if(u.status !== 'pending') {
+              actionBtns += `<button onclick="setUserStatus('${u.id}','pending')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-[10px]" title="Pending"><i class="fa-solid fa-clock"></i></button>`;
+            }
+            actionBtns += `<button onclick="if(confirm('Hapus user ${u.name}?')){deleteUser('${u.id}')}" class="bg-slate-200 hover:bg-red-200 text-red-500 px-2 py-1 rounded text-[10px] ml-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>`;
+          } else {
+            actionBtns = '<span class="text-[10px] text-slate-400 italic">Admin Utama</span>';
+          }
+
+          return `<tr class="hover:bg-slate-50 ${u.status === 'pending' ? 'bg-amber-50/50' : ''}">
+            <td class="p-3">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">${(u.name||'?').charAt(0).toUpperCase()}</div>
+                <div>
+                  <p class="font-semibold text-xs">${u.name || '-'} ${isMe ? '<span class="text-[9px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full ml-1">ADMIN</span>' : ''}</p>
+                  <p class="text-[10px] text-slate-400">${u.email}</p>
+                </div>
+              </div>
+            </td>
+            <td class="p-3 text-xs">${u.school || '-'}</td>
+            <td class="p-3 text-center text-[10px] text-slate-500">${dateStr}</td>
+            <td class="p-3 text-center"><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+            <td class="p-3 text-center">${actionBtns}</td>
+          </tr>`;
+        }).join('');
+
+      } catch(e) {
+        loading.classList.add('hidden');
+        showToast('error','Error','Gagal memuat data pengguna: ' + e.message);
+      }
+    }
+
+    async function setUserStatus(uid, status) {
+      try {
+        await db.collection('users').doc(uid).update({ 
+          status: status,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedBy: currentUser.email
+        });
+        const labels = { approved: 'disetujui', rejected: 'ditolak', pending: 'dikembalikan ke pending' };
+        showToast('success','Berhasil!', `User telah ${labels[status]}.`);
+        loadAdminUsers();
+      } catch(e) {
+        showToast('error','Gagal', e.message);
+      }
+    }
+
+    async function deleteUser(uid) {
+      try {
+        await db.collection('users').doc(uid).delete();
+        showToast('success','Terhapus','Data user telah dihapus dari database.');
+        loadAdminUsers();
+      } catch(e) {
+        showToast('error','Gagal', e.message);
+      }
+    }
+
+    // ==========================================
+    // CLOUD DATA SAVE/LOAD
+    // ==========================================
+    async function saveToCloud() {
+      if(!checkEditAccess()) return;
+      try {
+        const profil = {
+          namaSekolah: g('namaSekolah'),
+          namaGuru: g('namaGuru'),
+          nipGuru: g('nipGuru'),
+          namaKepsek: g('namaKepsek'),
+          nipKepsek: g('nipKepsek'),
+          namaMapel: g('namaMapel'),
+          pilihanFaseKelas: g('pilihanFaseKelas'),
+          tahunAjaran: g('tahunAjaran'),
+          tglTtd: g('tglTtd')
+        };
+
+        await db.collection('appData').doc('profil').set(profil);
+        await db.collection('appData').doc('kalender').set({ items: defaultKalender });
+        await db.collection('appData').doc('cp').set({ items: defaultCP });
+
+        showToast('success','Tersimpan!','Data berhasil disimpan ke cloud.');
+      } catch(e) {
+        showToast('error','Gagal','Gagal menyimpan: ' + e.message);
+      }
+    }
+
+    async function saveGlobalDataToCloud() {
+      if(userAccessLevel !== 'admin') return;
+      await saveToCloud();
+    }
+
+    async function loadGlobalDataFromCloud() {
+      try {
+        const profilDoc = await db.collection('appData').doc('profil').get();
+        if(profilDoc.exists) {
+          const p = profilDoc.data();
+          if(p.namaSekolah) document.getElementById('namaSekolah').value = p.namaSekolah;
+          if(p.namaGuru) document.getElementById('namaGuru').value = p.namaGuru;
+          if(p.nipGuru) document.getElementById('nipGuru').value = p.nipGuru;
+          if(p.namaKepsek) document.getElementById('namaKepsek').value = p.namaKepsek;
+          if(p.nipKepsek) document.getElementById('nipKepsek').value = p.nipKepsek;
+          if(p.namaMapel) document.getElementById('namaMapel').value = p.namaMapel;
+          if(p.pilihanFaseKelas) document.getElementById('pilihanFaseKelas').value = p.pilihanFaseKelas;
+          if(p.tahunAjaran) document.getElementById('tahunAjaran').value = p.tahunAjaran;
+          if(p.tglTtd) document.getElementById('tglTtd').value = p.tglTtd;
+        }
+
+        const kalDoc = await db.collection('appData').doc('kalender').get();
+        if(kalDoc.exists && kalDoc.data().items) {
+          defaultKalender = kalDoc.data().items;
+        }
+
+        const cpDoc = await db.collection('appData').doc('cp').get();
+        if(cpDoc.exists && cpDoc.data().items) {
+          defaultCP = cpDoc.data().items;
+        }
+
+        initInputTables();
+        renderAllDocs();
+      } catch(e) {
+        console.log('Cloud data not found, using defaults.');
+        initInputTables();
+        renderAllDocs();
+      }
+    }
+
+    async function deleteAllCloudData() {
+      if(userAccessLevel !== 'admin') return;
+      try {
+        await db.collection('appData').doc('profil').delete();
+        await db.collection('appData').doc('kalender').delete();
+        await db.collection('appData').doc('cp').delete();
+        showToast('success','Terhapus!','Semua data cloud telah dihapus.');
+      } catch(e) {
+        showToast('error','Gagal', e.message);
+      }
+    }
+
+    // ==========================================
+    // PROFILE MODAL
+    // ==========================================
+    function openProfileModal() {
+      if(!currentUser || !currentUserData) return;
+      document.getElementById('profileName').textContent = currentUserData.name || '-';
+      document.getElementById('profileEmail').textContent = currentUser.email;
+      document.getElementById('profileSchool').textContent = currentUserData.school || '-';
+      
+      const statusMap = {
+        approved: '<span class="status-badge bg-emerald-100 text-emerald-700">Disetujui</span>',
+        pending: '<span class="status-badge bg-amber-100 text-amber-700">Menunggu</span>',
+        rejected: '<span class="status-badge bg-red-100 text-red-700">Ditolak</span>'
+      };
+      document.getElementById('profileStatus').innerHTML = statusMap[currentUserData.status] || statusMap.pending;
+      document.getElementById('profileRole').textContent = currentUserData.role === 'admin' ? 'Administrator' : 'Pengguna';
+      
+      const dateStr = currentUserData.createdAt ? new Date(currentUserData.createdAt.seconds * 1000).toLocaleDateString('id-ID', {day:'numeric',month:'long',year:'numeric'}) : '-';
+      document.getElementById('profileDate').textContent = dateStr;
+      
+      document.getElementById('profileModal').classList.remove('hidden');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.add('hidden');
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    // ==========================================
+    // TAB SWITCHING
+    // ==========================================
+    function switchTab(id) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const tab = document.getElementById('tab-' + id);
+      if(tab) tab.classList.remove('hidden');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-nav'));
+      const btn = document.getElementById('btn-' + id);
+      if(btn) btn.classList.add('active-nav');
+      
+      // Update page title
+      const titles = {
+        'input-profil': ['Profil Guru & Sekolah','Kelola identitas dasar dokumen'],
+        'input-kalender': ['Input Kalender','Masukkan data kalender pendidikan'],
+        'input-cp': ['Input CP / ATP','Masukkan Capaian Pembelajaran & ATP'],
+        'prompt-ai': ['Prompt AI Generator','Generate data CSV dengan AI'],
+        'doc-kalender': ['Kalender Pendidikan','Dokumen kalender pendidikan'],
+        'doc-jadwal': ['Jadwal Pelajaran','Dokumen jadwal mata pelajaran'],
+        'doc-acp': ['Analisis CP','Dokumen Analisis Capaian Pembelajaran'],
+        'doc-atp': ['ATP / Silabus','Dokumen Alur Tujuan Pembelajaran'],
+        'doc-prota': ['Program Tahunan','Dokumen Program Tahunan'],
+        'doc-promes': ['Program Semester','Dokumen Program Semester'],
+        'doc-modul': ['Modul Deep Learning','Dokumen Modul Ajar'],
+        'doc-kktp': ['KKTP','Kriteria Ketercapaian Tujuan Pembelajaran'],
+        'admin-panel': ['Panel Admin','Kelola akses pengguna'],
+        'admin-data': ['Kelola Data Global','Simpan/muat data cloud']
+      };
+      const t = titles[id] || ['SIPAI','Sistem Administrasi Guru'];
+      document.getElementById('pageTitle').textContent = t[0];
+      document.getElementById('pageSubtitle').textContent = t[1];
+      
+      renderAllDocs();
+      
+      if(id === 'admin-panel') loadAdminUsers();
+
+      // Close mobile sidebar
+      if(window.innerWidth < 768) {
+        document.getElementById('sidebar').classList.add('hidden');
+      }
+    }
+
+    // ==========================================
+    // DATA MANAGEMENT
+    // ==========================================
+    const g = id => document.getElementById(id).value;
+
+    function initInputTables() {
+      const isEditable = userAccessLevel === 'approved' || userAccessLevel === 'admin';
+      const disabledAttr = isEditable ? '' : 'disabled';
+      const disabledClass = isEditable ? '' : 'bg-slate-50 cursor-not-allowed opacity-70';
+
+      document.getElementById('tbodyKalender').innerHTML = defaultKalender.map((k, i) => `
+        <tr class="border-b">
+          <td class="p-1"><input value="${k.Semester}" onchange="defaultKalender[${i}].Semester=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${k.Tanggal}" onchange="defaultKalender[${i}].Tanggal=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${k.Agenda}" onchange="defaultKalender[${i}].Agenda=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${k.Kategori}" onchange="defaultKalender[${i}].Kategori=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1 text-center">${isEditable ? `<button onclick="defaultKalender.splice(${i},1); initInputTables(); renderAllDocs();" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : ''}</td>
+        </tr>`).join('');
+
+      document.getElementById('tbodyCP').innerHTML = defaultCP.map((c, i) => `
+        <tr class="border-b">
+          <td class="p-1"><input value="${c.Elemen}" onchange="defaultCP[${i}].Elemen=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${c.ATP}" onchange="defaultCP[${i}].ATP=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${c.Smt}" onchange="defaultCP[${i}].Smt=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${c.JP}" onchange="defaultCP[${i}].JP=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${c.Metode}" onchange="defaultCP[${i}].Metode=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${c.Dimensi}" onchange="defaultCP[${i}].Dimensi=this.value; renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1"><input value="${(c.Dates_Promes||[]).join(',')}" onchange="defaultCP[${i}].Dates_Promes=this.value.split(','); renderAllDocs()" class="w-full border rounded p-1 editable-field ${disabledClass}" ${disabledAttr}></td>
+          <td class="p-1 text-center">${isEditable ? `<button onclick="defaultCP.splice(${i},1); initInputTables(); renderAllDocs();" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : ''}</td>
+        </tr>`).join('');
+    }
+
+    function addRow(type) {
+      if(!checkEditAccess()) return;
+      if(type === 'kalender') defaultKalender.push({Semester:"Semester 1",Tanggal:"",Agenda:"",Kategori:""});
+      else defaultCP.push({Elemen:"",ATP:"",Smt:"Smt 1",JP:8,Metode:"",Dimensi:"",CP_Fase:"",Dates_Promes:[]});
+      initInputTables();
+      renderAllDocs();
+    }
+
+    function processCSV(type) {
+      if(!checkEditAccess()) return;
+      const raw = document.getElementById(type==='kalender'?'csvKalenderInput':'csvCPInput').value.trim();
+      if(!raw) return showToast('warning','Peringatan','Tempelkan data CSV terlebih dahulu!');
+      const lines = raw.split('\n').filter(l => l.trim());
+      if(type==='kalender') {
+        defaultKalender = lines.slice(1).map(l => {
+          const r = l.split(',');
+          return {Semester:r[0]?.replace(/"/g,'').trim(),Tanggal:r[1]?.replace(/"/g,'').trim(),Agenda:r[2]?.replace(/"/g,'').trim(),Kategori:r[3]?.replace(/"/g,'').trim()};
+        }).filter(k => k.Agenda);
+      } else {
+        defaultCP = lines.slice(1).map(l => {
+          const r = l.split(',');
+          return {Elemen:r[0]?.replace(/"/g,'').trim(),ATP:r[1]?.replace(/"/g,'').trim(),Smt:r[2]?.replace(/"/g,'').trim(),JP:parseInt(r[3])||8,Metode:r[4]?.replace(/"/g,'').trim(),Dimensi:r[5]?.replace(/"/g,'').trim(),CP_Fase:r[6]?.replace(/"/g,'').trim(),Dates_Promes:r[7]?.replace(/"/g,'').trim().split(';')};
+        }).filter(c => c.ATP);
+      }
+      initInputTables();
+      renderAllDocs();
+      showToast('success','Berhasil!',`${lines.length - 1} baris CSV berhasil diproses.`);
+    }
+
+    // ==========================================
+    // RENDER ALL DOCUMENTS
+    // ==========================================
+    function renderAllDocs() {
+      const ttdHTML = `
+        <div class="flex justify-between pt-6 text-xs text-center">
+          <div><p>Mengetahui,</p><p class="font-semibold">Kepala ${g('namaSekolah')}</p><div class="h-16"></div><p class="font-bold underline">${g('namaKepsek')}</p><p>NIP. ${g('nipKepsek')}</p></div>
+          <div><p>${g('tglTtd')}</p><p class="font-semibold">Guru ${g('namaMapel')}</p><div class="h-16"></div><p class="font-bold underline">${g('namaGuru')}</p><p>NIP. ${g('nipGuru')}</p></div>
+        </div>`;
+
+      document.querySelectorAll('.ttd-box').forEach(el => el.innerHTML = ttdHTML);
+      document.querySelectorAll('.mapel-field').forEach(el => el.innerText = g('namaMapel'));
+
+      const subtitle = `${g('namaSekolah')} • ${g('namaMapel')} • ${g('pilihanFaseKelas')} • TA ${g('tahunAjaran')}`;
+
+      // Kalender
+      document.getElementById('outKaldikJudul').innerText = `KALENDER PENDIDIKAN TA ${g('tahunAjaran')}`;
+      document.getElementById('outKaldikSub').innerText = g('namaSekolah');
+      document.getElementById('outKaldikTbody').innerHTML = defaultKalender.map((k,i) => {
+        const catColors = {'Libur Nasional':'bg-red-50','Asesmen':'bg-blue-50','Kegiatan Sekolah':'bg-emerald-50','Libur Semester':'bg-amber-50'};
+        return `<tr class="border ${catColors[k.Kategori]||''}"><td class="p-1 text-center">${i+1}</td><td class="p-1">${k.Semester}</td><td class="p-1">${k.Tanggal}</td><td class="p-1">${k.Agenda}</td><td class="p-1"><span class="text-[10px] font-semibold">${k.Kategori}</span></td></tr>`;
+      }).join('');
+
+      // Jadwal
+      document.getElementById('outJadwalSub').innerText = subtitle;
+
+      // ACP
+      document.getElementById('outAcpSub').innerText = subtitle;
+      // Group by Elemen for ACP
+      const elemenGroups = {};
+      defaultCP.forEach(c => {
+        if(!elemenGroups[c.Elemen]) elemenGroups[c.Elemen] = {smt1:[],smt2:[],cp:'',dimensi:[]};
+        if(c.Smt==='Smt 1') elemenGroups[c.Elemen].smt1.push(c.ATP);
+        else elemenGroups[c.Elemen].smt2.push(c.ATP);
+        if(c.CP_Fase) elemenGroups[c.Elemen].cp = c.CP_Fase;
+        if(c.Dimensi) elemenGroups[c.Elemen].dimensi.push(c.Dimensi);
+      });
+      let acpNum = 0;
+      document.getElementById('outAcpTbody').innerHTML = Object.entries(elemenGroups).map(([el, data]) => {
+        acpNum++;
+        const uniqueDimensi = [...new Set(data.dimensi.join(', ').split(', '))].join(', ');
+        return `<tr class="border"><td class="p-1 text-center">${acpNum}</td><td class="p-1 font-semibold">${el}</td><td class="p-1 text-[10px]">${data.cp||'-'}</td><td class="p-1 text-[10px]">${data.smt1.map((a,i)=>`${i+1}. ${a}`).join('<br>')||'-'}</td><td class="p-1 text-[10px]">${data.smt2.map((a,i)=>`${i+1}. ${a}`).join('<br>')||'-'}</td><td class="p-1 text-[10px]">${uniqueDimensi}</td></tr>`;
+      }).join('');
+
+      // ATP
+      document.getElementById('outAtpSub').innerText = subtitle;
+      document.getElementById('outAtpTbody').innerHTML = defaultCP.map((c,i) => `<tr class="border ${i%2?'bg-slate-50/50':''}"><td class="p-1 text-center">${i+1}</td><td class="p-1 font-semibold">${c.Elemen}</td><td class="p-1">${c.ATP}</td><td class="p-1 text-center">${c.JP} JP</td><td class="p-1">${c.Metode}</td><td class="p-1">${c.Dimensi}</td></tr>`).join('');
+
+      // Prota
+      document.getElementById('outProtaSub').innerText = subtitle;
+      let protaSmt1 = defaultCP.filter(c=>c.Smt==='Smt 1');
+      let protaSmt2 = defaultCP.filter(c=>c.Smt==='Smt 2');
+      let protaHTML = '';
+      if(protaSmt1.length) {
+        protaHTML += `<tr class="bg-blue-50 font-bold"><td colspan="5" class="p-2">SEMESTER 1</td></tr>`;
+        protaSmt1.forEach((c,i) => {
+          protaHTML += `<tr class="border"><td class="p-1 text-center">${i+1}</td><td class="p-1 font-semibold">${c.Elemen}</td><td class="p-1">${c.ATP}</td><td class="p-1 text-center">${c.Smt}</td><td class="p-1 text-center">${c.JP} JP</td></tr>`;
+        });
+        protaHTML += `<tr class="bg-blue-100 font-bold"><td colspan="4" class="p-1 text-right">Total JP Semester 1:</td><td class="p-1 text-center">${protaSmt1.reduce((s,c)=>s+parseInt(c.JP)||0,0)} JP</td></tr>`;
+      }
+      if(protaSmt2.length) {
+        protaHTML += `<tr class="bg-emerald-50 font-bold"><td colspan="5" class="p-2">SEMESTER 2</td></tr>`;
+        protaSmt2.forEach((c,i) => {
+          protaHTML += `<tr class="border"><td class="p-1 text-center">${i+1}</td><td class="p-1 font-semibold">${c.Elemen}</td><td class="p-1">${c.ATP}</td><td class="p-1 text-center">${c.Smt}</td><td class="p-1 text-center">${c.JP} JP</td></tr>`;
+        });
+        protaHTML += `<tr class="bg-emerald-100 font-bold"><td colspan="4" class="p-1 text-right">Total JP Semester 2:</td><td class="p-1 text-center">${protaSmt2.reduce((s,c)=>s+parseInt(c.JP)||0,0)} JP</td></tr>`;
+      }
+      document.getElementById('outProtaTbody').innerHTML = protaHTML;
+
+      // Promes
+      document.getElementById('outPromesSub').innerText = subtitle;
+      const smt1Only = defaultCP.filter(c => c.Smt === 'Smt 1');
+      document.getElementById('outPromesTbody').innerHTML = smt1Only.map((c,i) => {
+        let cells = Array.from({length:24}, (_,m) => {
+          const val = (c.Dates_Promes||[])[m]||'';
+          let cellClass = 'border p-0.5';
+          if(val === 'MPLS') cellClass += ' bg-blue-100 text-blue-700 font-bold text-[8px]';
+          else if(val === 'STS' || val === 'SAS') cellClass += ' bg-red-100 text-red-700 font-bold text-[8px]';
+          else if(val && !isNaN(val)) cellClass += ' bg-emerald-100 text-emerald-700 font-bold';
+          return `<td class="${cellClass}">${val}</td>`;
+        }).join('');
+        return `<tr class="border ${i%2?'bg-slate-50/30':''}"><td class="border p-1 font-bold">${i+1}</td><td class="border p-1 text-left text-[9px]">${c.ATP}</td><td class="border p-1 font-bold">${c.JP}</td>${cells}</tr>`;
+      }).join('');
+
+      // Modul
+      document.getElementById('mSekolah').innerText = g('namaSekolah');
+      document.getElementById('mMapel').innerText = g('namaMapel');
+      document.getElementById('mGuru').innerText = g('namaGuru');
+      document.getElementById('mFase').innerText = g('pilihanFaseKelas');
+      document.getElementById('mTP').innerText = defaultCP[0]?.ATP || '-';
+      document.getElementById('mProfil').innerText = defaultCP[0]?.Dimensi || '-';
+
+      // KKTP
+      document.getElementById('outKktpSub').innerText = subtitle;
+      document.getElementById('outKktpTbody').innerHTML = defaultCP.map((c,i) => `<tr class="border ${i%2?'bg-slate-50/50':''}">
+        <td class="p-2 text-center font-bold">${i+1}</td>
+        <td class="p-2">${c.ATP}</td>
+        <td class="p-2 text-red-600 text-[10px]">Peserta didik belum mampu ${c.ATP.toLowerCase().substring(0,50)}... meskipun sudah dibimbing.</td>
+        <td class="p-2 text-amber-600 text-[10px]">Peserta didik mampu ${c.ATP.toLowerCase().substring(0,50)}... dengan bimbingan guru.</td>
+        <td class="p-2 text-blue-600 text-[10px]">Peserta didik mampu ${c.ATP.toLowerCase().substring(0,50)}... secara mandiri.</td>
+        <td class="p-2 text-emerald-600 text-[10px] font-semibold">Peserta didik mampu ${c.ATP.toLowerCase().substring(0,50)}... dan membantu teman lain.</td>
+      </tr>`).join('');
+    }
+
+    // ==========================================
+    // EVENT LISTENERS
+    // ==========================================
+    document.querySelectorAll('#formProfil input, #formProfil select').forEach(el => {
+      el.addEventListener('input', renderAllDocs);
+    });
+
+    // Enter key on login
+    document.getElementById('loginPassword').addEventListener('keyup', e => { if(e.key === 'Enter') doLogin(); });
+    document.getElementById('loginEmail').addEventListener('keyup', e => { if(e.key === 'Enter') doLogin(); });
+
+    // Close modals on ESC
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape') {
+        closeProfileModal();
+        closeAdminModal();
+        document.getElementById('editOverlay').classList.add('hidden');
+      }
+    });
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    initInputTables();
+    renderAllDocs();
+  </script>
 </body>
 </html>
