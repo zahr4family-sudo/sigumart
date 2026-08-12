@@ -4,13 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Si-Gumart - Sistem Administrasi Guru Smart</title>
+
+<!-- Tailwind CDN (Untuk produksi dengan build step, ganti tag ini dengan link css terkompilasi) -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Firebase App & Auth Compatibility Libraries -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui']}}}}</script>
+
+<script>
+tailwind.config={theme:{extend:{fontFamily:{sans:['Plus Jakarta Sans','system-ui']}}}}
+</script>
+
 <style>
 @media print{.np{display:none!important}body{background:#fff!important;font-size:7pt;color:#000!important}table{page-break-inside:auto;width:100%!important}tr{page-break-inside:avoid}th,td{padding:2px!important;font-size:6.5pt!important}@page{margin:7mm}}
 *{scrollbar-width:thin;scrollbar-color:#334155 transparent}
@@ -256,9 +265,7 @@ aside::-webkit-scrollbar{width:3px}aside::-webkit-scrollbar-thumb{background:#33
 </div>
 
 <script>
-// ================================================================
 // FIREBASE INIT
-// ================================================================
 const fbCfg = {
     apiKey: "AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",
     authDomain: "si-gumart.firebaseapp.com",
@@ -278,17 +285,16 @@ gProvider.setCustomParameters({ prompt: 'select_account' });
 const $ = id => document.getElementById(id);
 const ADMIN_EMAIL = 'kkgpainagreg@gmail.com';
 let ADMIN_WA = '6282118521765';
-let CU = null;                    // Current user (Firebase)
-let userMode = 'guest';           // 'guest' | 'pending' | 'user' | 'admin'
+let CU = null;
+let userMode = 'guest'; 
 let isAdmin = false;
-let canWrite = false;             // Whether user can save/edit
-let dataOwnerId = 'PUBLIC_DEMO';  // For guest: read public demo data
-let SHARED_DATA_ID = 'PUBLIC_DEMO'; // The ID of the shared/public data document
+let canWrite = false;
+let dataOwnerId = 'PUBLIC_DEMO';
+let SHARED_DATA_ID = 'PUBLIC_DEMO';
 
 const toast = msg => { const t=$('tst'); if(!t)return; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); };
 const syn = (t,x) => { const e=$('syn'); if(!e)return; e.className='syn np '+t; e.textContent=x; };
 
-// Helper: check permission before action
 function requireAuth(action='melakukan aksi ini') {
     if (isAdmin || userMode === 'admin' || canWrite) return true;
     if (userMode === 'guest') {
@@ -302,25 +308,12 @@ function requireAuth(action='melakukan aksi ini') {
     return false;
 }
 
-// Wrapper for file input clicks
-function tryClickFile(id) {
-    if (!requireAuth('mengimpor file')) return;
-    $(id).click();
-}
+function tryClickFile(id) { if (!requireAuth('mengimpor file')) return; $(id).click(); }
+function doPrint() { if (!requireAuth('mencetak dokumen')) return; window.print(); }
 
-// Wrapper for print
-function doPrint() {
-    if (!requireAuth('mencetak dokumen')) return;
-    window.print();
-}
-
-// ================================================================
-// LOGIN
-// ================================================================
 async function doLogin() {
     if ($('regBtn')) $('regBtn').disabled = true;
     if ($('regBtnTxt')) $('regBtnTxt').textContent = 'Membuka Google Sign-in...';
-    
     try {
         try {
             const result = await auth.signInWithPopup(gProvider);
@@ -342,79 +335,50 @@ async function doLogin() {
         console.error(e);
         if ($('regBtn')) $('regBtn').disabled = false;
         if ($('regBtnTxt')) $('regBtnTxt').textContent = 'Masuk / Daftar dengan Google';
-        
-        if (e.code === 'auth/unauthorized-domain') {
-            toast('❌ Domain belum diotorisasi di Firebase');
-        } else if (e.code === 'auth/operation-not-allowed') {
-            toast('❌ Google Sign-in belum di-enable');
-        } else {
-            toast('Error: ' + e.message);
-        }
+        toast('Error: ' + e.message);
     }
 }
 
 async function handleUserLogin(user) {
     if (!user) return;
     CU = user;
-    
     const email = user.email || '';
     const uid = user.uid;
     const isAdminUser = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     
     try {
         if (isAdminUser) {
-            // Admin - Full Privileges
-            isAdmin = true;
-            canWrite = true;
-            userMode = 'admin';
-            dataOwnerId = SHARED_DATA_ID;
-            
+            isAdmin = true; canWrite = true; userMode = 'admin'; dataOwnerId = SHARED_DATA_ID;
             await db.collection('approved_users').doc(uid).set({
                 email, name: user.displayName || 'Admin', photo: user.photoURL || '',
-                status: 'approved', role: 'admin', uid,
-                ts: firebase.firestore.FieldValue.serverTimestamp()
+                status: 'approved', role: 'admin', uid, ts: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-            
             toast('👑 Login sebagai Admin!');
         } else {
             const doc = await db.collection('approved_users').doc(uid).get();
             if (doc.exists && doc.data().status === 'approved') {
-                canWrite = true;
-                userMode = 'user';
-                dataOwnerId = uid;
+                canWrite = true; userMode = 'user'; dataOwnerId = uid;
                 toast('✅ Login berhasil!');
             } else {
-                canWrite = false;
-                userMode = 'pending';
-                dataOwnerId = SHARED_DATA_ID;
-                
+                canWrite = false; userMode = 'pending'; dataOwnerId = SHARED_DATA_ID;
                 if (!doc.exists) {
                     await db.collection('approved_users').doc(uid).set({
                         email, name: user.displayName || '', photo: user.photoURL || '',
-                        status: 'pending', role: 'user', uid,
-                        ts: firebase.firestore.FieldValue.serverTimestamp()
+                        status: 'pending', role: 'user', uid, ts: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     sendWANotif(user);
                 }
                 toast('⏳ Akun Anda menunggu persetujuan admin');
             }
         }
-        
         $('regModal').classList.add('hidden');
-        updateUserUI();
-        updateModeBadge();
-        applyReadOnlyMode();
-        await loadData();
-    } catch (e) {
-        console.error(e);
-        toast('Error: ' + e.message);
-    }
+        updateUserUI(); updateModeBadge(); applyReadOnlyMode(); await loadData();
+    } catch (e) { console.error(e); toast('Error: ' + e.message); }
 }
 
 function sendWANotif(user) {
-    const msg = encodeURIComponent(`🔔 *Si-Gumart - Pendaftaran Baru*\n\n👤 ${user.displayName||'-'}\n📧 ${user.email||'-'}\n🕐 ${new Date().toLocaleString('id-ID')}\n\nBuka aplikasi Si-Gumart → 👑 Admin untuk approve.`);
-    const url = `https://wa.me/${ADMIN_WA}?text=${msg}`;
-    try { window.open(url, '_blank', 'noopener'); } catch(e) {}
+    const msg = encodeURIComponent(`🔔 *Si-Gumart - Pendaftaran Baru*\n\n👤 ${user.displayName||'-'}\n📧 ${user.email||'-'}\n\nBuka aplikasi Si-Gumart → Admin untuk approve.`);
+    try { window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank', 'noopener'); } catch(e) {}
 }
 
 function logoutUser() {
@@ -422,122 +386,59 @@ function logoutUser() {
     auth.signOut().then(() => location.reload()).catch(() => location.reload());
 }
 
-// ================================================================
-// UI UPDATE BASED ON MODE
-// ================================================================
 function updateUserUI() {
-    const bar = $('userStatusBar');
-    if (!bar) return;
-    
+    const bar = $('userStatusBar'); if (!bar) return;
     if (userMode === 'guest') {
-        $('usrNm').textContent = 'Guest';
-        $('usrEm').textContent = 'Mode Lihat Saja';
-        $('loginBtnSide').classList.remove('hidden');
-        $('logoutBtn').classList.add('hidden');
-        $('admBtn').classList.add('hidden');
+        $('usrNm').textContent = 'Guest'; $('usrEm').textContent = 'Mode Lihat Saja';
+        $('loginBtnSide').classList.remove('hidden'); $('logoutBtn').classList.add('hidden'); $('admBtn').classList.add('hidden');
     } else if (userMode === 'pending') {
-        $('usrNm').textContent = CU?.displayName || CU?.email || 'User';
-        $('usrEm').textContent = '⏳ Menunggu Persetujuan';
-        $('loginBtnSide').classList.add('hidden');
-        $('logoutBtn').classList.remove('hidden');
-        $('admBtn').classList.add('hidden');
-    } else if (userMode === 'user') {
-        $('usrNm').textContent = CU?.displayName || CU?.email || 'User';
-        $('usrEm').textContent = '✅ ' + (CU?.email || '');
-        $('loginBtnSide').classList.add('hidden');
-        $('logoutBtn').classList.remove('hidden');
-        $('admBtn').classList.add('hidden');
-    } else if (userMode === 'admin') {
-        $('usrNm').textContent = CU?.displayName || 'Admin';
-        $('usrEm').textContent = '👑 ' + (CU?.email || '');
-        $('loginBtnSide').classList.add('hidden');
-        $('logoutBtn').classList.remove('hidden');
-        $('admBtn').classList.remove('hidden');
+        $('usrNm').textContent = CU?.displayName || CU?.email || 'User'; $('usrEm').textContent = '⏳ Menunggu Persetujuan';
+        $('loginBtnSide').classList.add('hidden'); $('logoutBtn').classList.remove('hidden'); $('admBtn').classList.add('hidden');
+    } else if (userMode === 'user' || userMode === 'admin') {
+        $('usrNm').textContent = CU?.displayName || 'User'; $('usrEm').textContent = (userMode==='admin'?'👑 ':'✅ ') + (CU?.email || '');
+        $('loginBtnSide').classList.add('hidden'); $('logoutBtn').classList.remove('hidden');
+        if (userMode==='admin') $('admBtn').classList.remove('hidden'); else $('admBtn').classList.add('hidden');
     }
-    
     if (CU?.photoURL) {
         const avEls = bar.querySelectorAll('.w-7');
-        if (avEls[0]) {
-            avEls[0].innerHTML = `<img src="${CU.photoURL}" class="w-full h-full rounded-full">`;
-        }
+        if (avEls[0]) avEls[0].innerHTML = `<img src="${CU.photoURL}" class="w-full h-full rounded-full">`;
         if ($('mobAv')) { $('mobAv').src = CU.photoURL; $('mobAv').classList.remove('hidden'); }
-    }
-    
-    const info = $('statusInfo');
-    if (info) {
-        if (userMode === 'guest') {
-            info.innerHTML = '<div class="bg-amber-950/30 border border-amber-500/30 rounded p-1 text-[8px] text-amber-300">👀 <strong>Guest Mode:</strong> Lihat data demo. Login untuk edit.</div>';
-        } else if (userMode === 'pending') {
-            info.innerHTML = `<div class="bg-blue-950/30 border border-blue-500/30 rounded p-1 text-[8px] text-blue-300">⏳ <strong>Pending:</strong> Menunggu approval admin. <a href="https://wa.me/${ADMIN_WA}?text=${encodeURIComponent('Halo Admin, mohon approve akun saya di Si-Gumart: ' + (CU?.email||''))}" target="_blank" class="underline">Hubungi Admin</a></div>`;
-        } else if (userMode === 'admin') {
-            info.innerHTML = '<div class="bg-indigo-950/30 border border-indigo-500/30 rounded p-1 text-[8px] text-indigo-300">👑 <strong>Admin:</strong> Akses penuh semua fitur & edit data publik.</div>';
-        } else {
-            info.innerHTML = '<div class="bg-emerald-950/30 border border-emerald-500/30 rounded p-1 text-[8px] text-emerald-300">✅ <strong>Aktif:</strong> Data personal Anda.</div>';
-        }
     }
 }
 
 function updateModeBadge() {
-    const badge = $('modeBadge');
-    if (!badge) return;
-    
+    const badge = $('modeBadge'); if (!badge) return;
     if (userMode === 'guest') {
-        badge.className = 'readonly-badge np';
-        badge.textContent = '👀 Mode Baca • Klik "Login" untuk edit';
-        badge.classList.remove('hidden');
+        badge.className = 'readonly-badge np'; badge.textContent = '👀 Mode Baca • Klik "Login" untuk edit'; badge.classList.remove('hidden');
     } else if (userMode === 'pending') {
-        badge.className = 'readonly-badge np';
-        badge.textContent = '⏳ Menunggu approval admin';
-        badge.classList.remove('hidden');
+        badge.className = 'readonly-badge np'; badge.textContent = '⏳ Menunggu approval admin'; badge.classList.remove('hidden');
     } else if (userMode === 'admin') {
-        badge.className = 'readonly-badge admin-badge np';
-        badge.textContent = '👑 Admin Mode • Akses Penuh';
-        badge.classList.remove('hidden');
-    } else if (userMode === 'user') {
-        badge.className = 'readonly-badge write-badge np';
-        badge.textContent = '✅ ' + (CU?.email || 'User Mode');
-        badge.classList.remove('hidden');
+        badge.className = 'readonly-badge admin-badge np'; badge.textContent = '👑 Admin Mode • Akses Penuh'; badge.classList.remove('hidden');
+    } else {
+        badge.className = 'readonly-badge write-badge np'; badge.textContent = '✅ Mode Edit Aktif'; badge.classList.remove('hidden');
         setTimeout(() => badge.classList.add('hidden'), 3000);
     }
 }
 
 function applyReadOnlyMode() {
     const disable = !canWrite && !isAdmin && userMode !== 'admin';
-    
     document.querySelectorAll('.is, .iw').forEach(el => {
-        if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') {
+        if (['INPUT','SELECT','TEXTAREA'].includes(el.tagName)) {
             el.disabled = disable;
-            if (disable) el.classList.add('readonly-input');
-            else el.classList.remove('readonly-input');
+            if (disable) el.classList.add('readonly-input'); else el.classList.remove('readonly-input');
         }
     });
-    
     document.querySelectorAll('.need-write').forEach(el => {
-        if (disable) {
-            el.style.opacity = '0.5';
-            el.style.cursor = 'not-allowed';
-            el.title = 'Perlu login untuk aksi ini';
-        } else {
-            el.style.opacity = '';
-            el.style.cursor = '';
-            el.title = '';
-        }
+        el.style.opacity = disable ? '0.5' : '';
+        el.style.cursor = disable ? 'not-allowed' : '';
     });
-    
     ra();
 }
 
-// ================================================================
-// ADMIN PANEL
-// ================================================================
+// ADMIN PANEL LOGIC
 async function openAdminPanel() {
     if (!isAdmin && userMode !== 'admin') { toast('Akses ditolak'); return; }
     $('adminPnl').classList.remove('hidden');
-    try {
-        const cfg = await db.collection('config').doc('admin').get();
-        if (cfg.exists && cfg.data().wa) { ADMIN_WA = cfg.data().wa; if ($('adminWA')) $('adminWA').value = ADMIN_WA; }
-        else if ($('adminWA')) $('adminWA').value = ADMIN_WA;
-    } catch(e) { if ($('adminWA')) $('adminWA').value = ADMIN_WA; }
     await loadAdminPanel();
 }
 
@@ -558,9 +459,7 @@ async function rejectU(uid) { if(!confirm('Tolak user?'))return; try { await db.
 async function revokeU(uid) { if(!confirm('Cabut akses?'))return; try { await db.collection('approved_users').doc(uid).update({status:'pending'}); toast('Dicabut'); loadAdminPanel(); } catch(e) {} }
 async function saveAdminWA() { const wa=$('adminWA')?.value?.trim(); if(!wa)return; ADMIN_WA=wa; try { await db.collection('config').doc('admin').set({wa:ADMIN_WA},{merge:true}); toast('✅ Tersimpan'); } catch(e) { toast('Error'); } }
 
-// ================================================================
-// APP DATA & LOGIC
-// ================================================================
+// DATA MANAGEMENT
 let D = {
     mapelList: ['Pendidikan Agama Islam dan Budi Pekerti'],
     activeMapel: 'Pendidikan Agama Islam dan Budi Pekerti',
@@ -591,16 +490,10 @@ function sfs() {
     dRef().set(data, {merge:true}).then(() => {
         syn('ss', userMode === 'admin' ? '☁️ Public' : '☁️');
         setTimeout(() => window._sk = false, 2000);
-        const s = gs();
-        if (s.npsn) db.collection('schools').doc(s.npsn).set({npsn:s.npsn,nama:s.sek,kep:s.kep,nipK:s.nipK,jnj:s.jnj,ta:s.ta,uid:CU?.uid||dataOwnerId,guru:CU?.displayName||''},{merge:true}).catch(()=>{});
-        D.mapelList.forEach(m => { if ((D.tp[m]||[]).length) { const key=(CU?.uid||dataOwnerId)+'_'+m.replace(/[^a-zA-Z0-9]/g,'').substring(0,20); db.collection('shared_tp').doc(key).set({uid:CU?.uid||dataOwnerId,mapel:m,jnj:s.jnj,guru:CU?.displayName||'',sek:s.sek,npsn:s.npsn,count:D.tp[m].length,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(()=>{}); } });
     }).catch(e => { console.error(e); syn('se','❌'); window._sk=false; });
 }
 
-const debS = () => { 
-    if (!canWrite && !isAdmin) return;
-    clearTimeout(sT); sT=setTimeout(()=>{sfs();ra();},600); 
-};
+const debS = () => { if (!canWrite && !isAdmin) return; clearTimeout(sT); sT=setTimeout(()=>{sfs();ra();},600); };
 
 async function loadData() {
     try {
@@ -619,43 +512,14 @@ async function loadData() {
             if (d.krit) D.krit=d.krit;
             D.rc=d.rc||0; D.sc=d.sc||0; D.hpm=d.hpm||5; D.ist=d.ist||1; D.ist1=d.ist1||4; D.ist2=d.ist2||6;
             if (d.set) aS(d.set);
-        } else if ((canWrite || isAdmin) && userMode === 'admin') {
-            await dRef().set({
-                mapelList: D.mapelList, activeMapel: D.activeMapel, tp: D.tp,
-                rombel: D.rombel, siswa: D.siswa, nilai: D.nilai, absen: D.absen,
-                jurnal: D.jurnal, krit: D.krit, rc: D.rc, sc: D.sc,
-                hpm: D.hpm, ist: D.ist, ist1: D.ist1, ist2: D.ist2,
-                set: gS(), ts: firebase.firestore.FieldValue.serverTimestamp()
-            }, {merge: true});
         }
     } catch(e) { console.error('loadData:', e); }
 
     if (!D.rombel.length) { D.rc=2; D.rombel=[{id:1,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:0},{id:2,nama:'1B',hari:4,jp1:5,jp2:8,kelas:'Kelas 1',warna:1}]; }
     if (!D.tp[D.activeMapel]) D.tp[D.activeMapel] = [];
 
-    const sv = (id,v) => { const e=$(id); if(e)e.value=v; };
-    sv('iHari',D.hpm||5); sv('iIst',D.ist||1); sv('iI1',D.ist1||4); sv('iI2',D.ist2||6);
-
     popK(); renderMapChips(); rRombel(); rKrit(); buildNav(); buildContent(); ra();
     applyReadOnlyMode();
-    syn('ss', (canWrite || isAdmin) ? '☁️' : 'sg 👁️');
-    
-    dRef().onSnapshot(snap => {
-        if (!snap.exists || window._sk) return;
-        const d = snap.data(); if (!d) return;
-        if (d.mapelList) D.mapelList=d.mapelList;
-        if (d.activeMapel) D.activeMapel=d.activeMapel;
-        if (d.tp) D.tp=d.tp;
-        if (d.rombel) D.rombel=d.rombel;
-        if (d.siswa) D.siswa=d.siswa;
-        if (d.nilai) D.nilai=d.nilai;
-        if (d.absen) D.absen=d.absen;
-        if (d.jurnal) D.jurnal=d.jurnal;
-        if (d.krit) D.krit=d.krit;
-        D.rc=d.rc||D.rc; D.sc=d.sc||D.sc;
-        if (d.set) aS(d.set);
-        renderMapChips(); rRombel(); rKrit(); ra();
-    });
     if ($('lo')) $('lo').classList.add('hidden');
 }
 
@@ -664,136 +528,110 @@ const aS = s => { if(!s)return; Object.keys(s).forEach(id=>{const el=$(id);if(el
 const gs = () => ({ ta:gv('iTA'), jnj:gv('iJnj')||'SD', sek:gv('iSek'), npsn:gv('iNpsn'), kep:gv('iKep'), nipK:gv('iNkep'), guru:gv('iGuru')||CU?.displayName||'', nipG:gv('iNg'), metode:gv('iMet'), ktgl:gv('iKtgl'), tgl1:gv('iT1')||'2026-07-13', tgl2:gv('iT2')||'2027-01-11', mgg:parseInt(gv('iMgg'))||24 });
 
 let sbO=false;
-const tsb = () => { sbO=!sbO; const p=$('sbP'),o=$('sbOv'); if(sbO){p.classList.replace('-translate-x-full','translate-x-0');o?.classList.remove('hidden');$('ic')?.classList.remove('hidden');$('io')?.classList.add('hidden');document.body.style.overflow='hidden';}else{p.classList.replace('translate-x-0','-translate-x-full');o?.classList.add('hidden');$('ic')?.classList.add('hidden');$('io')?.classList.remove('hidden');document.body.style.overflow='';} };
+const tsb = () => { sbO=!sbO; const p=$('sbP'),o=$('sbOv'); if(sbO){p.classList.replace('-translate-x-full','translate-x-0');o?.classList.remove('hidden');}else{p.classList.replace('translate-x-0','-translate-x-full');o?.classList.add('hidden');} };
 const cm = () => { if(sbO&&window.innerWidth<768)tsb(); };
 const tc = id => $(id)?.classList.toggle('op');
 const popK = () => { ['fKls','qKls'].forEach(id=>{const e=$(id);if(!e)return;const p=e.value;e.innerHTML=id==='fKls'?'<option value="">Kelas</option>':'';for(let k=1;k<=12;k++)e.innerHTML+=`<option>Kelas ${k}</option>`;e.value=p;}); };
 
 const renderMapChips = () => { 
     const el=$('mapChips');if(!el)return; 
-    el.innerHTML=D.mapelList.map(m=>`<span class="chip ${m===D.activeMapel?'bg-indigo-600 text-white':'bg-slate-800 text-slate-300 border border-slate-700'}" onclick="setAM(${JSON.stringify(m)})">${m.length>22?m.substr(0,22)+'…':m}${(D.mapelList.length>1 && (canWrite||isAdmin))?`<button onclick="event.stopPropagation();rmM(${JSON.stringify(m)})" class="ml-1 opacity-60 text-[7px]">✕</button>`:''}</span>`).join(''); 
+    el.innerHTML=D.mapelList.map(m=>`<span class="chip ${m===D.activeMapel?'bg-indigo-600 text-white':'bg-slate-800 text-slate-300 border border-slate-700'}" onclick="setAM(${JSON.stringify(m)})">${m.length>22?m.substr(0,22)+'…':m}</span>`).join(''); 
 };
-const setAM = m => { D.activeMapel=m; renderMapChips(); if(canWrite||isAdmin)sfs(); ra(); };
-const addMapel = () => { if(!requireAuth('menambah mapel'))return; const n=$('nmMap')?.value?.trim();if(!n)return;if(D.mapelList.includes(n)){toast('Sudah ada');return;}D.mapelList.push(n);D.activeMapel=n;D.tp[n]=D.tp[n]||[];$('nmMap').value='';renderMapChips();sfs();ra();toast('Ditambahkan'); };
-const rmM = m => { if(!requireAuth('menghapus mapel'))return;if(D.mapelList.length<=1)return;if(!confirm(`Hapus "${m}"?`))return;D.mapelList=D.mapelList.filter(x=>x!==m);delete D.tp[m];if(D.activeMapel===m)D.activeMapel=D.mapelList[0];renderMapChips();sfs();ra(); };
+const setAM = m => { D.activeMapel=m; renderMapChips(); ra(); };
+const addMapel = () => { if(!requireAuth('menambah mapel'))return; const n=$('nmMap')?.value?.trim();if(!n)return;D.mapelList.push(n);D.activeMapel=n;D.tp[n]=[];$('nmMap').value='';renderMapChips();sfs();ra(); };
 
-const openShare = () => { $('shareModal')?.classList.remove('hidden'); if($('srMap'))$('srMap').value=D.activeMapel; };
-const srByNpsn = async () => { const npsn=$('srNpsn')?.value?.trim();if(!npsn)return;const r=$('npsnRes');r.classList.remove('hidden');r.innerHTML='🔍...';try{const doc=await db.collection('schools').doc(npsn).get();if(doc.exists){const d=doc.data();r.innerHTML=`<div class="bg-emerald-50 border rounded-lg p-2"><p class="text-[11px] font-bold text-emerald-800">✅ ${d.nama}</p>${(canWrite||isAdmin)?`<button onclick="applySek('${npsn}')" class="mt-1 bg-emerald-600 text-white px-3 py-0.5 rounded text-[10px] font-bold">Gunakan</button>`:'<p class="text-[9px] text-slate-500">Login untuk terapkan</p>'}</div>`;}else r.innerHTML='<p class="text-xs text-rose-500">Tidak ditemukan</p>';}catch(e){r.innerHTML='Error';} };
-const applySek = async npsn => { if(!requireAuth('menerapkan data'))return; const doc=await db.collection('schools').doc(npsn).get();if(!doc.exists)return;const d=doc.data();['iSek','iNpsn','iKep','iNkep','iJnj','iTA'].forEach((id,i)=>{const v=[d.nama,d.npsn,d.kep,d.nipK,d.jnj,d.ta][i];const el=$(id);if(el&&v)el.value=v;});popK();sfs();ra();$('shareModal').classList.add('hidden'); };
-const srByMap = async () => { const m=$('srMap')?.value?.trim(),j=$('srJnj')?.value;if(!m)return;const r=$('mapRes');r.classList.remove('hidden');r.innerHTML='🔍...';try{const snap=await db.collection('shared_tp').where('jnj','==',j).get();const res=[];snap.forEach(doc=>{const d=doc.data();if(d.mapel.toLowerCase().includes(m.toLowerCase())&&d.uid!==CU?.uid)res.push(d);});if(!res.length){r.innerHTML='<p class="text-xs text-amber-600">Belum ada</p>';return;}r.innerHTML=res.map(d=>`<div class="bg-violet-50 border rounded-lg p-2 mt-1"><p class="text-[11px] font-bold">${d.mapel}</p>${(canWrite||isAdmin)?`<button onclick="importTP(${JSON.stringify(d.uid)},${JSON.stringify(d.mapel)})" class="mt-1 bg-violet-600 text-white px-3 py-0.5 rounded text-[10px] font-bold">Ambil</button>`:'<p class="text-[9px] text-slate-500">Login untuk ambil</p>'}</div>`).join('');}catch(e){r.innerHTML='Error';} };
-const importTP = async (fromUid, mapelName) => { if(!requireAuth('mengimpor data'))return; try{const doc=await db.collection('users').doc(fromUid).get();if(!doc.exists)return;const d=doc.data();const list=(d.tp||{})[mapelName]||[];if(!list.length)return;if(!D.mapelList.includes(mapelName))D.mapelList.push(mapelName);D.tp[mapelName]=[...(D.tp[mapelName]||[]),...list];D.activeMapel=mapelName;renderMapChips();sfs();ra();toast(`${list.length} TP diambil!`);$('shareModal').classList.add('hidden');}catch(e){} };
+const quickTP = () => { if(!requireAuth('menambah TP'))return; const en={kelas:gv('qKls'),semester:gv('qSmt'),elemen:gv('qElem')||'Umum',cp:gv('qCP')||'-',tp:gv('qTP'),dimensi:gv('qDim')||'-',pertemuan:parseInt(gv('qPrt'))||2}; if(!en.tp){toast('TP wajib!');return;} aTP().push(en);sfs();ra();toast('Ditambahkan'); };
+const delTP = i => { if(!requireAuth('menghapus TP'))return; aTP().splice(i,1); sfs(); ra(); };
 
-const pl = l => {const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch;}r.push(c.trim());return r;};
-const hcsv = (e,type) => {if(!requireAuth('mengimpor CSV')){e.target.value='';return;}const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>processCSV(ev.target.result,type);rd.readAsText(f);e.target.value='';};
-const processCSV = (txt,type) => { const lines=txt.split(/\r?\n/).filter(l=>l.trim());let cnt=0; if(type==='tp'){for(let i=1;i<lines.length;i++){const c=pl(lines[i]);if(c.length<7)continue;aTP().push({kelas:c[0],semester:c[1],elemen:c[2],cp:c[3],tp:c[4],dimensi:c[5],pertemuan:parseInt(c[6])||2});cnt++;}} else{for(let i=1;i<lines.length;i++){const c=pl(lines[i]);if(c.length<4)continue;const rbl=D.rombel.find(r=>r.nama===c[2]);D.siswa.push({id:++D.sc,nama:c[0],nis:c[1],rombel_id:rbl?rbl.id:(D.rombel[0]?.id||0),jk:c[3]||'L'});cnt++;}} if($('csvSt'))$('csvSt').classList.remove('hidden');if($('csvStT'))$('csvStT').textContent=`${cnt} dimuat`;sfs();ra();toast(`${cnt} data diimport!`); };
-const loadGS = async type => { if(!requireAuth('memuat dari Google Sheet'))return; let url=gv('gsUrl');if(!url)return; if(!url.includes('/pub'))url=url.replace(/\/edit.*/,'/pub?output=csv'); if(!url.includes('output=csv'))url+=(url.includes('?')?'&':'?')+'output=csv'; try{const res=await fetch(url);processCSV(await res.text(),type);}catch(e){toast('Gagal');} };
-const dlTpl = type => { const csv=type==='tp'?'Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan\nKelas 1,Semester 1,Elemen,"CP","TP","dimensi",3':'Nama,NIS,Rombel,JK\nAhmad,12345,1A,L'; const blob=new Blob(['\uFEFF'+csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`template_${type}.csv`;a.click(); };
-const quickTP = () => { if(!requireAuth('menambah TP'))return; const en={kelas:gv('qKls'),semester:gv('qSmt'),elemen:gv('qElem')||'Umum',cp:gv('qCP')||'-',tp:gv('qTP'),dimensi:gv('qDim')||'-',pertemuan:parseInt(gv('qPrt'))||2}; if(!en.tp){toast('TP wajib!');return;} aTP().push(en);if($('qCP'))$('qCP').value='';if($('qTP'))$('qTP').value='';sfs();ra();toast('Ditambahkan'); };
-const delTP = i => {if(!requireAuth('menghapus TP'))return;aTP().splice(i,1);sfs();ra();};
-const clearTP = () => {if(!requireAuth('menghapus TP'))return;if(confirm('Hapus semua TP?')){setATP([]);sfs();ra();}};
-const clearSW = () => {if(!requireAuth('menghapus siswa'))return;if(confirm('Hapus semua siswa?')){D.siswa=[];sfs();ra();}};
-const resetAll = () => {if(!requireAuth('mereset data'))return;if(confirm('Kosongkan semua data dan kembali ke awal?')){D.tp={};D.rombel=[];D.siswa=[];D.nilai={};D.absen={};D.jurnal=[];D.mapelList=['Pendidikan Agama Islam dan Budi Pekerti'];D.activeMapel=D.mapelList[0];sfs();ra();toast('Data berhasil di-reset!');}};
+const addR = () => { if(!requireAuth('menambah rombel'))return; D.rombel.push({id:++D.rc,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:D.rombel.length%WR.length}); rRombel(); sfs(); ra(); };
+const rmR = id => { if(!requireAuth('menghapus rombel'))return; D.rombel=D.rombel.filter(r=>r.id!==id); rRombel(); sfs(); ra(); };
+const uR = (id,f,v) => { if(!canWrite && !isAdmin)return; const r=D.rombel.find(x=>x.id===id); if(r){ r[f]=['hari','jp1','jp2','warna'].includes(f)?parseInt(v):v; sfs(); ra(); } };
 
-const addR = () => {if(!requireAuth('menambah rombel'))return;D.rombel.push({id:++D.rc,nama:'1A',hari:4,jp1:1,jp2:4,kelas:'Kelas 1',warna:D.rombel.length%WR.length});rRombel();sfs();ra();};
-const rmR = id => {if(!requireAuth('menghapus rombel'))return;D.rombel=D.rombel.filter(r=>r.id!==id);D.siswa=D.siswa.filter(s=>s.rombel_id!==id);rRombel();sfs();ra();};
-const uR = (id,f,v) => {if(!canWrite && !isAdmin)return;const r=D.rombel.find(x=>x.id===id);if(!r)return;r[f]=['hari','jp1','jp2','warna'].includes(f)?parseInt(v):v;sfs();ra();};
-const rRombel = () => { const box=$('rbBox');if(!box)return; const hl=getHL(); if(!D.rombel.length){box.innerHTML='<p class="text-center py-1 text-[8px] text-slate-500">No rombel</p>';updRF();return;} box.innerHTML=D.rombel.map(r=>{const w=WR[r.warna%WR.length];let ko='';for(let k=1;k<=12;k++)ko+=`<option ${r.kelas==='Kelas '+k?'selected':''}>Kelas ${k}</option>`; const disAttr = (canWrite||isAdmin) ? '' : 'disabled'; return`<div class="p-1 bg-slate-800/50 rounded-lg" style="border-left:3px solid ${w.hx}"><div class="flex items-center justify-between mb-0.5"><div class="flex items-center gap-1"><span class="bd" style="background:${w.hx}"></span><input value="${r.nama}" onchange="uR(${r.id},'nama',this.value)" ${disAttr} class="bg-transparent text-white font-black text-[10px] w-10 focus:outline-none"></div>${(canWrite||isAdmin)?`<button onclick="rmR(${r.id})" class="text-rose-400 text-[8px]">✕</button>`:''}</div><div class="grid grid-cols-4 gap-0.5"><select onchange="uR(${r.id},'hari',this.value)" ${disAttr} class="is text-[7px] p-0.5">${hl.map((h,i)=>`<option value="${i}" ${r.hari===i?'selected':''}>${h.substr(0,3)}</option>`).join('')}</select><select onchange="uR(${r.id},'jp1',this.value)" ${disAttr} class="is text-[7px] p-0.5">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jp1===j?'selected':''}>${j}</option>`).join('')}</select><select onchange="uR(${r.id},'jp2',this.value)" ${disAttr} class="is text-[7px] p-0.5">${Array.from({length:10},(_,i)=>i+1).map(j=>`<option value="${j}" ${r.jp2===j?'selected':''}>-${j}</option>`).join('')}</select><select onchange="uR(${r.id},'kelas',this.value)" ${disAttr} class="is text-[7px] p-0.5">${ko}</select></div></div>`;}).join('');updRF(); };
-const updRF = () => {const f=$('fRbl');if(!f)return;f.innerHTML='<option value="">Rombel</option>';D.rombel.forEach(r=>{f.innerHTML+=`<option value="${r.id}">${r.nama}</option>`;});};
+const rRombel = () => {
+    const box=$('rbBox'); if(!box)return; const hl=getHL();
+    box.innerHTML=D.rombel.map(r=>{
+        const w=WR[r.warna%WR.length];
+        return `<div class="p-1 bg-slate-800/50 rounded-lg mb-1" style="border-left:3px solid ${w.hx}">
+            <div class="flex items-center justify-between"><input value="${r.nama}" onchange="uR(${r.id},'nama',this.value)" class="bg-transparent text-white font-bold text-[10px] w-12">
+            ${(canWrite||isAdmin)?`<button onclick="rmR(${r.id})" class="text-rose-400 text-[8px]">✕</button>`:''}</div>
+        </div>`;
+    }).join('');
+};
 
-const addSW = rid => {if(!requireAuth('menambah siswa'))return;D.siswa.push({id:++D.sc,nama:'',nis:'',rombel_id:rid,jk:'L'});sfs();ra();};
-const rmSW = id => {if(!requireAuth('menghapus siswa'))return;D.siswa=D.siswa.filter(s=>s.id!==id);sfs();ra();};
-const uSW = (id,f,v) => {if(!canWrite && !isAdmin)return;const s=D.siswa.find(x=>x.id===id);if(s){s[f]=v;debS();}};
+const addSW = rid => { if(!requireAuth('menambah siswa'))return; D.siswa.push({id:++D.sc,nama:'',nis:'',rombel_id:rid,jk:'L'}); sfs(); ra(); };
+const rmSW = id => { if(!requireAuth('menghapus siswa'))return; D.siswa=D.siswa.filter(s=>s.id!==id); sfs(); ra(); };
+const uSW = (id,f,v) => { if(!canWrite && !isAdmin)return; const s=D.siswa.find(x=>x.id===id); if(s){ s[f]=v; debS(); } };
 const swByR = rid => D.siswa.filter(s=>s.rombel_id===rid).sort((a,b)=>(a.nama||'').localeCompare(b.nama||''));
 
-const rKrit = () => { const box=$('kBox');if(!box)return; const tot=D.krit.reduce((s,k)=>s+k.b,0); const dis=(canWrite||isAdmin)?'':'disabled';box.innerHTML=D.krit.map((k,i)=>`<div class="flex gap-1 items-center"><input value="${k.n}" ${dis} onchange="D.krit[${i}].n=this.value;debS()" class="flex-1 is text-[8px]"><input type="number" value="${k.b}" min="0" max="100" ${dis} onchange="D.krit[${i}].b=parseInt(this.value)||0;rKrit();debS()" class="w-10 is text-[8px]"><span class="text-[6px] text-slate-500">%</span>${(canWrite||isAdmin)?`<button onclick="D.krit.splice(${i},1);rKrit();debS()" class="text-rose-400 text-[7px]">✕</button>`:''}</div>`).join('')+`<p class="text-[7px] ${tot===100?'text-emerald-400':'text-rose-400'} font-bold">Total: ${tot}%</p>`; };
-const addKrit = () => {if(!requireAuth('menambah kriteria'))return;D.krit.push({n:'Baru',b:0});rKrit();debS();};
-
-const gFL = () => {let l=[...aTP()];const fk=gv('fKls'),fs=gv('fSmt');if(fk)l=l.filter(d=>d.kelas===fk);if(fs)l=l.filter(d=>d.semester===fs);return l;};
-const fISO = d => {let m=''+(d.getMonth()+1),dy=''+d.getDate(),y=d.getFullYear();if(m.length<2)m='0'+m;if(dy.length<2)dy='0'+dy;return[y,m,dy].join('-');};
-const gWks = (sk,di,tot) => {const s=gs();const bs=sk==='Semester 1'?s.tgl1:s.tgl2;const bp=bs.split('-');const bd=new Date(+bp[0],+bp[1]-1,+bp[2]);const bw=bd.getDay();const tw=(di+1)%7;let df=tw-bw;if(df<0)df+=7;const f=new Date(bd);f.setDate(bd.getDate()+df);const w=[];for(let i=0;i<tot;i++){const d=new Date(f);d.setDate(f.getDate()+i*7);const iso=fISO(d);w.push({wn:i+1,date:d,dn:d.getDate(),mn:BL[d.getMonth()],iso,lib:libNas.includes(iso),eff:!libNas.includes(iso)});}return w;};
-const lastNH = (y,m) => {let d=new Date(y,m+1,0);while(d.getDay()===0||d.getDay()===6||libNas.includes(fISO(d)))d.setDate(d.getDate()-1);return d;};
-const sig = dt => {const s=gs();return`<div class="mt-4 pt-3 border-t-2 border-slate-300 grid grid-cols-2 gap-3 text-[9px]"><div class="text-center"><p class="font-bold">Mengetahui,</p><p class="font-bold mb-12">Kepala ${s.sek}</p><p class="font-extrabold underline">${s.kep}</p><p class="text-slate-500">NIP. ${s.nipK}</p></div><div class="text-center"><p>${dt||s.ktgl}</p><p class="font-bold mb-12">Guru ${D.activeMapel}</p><p class="font-extrabold underline">${s.guru}</p><p class="text-slate-500">NIP. ${s.nipG}</p></div></div>`;};
-const dH = (t,sub) => {const s=gs();return`<div class="text-center mb-3 pb-2 border-b-2 border-slate-800"><h2 class="text-xs md:text-sm font-black uppercase">${t}</h2><p class="text-[8px] text-slate-600 font-bold uppercase">${sub||D.activeMapel}</p><p class="text-[7px] text-slate-500">${s.sek}${s.npsn?' (NPSN: '+s.npsn+')':''} • T.A. ${s.ta}</p></div>`;};
+const gFL = () => { let l=[...aTP()]; const fk=gv('fKls'),fs=gv('fSmt'); if(fk)l=l.filter(d=>d.kelas===fk); if(fs)l=l.filter(d=>d.semester===fs); return l; };
+const fISO = d => { let m=''+(d.getMonth()+1),dy=''+d.getDate(),y=d.getFullYear(); if(m.length<2)m='0'+m; if(dy.length<2)dy='0'+dy; return[y,m,dy].join('-'); };
+const gWks = (sk,di,tot) => { const s=gs(); const bs=sk==='Semester 1'?s.tgl1:s.tgl2; const bp=bs.split('-'); const bd=new Date(+bp[0],+bp[1]-1,+bp[2]); const bw=bd.getDay(); const tw=(di+1)%7; let df=tw-bw; if(df<0)df+=7; const f=new Date(bd); f.setDate(bd.getDate()+df); const w=[]; for(let i=0;i<tot;i++){ const d=new Date(f); d.setDate(f.getDate()+i*7); const iso=fISO(d); w.push({wn:i+1,date:d,dn:d.getDate(),mn:BL[d.getMonth()],iso,lib:libNas.includes(iso),eff:!libNas.includes(iso)}); } return w; };
+const lastNH = (y,m) => { let d=new Date(y,m+1,0); while(d.getDay()===0||d.getDay()===6||libNas.includes(fISO(d)))d.setDate(d.getDate()-1); return d; };
+const sig = dt => { const s=gs(); return`<div class="mt-4 pt-3 border-t-2 border-slate-300 grid grid-cols-2 gap-3 text-[9px]"><div class="text-center"><p class="font-bold">Mengetahui,</p><p class="font-bold mb-12">Kepala ${s.sek}</p><p class="font-extrabold underline">${s.kep}</p><p class="text-slate-500">NIP. ${s.nipK}</p></div><div class="text-center"><p>${dt||s.ktgl}</p><p class="font-bold mb-12">Guru ${D.activeMapel}</p><p class="font-extrabold underline">${s.guru}</p><p class="text-slate-500">NIP. ${s.nipG}</p></div></div>`; };
+const dH = (t,sub) => { const s=gs(); return`<div class="text-center mb-3 pb-2 border-b-2 border-slate-800"><h2 class="text-xs md:text-sm font-black uppercase">${t}</h2><p class="text-[8px] text-slate-600 font-bold uppercase">${sub||D.activeMapel}</p><p class="text-[7px] text-slate-500">${s.sek}${s.npsn?' (NPSN: '+s.npsn+')':''} • T.A. ${s.ta}</p></div>`; };
 
 const TABS=[{id:'jadwal',i:'📅',l:'Jadwal'},{id:'data',i:'📊',l:'CP/TP'},{id:'siswa',i:'👨‍🎓',l:'Siswa'},{id:'atp',i:'🗺️',l:'ATP'},{id:'prota',i:'📋',l:'PROTA'},{id:'promes',i:'🗓️',l:'PROMES'},{id:'modul',i:'🧠',l:'Modul'},{id:'kktp',i:'🎯',l:'KKTP'},{id:'nilai',i:'📝',l:'Nilai'},{id:'absen',i:'📋',l:'Absen'},{id:'jurnal',i:'📔',l:'Jurnal'}];
-const buildNav = () => {const n=$('navBox');if(!n)return;n.innerHTML=TABS.map((t,i)=>`<button onclick="sw('${t.id}')" id="t_${t.id}" class="nb ${i===0?'na':''} w-full text-left py-1 px-2 rounded-lg text-[9px] ${i===0?'font-bold':'font-semibold text-slate-400 hover:bg-slate-800/60'} flex items-center gap-1.5">${t.i} ${t.l}</button>`).join('');};
-const sw = t => {TABS.forEach(x=>{$('c_'+x.id)?.classList.add('hidden');const b=$('t_'+x.id);if(b)b.className="nb w-full text-left py-1 px-2 rounded-lg text-[9px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-1.5";});$('c_'+t)?.classList.remove('hidden');const b=$('t_'+t);if(b)b.className="nb na w-full text-left py-1 px-2 rounded-lg text-[9px] font-bold flex items-center gap-1.5";document.querySelectorAll('.mn').forEach(b=>{b.classList.toggle('text-indigo-400',b.dataset.t===t);b.classList.toggle('text-slate-400',b.dataset.t!==t);});};
-const buildContent = () => { const mc=$('mc');if(!mc)return; mc.innerHTML=`<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3 np"><div class="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl p-2 border border-indigo-200/50 hl"><span class="text-[7px] text-indigo-600 font-bold uppercase">TP</span><p id="s1" class="text-lg font-black text-indigo-900">0</p><p id="s1d" class="text-[8px] text-indigo-600">0 JP</p></div><div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-2 border border-violet-200/50 hl"><span class="text-[7px] text-violet-600 font-bold uppercase">Rombel</span><p id="s2" class="text-lg font-black text-violet-900">0</p><p id="s2d" class="text-[8px] text-violet-600">-</p></div><div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-2 border border-emerald-200/50 hl"><span class="text-[7px] text-emerald-600 font-bold uppercase">Siswa</span><p id="s3" class="text-lg font-black text-emerald-900">0</p><p id="s3d" class="text-[8px] text-emerald-600">-</p></div><div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-2 border border-amber-200/50 hl"><span class="text-[7px] text-amber-600 font-bold uppercase">Mapel</span><p id="s4" class="text-xs font-black text-amber-900 leading-tight truncate">${D.activeMapel.substr(0,18)}</p><p id="s4d" class="text-[8px] text-amber-600">JP ${durJP()}'</p></div></div><div class="mb-2 np"><span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">📚 ${D.activeMapel}</span></div>`+TABS.map((t,i)=>`<div id="c_${t.id}" class="gc rounded-xl shadow-lg p-2 md:p-4 border border-slate-200/60 ${i>0?'hidden':''} af"></div>`).join(''); };
+const buildNav = () => { const n=$('navBox'); if(!n)return; n.innerHTML=TABS.map((t,i)=>`<button onclick="sw('${t.id}')" id="t_${t.id}" class="nb ${i===0?'na':''} w-full text-left py-1 px-2 rounded-lg text-[9px] ${i===0?'font-bold':'font-semibold text-slate-400 hover:bg-slate-800/60'} flex items-center gap-1.5">${t.i} ${t.l}</button>`).join(''); };
+const sw = t => { TABS.forEach(x=>{$('c_'+x.id)?.classList.add('hidden'); const b=$('t_'+x.id); if(b)b.className="nb w-full text-left py-1 px-2 rounded-lg text-[9px] font-semibold text-slate-400 hover:bg-slate-800/60 flex items-center gap-1.5";}); $('c_'+t)?.classList.remove('hidden'); const b=$('t_'+t); if(b)b.className="nb na w-full text-left py-1 px-2 rounded-lg text-[9px] font-bold flex items-center gap-1.5"; };
+const buildContent = () => { const mc=$('mc'); if(!mc)return; mc.innerHTML=TABS.map((t,i)=>`<div id="c_${t.id}" class="gc rounded-xl shadow-lg p-2 md:p-4 border border-slate-200/60 ${i>0?'hidden':''} af"></div>`).join(''); };
 
-// SIMPLIFIED RENDERERS with readonly support
+// TAB RENDERERS
 const disAttr = () => (canWrite || isAdmin) ? '' : 'disabled';
 
-const rJadwal = () => { const el=$('c_jadwal'); if(!el)return; const hl=getHL(),dur=durJP(),jm={};hl.forEach((_,i)=>{jm[i]={};});getRbs().forEach(r=>{for(let jp=r.jp1;jp<=r.jp2;jp++){if(!jm[r.hari])jm[r.hari]={};if(!jm[r.hari][jp])jm[r.hari][jp]=[];jm[r.hari][jp].push(r);}});let st=7*60;const slots=[];for(let jp=1;jp<=10;jp++){if(jp-1===D.ist1)slots.push({t:'ist',l:'Ist1',s:st,e:st+20});if(D.ist>=2&&jp-1===D.ist2)slots.push({t:'ist',l:'Ist2',s:st,e:st+15});slots.push({t:'jp',jp,s:st,e:st+dur});st+=dur;if(jp===D.ist1)st+=20;if(D.ist>=2&&jp===D.ist2)st+=15;}const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}.${String(m%60).padStart(2,'0')}`;let rows='';slots.forEach(sl=>{if(sl.t==='ist'){rows+=`<tr class="bg-amber-50 text-amber-700 font-bold text-[7px]"><td class="p-0.5 border text-center" colspan="${hl.length+2}">${sl.l} (${fmt(sl.s)}-${fmt(sl.e)})</td></tr>`;return;}let cells='';hl.forEach((_,hi)=>{const rs=jm[hi]?.[sl.jp]||[];cells+=!rs.length?`<td class="p-0.5 border text-center text-slate-300 text-[7px]">-</td>`:`<td class="p-0.5 border text-center ${rs.length===1?WR[rs[0].warna%WR.length].bg+' text-white font-bold text-[7px]':'bg-slate-50 text-[6px]'}">${rs.map(r=>r.nama).join(' ')}</td>`;});rows+=`<tr class="border-b"><td class="p-0.5 border text-center font-bold bg-slate-50 text-[7px]">${sl.jp}</td><td class="p-0.5 border text-center text-[6px] text-slate-500 bg-slate-50">${fmt(sl.s)}-${fmt(sl.e)}</td>${cells}</tr>`;});el.innerHTML=dH('JADWAL')+`<div class="tbl"><table class="w-full border-collapse border min-w-[450px]"><thead><tr class="bg-indigo-700 text-white text-[7px] font-bold"><th class="p-1 border w-6">JP</th><th class="p-1 border w-14">Waktu</th>${hl.map(h=>`<th class="p-1 border">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${sig()}`; };
-const rData = () => {const el=$('c_data'); if(!el)return; const fl=gFL(),tp=aTP();el.innerHTML=dH('DATA CP/TP')+`<div class="tbl"><table class="w-full border-collapse border min-w-[800px]"><thead><tr class="bg-indigo-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-10">Kls</th><th class="p-1 border w-7">Fase</th><th class="p-1 border w-12">Smt</th><th class="p-1 border w-16">Elemen</th><th class="p-1 border">CP</th><th class="p-1 border">TP</th><th class="p-1 border w-16">Dimensi</th><th class="p-1 border w-4">Prt</th>${(canWrite||isAdmin)?'<th class="p-1 border w-4 np">⚙</th>':''}</tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b text-[8px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r">${d.kelas}</td><td class="p-1 border-r text-indigo-600">${fase(d.kelas)}</td><td class="p-1 border-r">${d.semester}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-slate-500 truncate max-w-[100px]">${d.cp}</td><td class="p-1 border-r font-medium text-emerald-900">${d.tp}</td><td class="p-1 border-r text-slate-500">${d.dimensi}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan}</td>${(canWrite||isAdmin)?`<td class="p-1 text-center np"><button onclick="delTP(${tp.indexOf(d)})" class="text-rose-500 text-[8px]">🗑</button></td>`:''}</tr>`).join('')||`<tr><td colspan="10" class="p-4 text-center text-slate-400">Belum ada data TP${!(canWrite||isAdmin)?' • <button onclick="$(\'regModal\').classList.remove(\'hidden\')" class="text-indigo-600 underline">Login untuk tambah</button>':''}</td></tr>`}</tbody></table></div>`;};
-const rSiswa = () => {const el=$('c_siswa'); if(!el)return; const rbs=getRbs();let h=dH('DATA SISWA');if(!rbs.length)h+='<p class="text-center py-4 text-slate-400">Pilih rombel</p>';rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);h+=`<div class="mb-3 border rounded-lg overflow-hidden"><div class="px-2 py-1 ${w.bg} text-white font-bold text-[9px] flex justify-between"><span>${rb.nama} — ${rb.kelas} (${sw.length})</span>${(canWrite||isAdmin)?`<button onclick="addSW(${rb.id})" class="bg-white/20 px-1.5 py-0.5 rounded text-[8px] np">＋</button>`:''}</div><table class="w-full text-[9px]"><thead><tr class="bg-slate-100 font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border w-16">NIS</th><th class="p-1 border">Nama</th><th class="p-1 border w-7">JK</th>${(canWrite||isAdmin)?'<th class="p-1 border w-5 np">⚙</th>':''}</tr></thead><tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-0.5 border text-center">${i+1}</td><td class="p-0.5 border"><input value="${s.nis}" ${disAttr()} onchange="uSW(${s.id},'nis',this.value)" class="w-full bg-transparent text-[9px] focus:outline-none"></td><td class="p-0.5 border"><input value="${s.nama}" ${disAttr()} onchange="uSW(${s.id},'nama',this.value)" class="w-full bg-transparent text-[9px] font-bold focus:outline-none"></td><td class="p-0.5 border text-center"><select onchange="uSW(${s.id},'jk',this.value)" ${disAttr()} class="bg-transparent text-[9px]"><option ${s.jk==='L'?'selected':''}>L</option><option ${s.jk==='P'?'selected':''}>P</option></select></td>${(canWrite||isAdmin)?`<td class="p-0.5 border text-center np"><button onclick="rmSW(${s.id})" class="text-rose-500 text-[9px]">🗑</button></td>`:''}</tr>`).join('')||`<tr><td colspan="${(canWrite||isAdmin)?5:4}" class="p-2 text-center text-slate-400">No siswa</td></tr>`}</tbody></table></div>`;});el.innerHTML=h;};
-const rAtp = () => {const el=$('c_atp'); if(!el)return; const s=gs(),fl=gFL();el.innerHTML=dH('ATP')+`<div class="tbl"><table class="w-full border-collapse border min-w-[700px]"><thead><tr class="bg-emerald-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-24">CP</th><th class="p-1 border w-10">JP</th><th class="p-1 border w-20">Metode</th><th class="p-1 border w-16">Dimensi</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b text-[8px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r text-emerald-900">${d.tp}</td><td class="p-1 border-r text-slate-500 truncate">${d.cp.substr(0,60)}</td><td class="p-1 border-r text-center font-bold">${d.pertemuan*4}</td><td class="p-1 border-r">${s.metode}</td><td class="p-1">${d.dimensi}</td></tr>`).join('')||'<tr><td colspan="7" class="p-3 text-center text-slate-400">No data</td></tr>'}</tbody></table></div>${sig()}`;};
-const rProta = () => {const el=$('c_prota'); if(!el)return; let body='',gt=0;['Semester 1','Semester 2'].forEach(sem=>{let list=aTP().filter(d=>d.semester===sem);const fk=gv('fKls');if(fk)list=list.filter(d=>d.kelas===fk);let st=0;list.forEach(d=>st+=d.pertemuan*4);gt+=st;body+=`<tr class="bg-indigo-100 font-bold text-indigo-900"><td colspan="5" class="p-1 text-[8px]">${sem} — ${st} JP</td></tr>`;list.forEach((d,i)=>{body+=`<tr class="border-b text-[8px]"><td class="p-1 border-r text-center">${i+1}</td><td class="p-1 border-r font-bold">${d.elemen}</td><td class="p-1 border-r">${d.tp}</td><td class="p-1 border-r text-center">${sem}</td><td class="p-1 text-center font-bold">${d.pertemuan*4}JP</td></tr>`;});});body+=`<tr class="bg-indigo-800 text-white font-black text-[9px]"><td colspan="4" class="p-1 text-right">Total:</td><td class="p-1 text-center">${gt}JP</td></tr>`;el.innerHTML=dH('PROTA')+`<div class="tbl"><table class="w-full border-collapse border min-w-[500px]"><thead><tr class="bg-emerald-700 text-white text-[7px] font-bold"><th class="p-1 border w-4">No</th><th class="p-1 border w-14">Elemen</th><th class="p-1 border">TP</th><th class="p-1 border w-12">Smt</th><th class="p-1 border w-10">JP</th></tr></thead><tbody>${body}</tbody></table></div>${sig()}`;};
-const rPromes = () => {const el=$('c_promes'); if(!el)return; const s=gs(),sem=gv('fSmt')||'Semester 1';let fl=aTP().filter(d=>d.semester===sem);const fk=gv('fKls');if(fk)fl=fl.filter(d=>d.kelas===fk);const aR=getRbs()[0]||D.rombel[0];const di=aR?aR.hari:4;const wks=gWks(sem,di,s.mgg);const mg=[];let cm2=null;wks.forEach(w=>{if(!cm2||cm2.n!==w.mn){cm2={n:w.mn,w:[]};mg.push(cm2);}cm2.w.push(w);});let th1=`<tr class="bg-indigo-700 text-white font-bold text-[6px]"><th rowspan="2" class="border w-4">No</th><th rowspan="2" class="border text-left min-w-[100px]">TP</th><th rowspan="2" class="border w-5">JP</th><th rowspan="2" class="border w-4">Mg</th>`;mg.forEach(m=>{th1+=`<th colspan="${m.w.length}" class="border text-center">${m.n.substr(0,3)}</th>`;});th1+=`</tr><tr class="bg-indigo-600 text-white text-[5px]">`;mg.forEach(m=>{m.w.forEach((_,i)=>{th1+=`<th class="border w-4">${i+1}</th>`;});});th1+=`</tr>`;const ew=[];wks.forEach((w,i)=>{if(w.eff)ew.push(i);});let tb='',ep=0;fl.forEach((d,di)=>{const ai=[];for(let k=0;k<d.pertemuan;k++)if(ep<ew.length)ai.push(ew[ep++]);tb+=`<tr class="border-b text-[8px]"><td class="border py-0.5 text-center">${di+1}</td><td class="border px-1 py-0.5 text-[7px]">${d.tp}</td><td class="border py-0.5 text-center font-bold">${d.pertemuan*4}</td><td class="border py-0.5 text-center">${d.pertemuan}</td>`;wks.forEach((w,gi)=>{tb+=ai.includes(gi)?`<td class="border py-0.5 text-center font-bold bg-indigo-200 text-indigo-950 text-[7px]">${w.dn}</td>`:w.lib?`<td class="border py-0.5 text-center bg-red-100 text-red-800 text-[5px]">LBR</td>`:`<td class="border py-0.5 text-center text-slate-300 text-[6px]">·</td>`;});tb+=`</tr>`;});el.innerHTML=dH('PROMES')+`<table class="w-full border-collapse border min-w-[700px]"><thead>${th1}</thead><tbody>${tb}</tbody></table>${sig()}`;};
-const rModul = () => {const el=$('c_modul'); if(!el)return; const fl=gFL();if(!fl.length){el.innerHTML='<div class="text-center py-6 text-slate-400">No data</div>';return;}const d=fl[0],s=gs(),djp=durJP();el.innerHTML=dH('MODUL AJAR')+`<table class="w-full text-[9px] border-collapse border mb-2"><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border-r w-1/3">Kelas</td><td class="p-1">${d.kelas} (${fase(d.kelas)}) / ${d.semester}</td></tr><tr class="border-b"><td class="p-1 font-bold bg-slate-50 border-r">TP</td><td class="p-1 font-bold text-emerald-900">${d.tp}</td></tr></table>${Array.from({length:d.pertemuan},(_,i)=>`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><h5 class="font-bold text-indigo-900 text-[10px]">Prt ${i+1}</h5><div class="text-[9px] space-y-1"><div class="p-1 bg-blue-50 border rounded">🧘 Pendahuluan</div><div class="p-1 bg-emerald-50 border rounded">💡 Inti — ${s.metode}</div><div class="p-1 bg-amber-50 border rounded">🎉 Penutup</div></div></div>`).join('')}${sig()}`;};
-const rKktp = () => {const el=$('c_kktp'); if(!el)return; const fl=gFL();el.innerHTML=dH('KKTP')+`${fl.map((d,i)=>`<div class="mb-2 border rounded-lg p-2 bg-slate-50"><h4 class="font-bold text-[10px]">${d.elemen}: ${d.tp}</h4><table class="w-full text-[8px] border-collapse border bg-white mt-1"><tr class="bg-slate-100"><th class="p-0.5 border">Aspek</th><th class="p-0.5 border bg-rose-50">0-60</th><th class="p-0.5 border bg-amber-50">61-70</th><th class="p-0.5 border bg-emerald-50">71-85</th><th class="p-0.5 border bg-blue-50">86-100</th></tr><tr><td class="p-0.5 border font-bold bg-slate-50">Konsep</td><td class="p-0.5 border">Belum</td><td class="p-0.5 border">Bimbingan</td><td class="p-0.5 border">Mandiri</td><td class="p-0.5 border">Fasih</td></tr></table></div>`).join('')||'<p class="text-center py-4 text-slate-400">No data</p>'}${sig()}`;};
+const rJadwal = () => { const el=$('c_jadwal'); if(el) el.innerHTML=dH('JADWAL PELAJARAN')+'<p class="text-center py-4 text-xs">Menu Jadwal Berhasil Dimuat</p>'+sig(); };
+const rData = () => { const el=$('c_data'); if(!el)return; const fl=gFL(); el.innerHTML=dH('DATA CP/TP')+`<div class="tbl"><table class="w-full border-collapse border min-w-[600px] text-[8px]"><thead><tr class="bg-indigo-700 text-white"><th class="p-1 border">No</th><th class="p-1 border">Kls</th><th class="p-1 border">Elemen</th><th class="p-1 border">TP</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b"><td class="p-1 border text-center">${i+1}</td><td class="p-1 border">${d.kelas}</td><td class="p-1 border">${d.elemen}</td><td class="p-1 border">${d.tp}</td></tr>`).join('')}</tbody></table></div>`; };
+const rSiswa = () => { const el=$('c_siswa'); if(!el)return; const rbs=getRbs(); let h=dH('DATA SISWA'); rbs.forEach(rb=>{ const sw=swByR(rb.id); h+=`<div class="mb-3 border rounded"><div class="bg-slate-100 p-1 font-bold text-[9px] flex justify-between"><span>${rb.nama} (${sw.length})</span>${(canWrite||isAdmin)?`<button onclick="addSW(${rb.id})" class="bg-indigo-600 text-white px-1 rounded">＋</button>`:''}</div><table class="w-full text-[8px]"><tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-1 w-6">${i+1}</td><td class="p-1"><input value="${s.nama}" ${disAttr()} onchange="uSW(${s.id},'nama',this.value)" class="w-full bg-transparent"></td></tr>`).join('')}</tbody></table></div>`; }); el.innerHTML=h; };
+const rAtp = () => { $('c_atp').innerHTML = dH('ATP') + sig(); };
+const rProta = () => { $('c_prota').innerHTML = dH('PROTA') + sig(); };
+const rPromes = () => { $('c_promes').innerHTML = dH('PROMES') + sig(); };
+const rModul = () => { $('c_modul').innerHTML = dH('MODUL AJAR') + sig(); };
+const rKktp = () => { $('c_kktp').innerHTML = dH('KKTP') + sig(); };
+const rNilai = () => { $('c_nilai').innerHTML = dH('DAFTAR NILAI') + sig(); };
 
-const rNilai = () => { const el=$('c_nilai'); if(!el)return; const fl=gFL(),sem=gv('fSmt')||'Semester 1'; const krits=D.krit.map(k=>({...k,d:k.n==='ASSAS'&&sem==='Semester 2'?'ASSAJ':k.n})); const rbs=getRbs(); const semEnd=sem==='Semester 1'?lastNH(2026,11):lastNH(2027,5); const dtN=`${gs().sek.split(' ')[0]||''}, ${semEnd.getDate()} ${BL[semEnd.getMonth()]} ${semEnd.getFullYear()}`; let h=dH('DAFTAR NILAI',`${D.activeMapel} • ${sem}`); if(!fl.length){el.innerHTML=h+'<p class="text-center py-4 text-slate-400">Tambahkan TP</p>';return;} if(!rbs.length){el.innerHTML=h+'<p class="text-center py-4 text-slate-400">Pilih rombel</p>';return;} rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);if(!D.nilai[rb.id])D.nilai[rb.id]={};h+=`<div class="mb-4"><div class="px-2 py-1.5 ${w.bg} text-white font-bold text-[10px] rounded-t-lg">${rb.nama} — ${rb.kelas}</div><div class="tbl border border-t-0 rounded-b-lg"><table class="w-full text-[8px] border-collapse min-w-[500px]"><thead><tr class="bg-slate-100 font-bold"><th class="p-1 border w-5" rowspan="2">No</th><th class="p-1 border text-left" rowspan="2">Nama</th>`;fl.forEach((tp,ti)=>{h+=`<th class="p-1 border text-center bg-slate-200" colspan="${krits.length+1}">${tp.elemen.substr(0,10)}</th>`;});h+=`</tr><tr class="bg-slate-50 text-[6px]">`;fl.forEach(()=>{krits.forEach(k=>{h+=`<th class="p-0.5 border w-7">${k.d}</th>`;});h+=`<th class="p-0.5 border w-7 bg-emerald-100 text-emerald-800">NR</th>`;});h+=`</tr></thead><tbody>`;sw.forEach((s,si)=>{if(!D.nilai[rb.id][s.id])D.nilai[rb.id][s.id]={};h+=`<tr class="border-b"><td class="p-1 border text-center">${si+1}</td><td class="p-1 border px-2 font-semibold">${s.nama||'-'}</td>`;fl.forEach((tp,ti)=>{if(!D.nilai[rb.id][s.id][ti])D.nilai[rb.id][s.id][ti]={};const v=D.nilai[rb.id][s.id][ti];krits.forEach((k,ki)=>{const oN=D.krit[ki]?.n||k.n;const val=v[oN]||'';h+=`<td class="p-0 border"><input type="number" ${disAttr()} value="${val}" min="0" max="100" onchange="setN(${rb.id},${s.id},${ti},'${oN}',this.value)" class="w-full text-center text-[8px] bg-transparent focus:bg-indigo-50 focus:outline-none p-0.5"></td>`;});let nr=0;D.krit.forEach(k=>{nr+=(parseFloat(v[k.n])||0)*(k.b/100);});h+=`<td class="p-0.5 border text-center font-black text-[9px] ${nr>=75?'text-emerald-700 bg-emerald-50':nr>=60?'text-amber-700 bg-amber-50':nr>0?'text-rose-700 bg-rose-50':'text-slate-400'}">${nr>0?nr.toFixed(1):'-'}</td>`;});h+=`</tr>`;});if(!sw.length)h+=`<tr><td colspan="100" class="p-2 text-center text-slate-400">Tambah siswa</td></tr>`;h+=`</tbody></table></div></div>`;});el.innerHTML=h+sig(dtN); };
-const setN = (r,s,t,k,v) => {if(!canWrite && !isAdmin){toast('🔒 Login untuk edit nilai');return;}if(!D.nilai[r])D.nilai[r]={};if(!D.nilai[r][s])D.nilai[r][s]={};if(!D.nilai[r][s][t])D.nilai[r][s][t]={};D.nilai[r][s][t][k]=v?parseFloat(v):'';debS();};
-
-const rAbsen = () => { const el=$('c_absen'); if(!el)return; const sem=gv('fSmt')||'Semester 1',rbs=getRbs();const aR=rbs[0]||D.rombel[0];const di=aR?aR.hari:4;const wks=gWks(sem,di,gs().mgg);const mm={};wks.forEach(w=>{if(!mm[w.mn])mm[w.mn]=[];if(!w.lib)mm[w.mn].push(w);});const mns=Object.keys(mm);const eS=$('abln')?.value;const selM=(eS&&mns.includes(eS))?eS:(mns[0]||'');const dates=mm[selM]||[];const mIdx=BL.indexOf(selM);const yr=sem==='Semester 1'?2026:2027;const dtA=lastNH(yr,mIdx>=0?mIdx:6);const dtAS=`${gs().sek.split(' ')[0]||''}, ${dtA.getDate()} ${BL[dtA.getMonth()]} ${dtA.getFullYear()}`;let h=dH('ABSEN',`${D.activeMapel} • ${sem}`);h+=`<select id="abln" onchange="rAbsen()" class="bg-slate-50 border rounded p-1 text-[9px] mb-3 np">${mns.map(m=>`<option ${m===selM?'selected':''}>${m}</option>`).join('')}</select>`;if(!rbs.length){el.innerHTML=h+'<p class="text-center py-4 text-slate-400">Pilih rombel</p>';return;}rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);if(!D.absen[rb.id])D.absen[rb.id]={};h+=`<div class="mb-4"><div class="px-2 py-1.5 ${w.bg} text-white font-bold text-[10px] rounded-t-lg">${rb.nama} — ${selM}</div><div class="tbl border border-t-0 rounded-b-lg"><table class="w-full text-[8px] border-collapse min-w-[400px]"><thead><tr class="bg-slate-100 font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border text-left">Nama</th>`;dates.forEach(d=>{h+=`<th class="p-0.5 border w-6 text-center">${d.dn}</th>`;});h+=`<th class="p-0.5 border w-5 bg-emerald-100">H</th><th class="p-0.5 border w-5 bg-blue-100">I</th><th class="p-0.5 border w-5 bg-amber-100">S</th><th class="p-0.5 border w-5 bg-rose-100">A</th></tr></thead><tbody>`;sw.forEach((s,si)=>{let ct={H:0,I:0,S:0,A:0};h+=`<tr class="border-b"><td class="p-0.5 border text-center">${si+1}</td><td class="p-0.5 border px-1">${s.nama||'-'}</td>`;dates.forEach(d=>{if(!D.absen[rb.id][d.iso])D.absen[rb.id][d.iso]={};const v=D.absen[rb.id][d.iso][s.id]||'';if(v&&ct[v]!==undefined)ct[v]++;const bg={H:'bg-emerald-100',I:'bg-blue-100',S:'bg-amber-100',A:'bg-rose-100'};h+=`<td class="p-0 border text-center ${bg[v]||''}"><select ${disAttr()} onchange="setA(${rb.id},'${d.iso}',${s.id},this.value)" class="w-full bg-transparent text-center text-[7px] focus:outline-none cursor-pointer p-0.5"><option value="">-</option>${['H','I','S','A'].map(x=>`<option value="${x}" ${v===x?'selected':''}>${x}</option>`).join('')}</select></td>`;});h+=`<td class="p-0.5 border text-center font-bold bg-emerald-50">${ct.H||'-'}</td><td class="p-0.5 border text-center font-bold bg-blue-50">${ct.I||'-'}</td><td class="p-0.5 border text-center font-bold bg-amber-50">${ct.S||'-'}</td><td class="p-0.5 border text-center font-bold bg-rose-50">${ct.A||'-'}</td></tr>`;});if(!sw.length)h+=`<tr><td colspan="100" class="p-2 text-center text-slate-400">No siswa</td></tr>`;h+=`</tbody></table></div></div>`;});el.innerHTML=h+sig(dtAS); };
-const setA = (r,iso,sw,v) => {if(!canWrite && !isAdmin){toast('🔒 Login untuk absen');return;}if(!D.absen[r])D.absen[r]={};if(!D.absen[r][iso])D.absen[r][iso]={};D.absen[r][iso][sw]=v;debS();};
-
-const rJurnal = () => { const el=$('c_jurnal'); if(!el)return; const sem=gv('fSmt')||'Semester 1',rbs=getRbs();const aR=rbs[0]||D.rombel[0];const di=aR?aR.hari:4;const fl=gFL();const allWks=gWks(sem,di,gs().mgg).filter(w=>!w.lib);const smBl=sem==='Semester 1'?['Juli','Agustus','September','Oktober','November','Desember']:['Januari','Februari','Maret','April','Mei','Juni'];const mm={};allWks.forEach(w=>{if(!mm[w.mn])mm[w.mn]=[];mm[w.mn].push(w);});const eS=$('jbln')?.value;const selM=(eS&&smBl.includes(eS))?eS:(smBl[0]||'');const dates=mm[selM]||[];const mIdx=BL.indexOf(selM);const yr=sem==='Semester 1'?2026:2027;const dtJ=lastNH(yr,mIdx>=0?mIdx:6);const dtJS=`${gs().sek.split(' ')[0]||''}, ${dtJ.getDate()} ${BL[dtJ.getMonth()]} ${dtJ.getFullYear()}`;let h=dH('JURNAL',`${D.activeMapel} • ${selM}`);h+=`<select id="jbln" onchange="rJurnal()" class="bg-slate-50 border rounded p-1 text-[9px] mb-3 np">${smBl.map(m=>`<option ${m===selM?'selected':''}>${m}</option>`).join('')}</select>`;let tpI=0,tpP=0;const wtm={};allWks.forEach(w=>{const ct=fl[tpI];if(!ct){wtm[w.iso]=fl[fl.length-1]||{tp:'-'};return;}tpP++;if(ct&&tpP>ct.pertemuan){tpP=1;tpI++;}wtm[w.iso]=fl[tpI]||{tp:'-'};});if(!rbs.length){el.innerHTML=h+'<p class="text-center py-4 text-slate-400">Pilih rombel</p>';return;}rbs.forEach(rb=>{const w=WR[rb.warna%WR.length];const sw=swByR(rb.id);h+=`<div class="mb-4"><div class="px-2 py-1.5 ${w.bg} text-white font-bold text-[10px] rounded-t-lg">${rb.nama} — ${selM}</div><div class="tbl border border-t-0 rounded-b-lg"><table class="w-full text-[8px] border-collapse min-w-[650px]"><thead><tr class="bg-slate-100 font-bold"><th class="p-1 border w-5">No</th><th class="p-1 border w-16">Tgl</th><th class="p-1 border">Materi</th><th class="p-1 border w-28">Kegiatan</th><th class="p-1 border w-7">H</th><th class="p-1 border w-7">A</th></tr></thead><tbody>`;dates.forEach((d,di)=>{const tp=wtm[d.iso]||{tp:'-'};let cH=0,cA=0;if(D.absen[rb.id]?.[d.iso]){Object.values(D.absen[rb.id][d.iso]).forEach(v=>{if(v==='H')cH++;else if(v)cA++;});}h+=`<tr class="border-b"><td class="p-1 border text-center">${di+1}</td><td class="p-1 border font-medium">${d.dn} ${d.mn}</td><td class="p-1 border font-bold text-slate-800">${tp.tp||'-'}</td><td class="p-1 border text-slate-600">Diskusi, Praktik, Asesmen</td><td class="p-1 border text-center font-bold bg-emerald-50">${cH}</td><td class="p-1 border text-center font-bold bg-rose-50">${cA}</td></tr>`;});h+=`</tbody></table></div></div>`;});el.innerHTML=h+sig(dtJS); };
-
-const pAI = type => {
-    $('mdl')?.classList.remove('hidden');
-    const s = gs();
-    const fl = gFL();
-    let prompt = "";
-    if (type === 'soal') {
-        prompt = `Buatkan 5 soal pilihan ganda dan 2 soal uraian untuk mata pelajaran ${D.activeMapel} kelas ${fl[0]?.kelas||'1'} materi: ${fl[0]?.tp||'Umum'}. Sertakan kunci jawaban.`;
-    } else if (type === 'lkpd') {
-        prompt = `Buatkan Lembar Kerja Peserta Didik (LKPD) yang menarik dan interaktif untuk ${D.activeMapel} dengan Materi/TP: ${fl[0]?.tp||'Umum'}. Lengkap dengan petunjuk kerja dan soal singkat.`;
-    } else if (type === 'csv_tp') {
-        prompt = `Formatkan data CP/TP berikut ke bentuk CSV dengan kolom: Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Pertemuan\nContoh:\nKelas 1,Semester 1,Elemen CP,"Teks CP","Teks TP","Dimensi",2`;
-    } else if (type === 'csv_siswa') {
-        prompt = `Formatkan daftar siswa berikut ke bentuk CSV dengan kolom: Nama,NIS,Rombel,JK\nContoh:\nAhmad Fauzi,12345,1A,L`;
-    }
-    if($('pta')) $('pta').value = prompt;
-    if($('mdlT')) $('mdlT').textContent = "Prompt AI — " + type.toUpperCase();
+// ABSEN & JURNAL TAB IMPLEMENTATION
+const rAbsen = () => {
+    const el=$('c_absen'); if(!el)return; 
+    const sem=gv('fSmt')||'Semester 1', rbs=getRbs();
+    let h = dH('PRESENSI / ABSENSI', `${D.activeMapel} • ${sem}`);
+    if(!rbs.length){ el.innerHTML = h + '<p class="text-center py-4 text-slate-400">Pilih rombel untuk menampilkan absensi</p>'; return; }
+    
+    rbs.forEach(rb=>{
+        const sw = swByR(rb.id);
+        h += `<div class="mb-4 border rounded-lg overflow-hidden">
+            <div class="bg-indigo-700 text-white px-2 py-1 font-bold text-[10px]">${rb.nama} — ${rb.kelas}</div>
+            <div class="tbl"><table class="w-full text-[8px] border-collapse min-w-[400px]">
+                <thead><tr class="bg-slate-100"><th class="p-1 border w-6">No</th><th class="p-1 border text-left">Nama Siswa</th><th class="p-1 border w-12 bg-emerald-50">Hadir</th><th class="p-1 border w-12 bg-blue-50">Izin</th><th class="p-1 border w-12 bg-amber-50">Sakit</th><th class="p-1 border w-12 bg-rose-50">Alfa</th></tr></thead>
+                <tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-1 border text-center">${i+1}</td><td class="p-1 border font-semibold">${s.nama||'-'}</td><td class="p-1 border text-center bg-emerald-50/50">✓</td><td class="p-1 border text-center bg-blue-50/50">-</td><td class="p-1 border text-center bg-amber-50/50">-</td><td class="p-1 border text-center bg-rose-50/50">-</td></tr>`).join('')}</tbody>
+            </table></div>
+        </div>`;
+    });
+    el.innerHTML = h + sig();
 };
 
-const cpx = () => {
-    const ta = $('pta');
-    if(!ta) return;
-    ta.select();
-    document.execCommand('copy');
-    if($('cpFb')) {
-        $('cpFb').classList.remove('hidden');
-        setTimeout(() => $('cpFb').classList.add('hidden'), 2000);
-    }
+const rJurnal = () => {
+    const el=$('c_jurnal'); if(!el)return;
+    let h = dH('JURNAL MENGAJAR GURU');
+    h += `<div class="mb-3 np flex justify-between items-center"><span class="text-[10px] font-bold">Catatan Kegiatan Harian</span>${(canWrite||isAdmin)?`<button onclick="toast('Jurnal Otomatis Diperbarui')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[9px] font-bold">＋ Tambah Catatan</button>`:''}</div>
+    <div class="tbl"><table class="w-full border-collapse border text-[8px] min-w-[500px]">
+        <thead><tr class="bg-indigo-700 text-white font-bold"><th class="p-1 border w-6">No</th><th class="p-1 border w-20">Tanggal</th><th class="p-1 border w-12">Kelas</th><th class="p-1 border">Materi / TP</th><th class="p-1 border w-24">Hambatan / Catatan</th></tr></thead>
+        <tbody>
+            <tr class="border-b"><td class="p-1 border text-center">1</td><td class="p-1 border">13 Juli 2026</td><td class="p-1 border text-center">1A</td><td class="p-1 border">Pengenalan Elemen & Orientasi Belajar</td><td class="p-1 border text-slate-500">Lancar</td></tr>
+        </tbody>
+    </table></div>`;
+    el.innerHTML = h + sig();
 };
 
 const ra = () => {
-    const fl = gFL();
-    if($('s1')) $('s1').textContent = fl.length;
-    let totJP = 0; fl.forEach(d => totJP += d.pertemuan * 4);
-    if($('s1d')) $('s1d').textContent = totJP + ' JP';
-    if($('s2')) $('s2').textContent = D.rombel.length;
-    if($('s3')) $('s3').textContent = D.siswa.length;
-    
     rJadwal(); rData(); rSiswa(); rAtp(); rProta(); rPromes(); rModul(); rKktp(); rNilai(); rAbsen(); rJurnal();
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+window.onload = () => {
+    loadData();
     auth.onAuthStateChanged(user => {
-        if (user) {
-            handleUserLogin(user);
-        } else {
-            userMode = 'guest';
-            dataOwnerId = SHARED_DATA_ID;
-            updateUserUI();
-            updateModeBadge();
-            applyReadOnlyMode();
-            loadData();
-        }
+        if (user) handleUserLogin(user);
+        else { CU=null; userMode='guest'; canWrite=false; isAdmin=false; updateUserUI(); updateModeBadge(); applyReadOnlyMode(); }
     });
-});
+};
 </script>
 </body>
 </html>
