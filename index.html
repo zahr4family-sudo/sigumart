@@ -203,7 +203,7 @@
     </div>
   </div>
 
-  <!-- Mapel Selector -->
+  <!-- Mapel Selector (NO rombel — rombel auto from jadwal) -->
   <div id="selArea" class="mb-2 hidden">
     <label class="text-[8px] text-slate-500 uppercase font-bold">Mata Pelajaran Aktif</label>
     <div class="flex space-x-0.5 mt-0.5">
@@ -264,7 +264,7 @@
         <i class="fa-solid fa-right-from-bracket mr-1"></i>Keluar
       </button>
     </div>
-    <p class="text-[8px] text-slate-600 text-center">SI-GUMART v7.0 © 2026</p>
+    <p class="text-[8px] text-slate-600 text-center">SI-GUMART v7.0 © 2025</p>
   </div>
 </aside>
 
@@ -289,9 +289,7 @@
         <i class="fa-solid fa-print mr-0.5"></i>Cetak
       </button>
     </div>
-  </div>
-
-  <!-- ===== TAB: PROFIL ===== -->
+  </div>   <!-- ===== TAB: PROFIL ===== -->
   <div id="tab-profil" class="tab-c bg-white p-4 rounded-xl border fade-in">
     <div class="flex justify-between items-center mb-3 border-b pb-2">
       <h3 class="font-bold text-sm"><i class="fa-solid fa-school text-blue-500 mr-1"></i>Profil Sekolah & Guru</h3>
@@ -385,6 +383,12 @@
       <button onclick="ok()&&procCSV('cp')" class="bg-blue-600 text-white text-[10px] px-3 py-1 rounded mt-1">
         <i class="fa-solid fa-upload mr-0.5"></i>Proses CSV
       </button>
+      <div class="mt-2 bg-amber-50 border border-amber-200 rounded p-2 text-[9px] text-amber-700">
+        <b><i class="fa-solid fa-lightbulb mr-1"></i>Cara Publish Google Sheet:</b><br>
+        1. Buka Sheet → <b>File → Share → Publish to web</b> → pilih Sheet & CSV → Publish<br>
+        2. Copy link → Paste di atas<br>
+        <b>Atau</b>: File → Share → Anyone with link (Viewer) → copy link biasa
+      </div>
     </div>
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex flex-wrap gap-1 items-center mb-2">
@@ -506,7 +510,7 @@
   </div>
   <div id="tab-dKktp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dKktpContent"></div></div>
 
-  <!-- ===== TAB: ABSEN SISWA ===== -->
+  <!-- ===== TAB: ABSEN SISWA (per Rombel) ===== -->
   <div id="tab-absen" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2 no-print">
@@ -523,7 +527,7 @@
     </div>
   </div>
 
-  <!-- ===== TAB: DAFTAR NILAI ===== -->
+  <!-- ===== TAB: DAFTAR NILAI (per Rombel) ===== -->
   <div id="tab-nilai" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2 no-print">
@@ -544,7 +548,7 @@
     </div>
   </div>
 
-  <!-- ===== TAB: JURNAL PEMBELAJARAN ===== -->
+  <!-- ===== TAB: JURNAL PEMBELAJARAN (per Bulan) ===== -->
   <div id="tab-jurnal" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex items-center space-x-2 mb-2 no-print">
@@ -587,9 +591,7 @@
     </div>
   </div>
 
-</main>
-
-<script>
+</main> <script>
 // ============ FIREBASE INIT ============
 firebase.initializeApp({
   apiKey:"AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",
@@ -627,7 +629,7 @@ const hideAuth=()=>$('authScreen').classList.add('hidden');
 const getFase=k=>{const n=parseInt(String(k).replace(/\D/g,''));return n<=2?'A':n<=4?'B':n<=6?'C':n<=8?'D':n<=10?'E':'F'};
 const kelasRange=j=>j==='SD/MI'?[1,2,3,4,5,6]:j==='SMP/MTs'?[7,8,9]:[10,11,12];
 const getJPDur=j=>j==='SD/MI'?35:j==='SMP/MTs'?40:45;
-const copyEl=id=>{navigator.clipboardText($(id).innerText);toast('success','Disalin!')};
+const copyEl=id=>{navigator.clipboard.writeText($(id).innerText);toast('success','Disalin!')};
 const ok=()=>{if(AL==='approved'||AL==='admin')return true;$('mLock').classList.remove('hidden');return false};
 const handlePrint=()=>{if(ok())window.print()};
 const pcsv=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){q=!q;continue}if(ch===','&&!q){r.push(c.trim());c='';continue}c+=ch}r.push(c.trim());return r};
@@ -691,7 +693,7 @@ function getLastWorkdayOfMonth(bln){
   const maxDay=parseInt(v('fHari'))===6?6:5;
   for(let d=lastDay;d>=1;d--){
     const dt=new Date(yr,monthNum,d);
-    const dow=dt.getDay(); 
+    const dow=dt.getDay(); // 0=Min, 1=Sen, ...
     if(dow>=1&&dow<=maxDay)return `${d} ${bln} ${yr}`;
   }
   return `${lastDay} ${bln} ${yr}`;
@@ -768,7 +770,7 @@ async function loadWAConfig(){
   try{
     const d=await db.collection('config').doc('waContact').get();
     if(d.exists)adminWAConfig=d.data();
-  }catch(e){console.error('Load WA Error:',e)}
+  }catch(e){console.error('Load WA:',e)}
 }
 function updateWALink(){
   const email=CU?.email||'';
@@ -1094,13 +1096,14 @@ function rSwT(){
   $('swI').textContent=`${list.length} siswa • L: ${list.filter(s=>s.jk==='L').length} • P: ${list.filter(s=>s.jk==='P').length}`;
 }
 
-// ============ JADWAL ============
+// ============ JADWAL (auto-detect rombel) ============
 function rJadwal(){
   const ie=isEdit();
   const days=getDays();
   const mapelLC=ST.mapel.toLowerCase();
   const isGK=v('fTG')==='kelas';
   
+  // AUTO-DETECT rombel dari jadwal
   const detectedRombel=new Set();
   if(D.jadwal)D.jadwal.forEach(r=>{
     if(r.j==='ist'||!r.h)return;
@@ -1175,6 +1178,7 @@ function rJadwal(){
   });
   html+=`</tbody></table>`;
   
+  // Rekap JP per rombel
   let jpCount=0;
   const rombelJP={};
   D.jadwal.forEach(r=>{
@@ -1344,22 +1348,7 @@ function doImp(i){
   }
 }
 
-// ============ ABSEN ============
-function getJPPerWeekForRombel(rom){
-  let count=0;
-  if(!D.jadwal)return 2;
-  const mapelLC=ST.mapel.toLowerCase();
-  D.jadwal.forEach(r=>{
-    if(r.j==='ist'||!r.h)return;
-    getDays().forEach(d=>{
-      const val=r.h[d]||'';
-      const parts=val.split('\n');
-      if((parts[0]||'').toLowerCase().includes(mapelLC)&&(parts[1]||'').trim()===rom)count++;
-    });
-  });
-  return count||2;
-}
-
+// ============ ABSEN (default HADIR) ============
 function rAbsen(){
   const bln=$('abBln').value;
   const rom=ST.activeDocRombel||ST.rombel;
@@ -1394,506 +1383,999 @@ function rAbsen(){
     }
     html+=`<td class="border p-0.5 text-center font-bold text-emerald-600">${h}</td><td class="border p-0.5 text-center text-amber-600">${sk}</td><td class="border p-0.5 text-center text-blue-600">${iz}</td><td class="border p-0.5 text-center text-red-600">${a}</td></tr>`;
   });
-  html+=`</tbody></table>`;
+  html+=`</tbody></table>
+    <p class="text-[9px] text-slate-400 mt-1"><b>Keterangan:</b> H=Hadir • S=Sakit • I=Izin • A=Alpha • Default: Hadir</p>`;
   $('abArea').innerHTML=html;
   $('abTTD').innerHTML=makeTTD(getTTDPelaporan(bln));
 }
 
-// ============ NILAI ============
-function addKrit(){
-  if(!D.kriteria)D.kriteria=[];
-  const k=prompt('Nama kriteria penilaian baru (misal: Formatif 1, Sumatif Bab 1):');
-  if(!k)return;
-  D.kriteria.push(k.trim());
-  rNilai();
+function getJPPerWeekForRombel(rom){
+  let c=0;
+  const ml=ST.mapel.toLowerCase();
+  D.jadwal.forEach(r=>{
+    if(r.j==='ist')return;
+    getDays().forEach(d=>{
+      const val=r.h?.[d]||'';
+      const parts=val.split('\n');
+      const mp=(parts[0]||'').toLowerCase();
+      const rb=(parts[1]||'').trim();
+      if(mp.includes(ml)&&(!rb||rb===rom))c++;
+    });
+  });
+  return c||2;
 }
+
+// ============ NILAI ============
+function addKrit(){D.kriteria.push({n:'Kriteria Baru',b:100});rNilai()}
 function rNilai(){
-  const bln=$('nlBln').value;
+  const ie=isEdit();
   const rom=ST.activeDocRombel||ST.rombel;
+  const bln=$('nlBln').value||'Juli';
   const list=D.siswa[rom]||[];
   $('nlR').textContent=rom||'(belum ada)';
   $('nilaiHeader').innerHTML=`<div class="print-area text-center mb-2">
     <h2 class="text-sm font-bold uppercase">DAFTAR NILAI SISWA</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • Rombel ${rom} • Bulan ${bln} TA ${v('fTA')}</p>
+    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • Rombel ${rom} • ${bln} TA ${v('fTA')}</p>
   </div>`;
-  if(!rom){$('nlArea').innerHTML='<p class="text-center py-6 text-slate-400 text-xs">Pilih rombel dari tab di atas</p>';$('nlTTD').innerHTML='';return}
-  if(!D.kriteria||!D.kriteria.length)D.kriteria=['Formatif 1','Formatif 2','Sumatif Bab 1','Sumatif Bab 2'];
-  const ie=isEdit();
-  
-  $('krArea').innerHTML=`<div class="flex items-center gap-1 text-[9px] text-slate-500"><span>Kriteria Aktif:</span>`+
-    D.kriteria.map((k,ki)=>`<span class="bg-slate-100 border px-1.5 py-0.5 rounded flex items-center gap-1">${k} ${ie?`<button onclick="D.kriteria.splice(${ki},1);rNilai()" class="text-red-500"><i class="fa-solid fa-xmark"></i></button>`:''}</span>`).join('')+`</div>`;
-    
+  if(!rom){$('nlArea').innerHTML='<p class="text-center py-6 text-slate-400 text-xs">Pilih rombel dari tab di atas</p>';$('nlTTD').innerHTML='';$('krArea').innerHTML='';return}
   if(!D.nilai[rom])D.nilai[rom]={};
-  if(!D.nilai[rom][bln])D.nilai[rom][bln]={};
-
-  let html=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 text-left min-w-[120px]">Nama Siswa</th>`;
-  D.kriteria.forEach(k=>html+=`<th class="border p-1 text-center min-w-[50px]">${k}</th>`);
-  html+=`<th class="border p-1 bg-blue-50 text-center font-bold w-12">Rata2</th></tr></thead><tbody>`;
-
+  $('krArea').innerHTML=`<div class="text-[10px] font-semibold text-slate-600 mb-1">Kriteria Penilaian (Bobot total sebaiknya = 100%):</div>`+
+    D.kriteria.map((k,i)=>`<div class="flex items-center space-x-1 text-[10px]">
+      <input value="${k.n}" onchange="D.kriteria[${i}].n=this.value;rNilai()" class="border rounded p-1 flex-1 ef" ${ie?'':'disabled'}>
+      <span class="text-slate-500">Bobot:</span>
+      <input type="number" value="${k.b}" onchange="D.kriteria[${i}].b=+this.value;rNilai()" class="border rounded p-1 w-16 ef" ${ie?'':'disabled'}>%
+      ${ie?`<button onclick="D.kriteria.splice(${i},1);rNilai()" class="text-red-500"><i class="fa-solid fa-trash text-[9px]"></i></button>`:''}
+    </div>`).join('');
+  const totalBobot=D.kriteria.reduce((s,k)=>s+(k.b||0),0);
+  if(totalBobot!==100)$('krArea').innerHTML+=`<p class="text-[9px] text-amber-600"><i class="fa-solid fa-exclamation-triangle mr-0.5"></i>Total bobot saat ini: ${totalBobot}%</p>`;
+  let html=`<table class="w-full text-[10px]"><thead class="bg-slate-100"><tr>
+    <th class="border p-1">No</th><th class="border p-1 text-left">Nama Siswa</th>`;
+  D.kriteria.forEach(k=>html+=`<th class="border p-1">${k.n}<br><span class="text-[7px]">(${k.b}%)</span></th>`);
+  html+=`<th class="border p-1 bg-blue-50">Nilai<br>Akhir</th><th class="border p-1 bg-emerald-50">Predikat</th></tr></thead><tbody>`;
   list.forEach((s,si)=>{
-    html+=`<tr><td class="border p-0.5 text-center">${si+1}</td><td class="border p-0.5">${s.nama||'-'}</td>`;
-    let sum=0,cnt=0;
+    html+=`<tr><td class="border p-1 text-center">${si+1}</td><td class="border p-1">${s.nama||'-'}</td>`;
+    let tw=0;
     D.kriteria.forEach((k,ki)=>{
-      const key=`${si}_${ki}`;
-      const val=D.nilai[rom][bln][key]||'';
-      if(val!==''&&!isNaN(val)){sum+=parseFloat(val);cnt++}
-      html+=`<td class="border p-0"><input type="number" value="${val}" onchange="D.nilai['${rom}']['${bln}']['${key}']=this.value;rNilai()" class="w-full text-[9px] text-center p-0.5 bg-transparent border-0 ef" ${ie?'':'disabled'}></td>`;
+      const key=`${si}_${ki}_${bln}`;
+      const val=D.nilai[rom][key]||'';
+      const nv=parseFloat(val)||0;
+      tw+=nv*(k.b/100);
+      html+=`<td class="border p-0"><input type="number" value="${val}" onchange="D.nilai['${rom}']['${key}']=this.value;rNilai()" class="w-full text-center text-[10px] p-1 ef border-0" min="0" max="100" ${ie?'':'disabled'}></td>`;
     });
-    const avg=cnt>0?Math.round(sum/cnt):'-';
-    html+=`<td class="border p-0.5 text-center font-bold text-blue-600 bg-blue-50/50">${avg}</td></tr>`;
+    const avg=Math.round(tw);
+    const pred=avg>=89?'Sangat Baik':avg>=76?'Baik':avg>=61?'Cukup':'Perlu Bimbingan';
+    const pc=avg>=89?'text-emerald-600':avg>=76?'text-blue-600':avg>=61?'text-amber-600':'text-red-600';
+    html+=`<td class="border p-1 text-center font-bold text-blue-700">${avg}</td><td class="border p-1 text-center font-bold ${pc} text-[9px]">${pred}</td></tr>`;
   });
-  html+=`</tbody></table>`;
+  html+=`</tbody></table>
+    <p class="text-[9px] text-slate-400 mt-1"><b>Predikat:</b> Perlu Bimbingan (0-60) • Cukup (61-75) • Baik (76-88) • Sangat Baik (89-100)</p>`;
   $('nlArea').innerHTML=html;
   $('nlTTD').innerHTML=makeTTD(getTTDPelaporan(bln));
 }
 
-// ============ JURNAL PEMBELAJARAN (JP Berurutan Ringkas) ============
+// ============ JURNAL PEMBELAJARAN ============
 function rJurnal(){
   const bln=$('jrBln').value;
-  const rom=ST.activeDocRombel||ST.rombel;
   const ie=isEdit();
-  if(!rom){
-    $('jrContent').innerHTML='<p class="text-center py-6 text-slate-400 text-xs">Pilih rombel dari tab di atas</p>';
-    return;
-  }
-  if(!D.jurnal[rom])D.jurnal[rom]={};
-  if(!D.jurnal[rom][bln])D.jurnal[rom][bln]=[];
-
   const mapelLC=ST.mapel.toLowerCase();
-  const teachingSchedule=[];
-  if(D.jadwal){
-    getDays().forEach(day=>{
-      D.jadwal.forEach(row=>{
-        if(row.j==='ist'||!row.h)return;
-        const val=row.h[day]||'';
-        const parts=val.split('\n');
-        if((parts[0]||'').toLowerCase().includes(mapelLC)&&(parts[1]||'').trim()===rom){
-          teachingSchedule.push({day,jp:row.j,waktu:row.w});
-        }
-      });
-    });
-  }
-
-  // Generate Hari Kerja Pembelajaran
-  const mi=BULAN.indexOf(bln);
-  const monthNum=BULAN_IDX_JS[bln];
-  const yr=mi<6?parseInt((v('fTA').split('/')[0])||2026):parseInt((v('fTA').split('/')[1])||2027);
-  const totalDays=new Date(yr,monthNum+1,0).getDate();
-  const daysName=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const days=getDays();
+  const yr=BULAN_IDX_JS[bln]>=6?parseInt(v('fTA').split('/')[0])||2026:parseInt(v('fTA').split('/')[1])||2027;
+  const monthIdx=BULAN_IDX_JS[bln];
+  const lastDay=new Date(yr,monthIdx+1,0).getDate();
   
-  const entries=[];
-  for(let d=1;d<=totalDays;d++){
-    const dt=new Date(yr,monthNum,d);
-    const dayName=daysName[dt.getDay()];
-    const matches=teachingSchedule.filter(s=>s.day===dayName);
-    if(matches.length>0){
-      entries.push({
-        tgl:`${d} ${bln} ${yr}`,
-        hari:dayName,
-        slots:matches
-      });
-    }
-  }
-
-  const rombelKelas=getRombelKelas();
-  const tps=D.cp.filter(c=>!c.K||c.K===rombelKelas);
-
-  let html=`<div class="text-center mb-3">
-    <h2 class="text-sm font-bold uppercase">JURNAL PELAKSANAAN PEMBELAJARAN</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • Rombel ${rom} • Bulan ${bln} TA ${v('fTA')}</p>
-  </div>
-  <table class="w-full text-[9px]">
-    <thead class="bg-slate-100">
-      <tr>
-        <th class="border p-1 w-6">No</th>
-        <th class="border p-1 w-24">Hari / Tanggal</th>
-        <th class="border p-1 w-24">Jam ke / Waktu</th>
-        <th class="border p-1 min-w-[120px]">Materi / Tujuan Pembelajaran</th>
-        <th class="border p-1 w-20">Absensi</th>
-        <th class="border p-1 min-w-[100px]">Catatan / Refleksi</th>
-      </tr>
-    </thead>
-    <tbody>`;
-
-  if(entries.length===0){
-    html+=`<tr><td colspan="6" class="border p-4 text-center text-slate-400">Tidak ada jadwal mengajar ${ST.mapel} di Rombel ${rom} untuk bulan ${bln}.</td></tr>`;
-  } else {
-    let entryIdx=0;
-    entries.forEach((e)=>{
-      // RINGKAS JAM BERURUTAN
-      let i=0;
-      while(i<e.slots.length){
-        let startSlot=e.slots[i];
-        let endSlot=e.slots[i];
-        let j=i+1;
-        
-        while(j<e.slots.length && typeof startSlot.jp==='number' && e.slots[j].jp===endSlot.jp+1){
-          endSlot=e.slots[j];
-          j++;
-        }
-        
-        entryIdx++;
-        const curData=D.jurnal[rom][bln][entryIdx-1]||{};
-        
-        let jamLabel='', waktuLabel='';
-        if(startSlot.jp===endSlot.jp){
-          jamLabel=`Jam ke ${startSlot.jp}`;
-          waktuLabel=startSlot.waktu;
-        } else {
-          jamLabel=`Jam ke ${startSlot.jp} - ${endSlot.jp}`;
-          const startTime=(startSlot.waktu||'').split('-')[0]||'';
-          const endTime=(endSlot.waktu||'').split('-')[1]||'';
-          waktuLabel=`${startTime}-${endTime}`;
-        }
-
-        const tpOpt=tps.map(t=>`<option value="${t.T}" ${curData.tp===t.T?'selected':''}>${t.T}</option>`).join('');
-
-        html+=`<tr>
-          <td class="border p-1 text-center font-bold">${entryIdx}</td>
-          <td class="border p-1"><b>${e.hari}</b>,<br>${e.tgl}</td>
-          <td class="border p-1 text-center"><b class="text-blue-600">${jamLabel}</b><br><span class="text-[8px] text-slate-500">(${waktuLabel})</span></td>
-          <td class="border p-1">
-            <select onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'tp',this.value)" class="w-full border rounded p-1 text-[8px] ef mb-1" ${ie?'':'disabled'}>
-              <option value="">-- Pilih TP --</option>${tpOpt}
-            </select>
-            <textarea onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'materi',this.value)" class="w-full border rounded p-1 text-[8px] ef" placeholder="Materi / Kegiatan..." rows="2" ${ie?'':'disabled'}>${curData.materi||''}</textarea>
-          </td>
-          <td class="border p-1">
-            <input value="${curData.absen||'Nihil'}" onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'absen',this.value)" class="w-full border rounded p-1 text-[8px] text-center ef" ${ie?'':'disabled'}>
-          </td>
-          <td class="border p-1">
-            <textarea onchange="setJurnalData('${rom}','${bln}',${entryIdx-1},'catatan',this.value)" class="w-full border rounded p-1 text-[8px] ef" placeholder="Catatan/Refleksi..." rows="2" ${ie?'':'disabled'}>${curData.catatan||'Pembelajaran berjalan lancar.'}</textarea>
-          </td>
-        </tr>`;
-
-        i=j;
+  // Generate entries: setiap tanggal di bulan tsb yang cocok dengan hari mengajar mapel ini
+  let entries=[];
+  for(let d=1;d<=lastDay;d++){
+    const dt=new Date(yr,monthIdx,d);
+    const dow=dt.getDay(); // 0=Min,1=Sen,...
+    const dayName=ALLDAYS[dow-1];
+    if(!dayName||!days.includes(dayName))continue;
+    D.jadwal.forEach(r=>{
+      if(r.j==='ist'||!r.h)return;
+      const val=r.h[dayName]||'';
+      const parts=val.split('\n');
+      const mp=(parts[0]||'').toLowerCase();
+      const rb=(parts[1]||'').trim();
+      if(mp.includes(mapelLC)){
+        entries.push({day:dayName,date:d,jam:r.j,waktu:r.w,rombel:rb||ST.rombel});
       }
     });
   }
-
-  html+=`</tbody></table>${makeTTD(getTTDPelaporan(bln))}`;
+  
+  if(!D.jurnal[bln])D.jurnal[bln]=[];
+  const jd=D.jurnal[bln];
+  while(jd.length<entries.length)jd.push({tp:'',keg:'',cat:''});
+  
+  const cpAll=D.cp;
+  const sub=`${v('fS')} • ${ST.mapel} • Bulan ${bln} TA ${v('fTA')}`;
+  
+  let html=`<h2 class="text-sm font-bold text-center uppercase">JURNAL PEMBELAJARAN</h2>
+    <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>`;
+  
+  if(!entries.length){
+    html+=`<div class="bg-amber-50 border border-amber-200 rounded p-3 text-center text-[11px] text-amber-700">
+      <i class="fa-solid fa-exclamation-triangle mr-1"></i>Belum ada pertemuan di bulan ${bln}. Isi jadwal dulu di menu <b>Jadwal</b>.
+    </div>${makeTTD(getTTDPelaporan(bln))}`;
+    $('jrContent').innerHTML=html;
+    return;
+  }
+  
+  html+=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
+    <th class="border p-1">No</th>
+    <th class="border p-1">Hari, Tanggal</th>
+    <th class="border p-1">Rombel</th>
+    <th class="border p-1">JP</th>
+    <th class="border p-1">Tujuan Pembelajaran / Materi</th>
+    <th class="border p-1">Kegiatan Pembelajaran</th>
+    <th class="border p-1 bg-emerald-50">H</th>
+    <th class="border p-1 bg-amber-50">S</th>
+    <th class="border p-1 bg-blue-50">I</th>
+    <th class="border p-1 bg-red-50">A</th>
+    <th class="border p-1">Catatan</th>
+  </tr></thead><tbody>`;
+  
+  entries.forEach((e,i)=>{
+    const j=jd[i]||{};
+    // Ambil absen data untuk hari itu
+    const abBln=D.absen[e.rombel]?.[bln]||{};
+    const swList=D.siswa[e.rombel]||[];
+    let h=0,s=0,iz=0,a=0;
+    swList.forEach((sw,si)=>{const av=abBln[`${si}_${i}`]||'H';if(av==='H')h++;else if(av==='S')s++;else if(av==='I')iz++;else if(av==='A')a++});
+    // TP options berdasarkan kelas rombel
+    const kelasRom='Kelas '+(parseInt(e.rombel.replace(/\D/g,''))||1);
+    const cpForRombel=cpAll.filter(c=>c.K===kelasRom);
+    const tpOpts=cpForRombel.map((c,ci)=>`<option value="${ci}" ${j.tp==ci?'selected':''}>${(c.T||'').substring(0,40)}</option>`).join('');
+    
+    html+=`<tr class="border ${i%2?'bg-slate-50/30':''}">
+      <td class="border p-0.5 text-center">${i+1}</td>
+      <td class="border p-0.5 text-center text-[8px]">${e.day},<br>${e.date} ${bln.substring(0,3)}</td>
+      <td class="border p-0.5 text-center font-bold text-blue-600">${e.rombel}</td>
+      <td class="border p-0.5 text-center text-[8px]">JP${e.jam}<br>(${e.waktu})</td>
+      <td class="border p-0.5">
+        <select onchange="D.jurnal['${bln}'][${i}].tp=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}>
+          <option value="">-Pilih TP-</option>${tpOpts}
+        </select>
+      </td>
+      <td class="border p-0.5"><input value="${j.keg||''}" onchange="D.jurnal['${bln}'][${i}].keg=this.value" class="w-full border rounded p-0.5 text-[8px] ef" placeholder="Kegiatan..." ${ie?'':'disabled'}></td>
+      <td class="border p-0.5 text-center text-emerald-600 font-bold">${h}</td>
+      <td class="border p-0.5 text-center text-amber-600">${s}</td>
+      <td class="border p-0.5 text-center text-blue-600">${iz}</td>
+      <td class="border p-0.5 text-center text-red-600">${a}</td>
+      <td class="border p-0.5"><input value="${j.cat||''}" onchange="D.jurnal['${bln}'][${i}].cat=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td>
+    </tr>`;
+  });
+  html+=`</tbody></table>
+    <p class="text-[9px] text-slate-400 mt-1">Total pertemuan bulan ${bln}: <b>${entries.length}</b> pertemuan</p>`;
+  html+=makeTTD(getTTDPelaporan(bln));
   $('jrContent').innerHTML=html;
 }
 
-function setJurnalData(rom,bln,idx,field,val){
-  if(!D.jurnal[rom])D.jurnal[rom]={};
-  if(!D.jurnal[rom][bln])D.jurnal[rom][bln]=[];
-  if(!D.jurnal[rom][bln][idx])D.jurnal[rom][bln][idx]={};
-  D.jurnal[rom][bln][idx][field]=val;
-}
-
-// ============ DOKUMEN GENERATORS ============
-function renderAll(){
-  rDKal();rDAcp();rDAtp();rDProta();rDPromes();rDModul();rDKktp();
-}
-
-function rDKal(){
-  $('dKalContent').innerHTML=`<div class="text-center mb-3">
-    <h2 class="text-sm font-bold uppercase">KALENDER PENDIDIKAN DAN AGENDA KEGIATAN</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • TA ${v('fTA')}</p>
-  </div>
-  <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1">Semester</th><th class="border p-1">Tanggal</th>
-    <th class="border p-1">Agenda / Kegiatan</th><th class="border p-1">Kategori</th>
-  </tr></thead><tbody>`+
-  (D.kal.length?D.kal.map(k=>`<tr>
-    <td class="border p-1 text-center font-semibold">${k.S||'-'}</td>
-    <td class="border p-1 text-center">${k.T||'-'}</td>
-    <td class="border p-1">${k.A||'-'}</td>
-    <td class="border p-1 text-center"><span class="sb bg-blue-100 text-blue-700">${k.K||'Umum'}</span></td>
-  </tr>`).join(''):`<tr><td colspan="4" class="text-center p-4 text-slate-400">Belum ada data kalender</td></tr>`)+
-  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
-}
-
-function rDAcp(){
-  const k=getRombelKelas();
-  const list=D.cp.filter(c=>!c.K||c.K===k);
-  $('dAcpContent').innerHTML=`<div class="text-center mb-3">
-    <h2 class="text-sm font-bold uppercase">ANALISIS CAPAIAN PEMBELAJARAN (ACP)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • Fase ${getFase(k)}</p>
-  </div>
-  <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1">Elemen</th>
-    <th class="border p-1 min-w-[150px]">Capaian Pembelajaran (CP)</th>
-    <th class="border p-1 min-w-[150px]">Tujuan Pembelajaran (TP)</th>
-    <th class="border p-1">Dimensi Profil Lulusan</th>
-  </tr></thead><tbody>`+
-  (list.length?list.map((c,i)=>`<tr>
-    <td class="border p-1 text-center">${i+1}</td>
-    <td class="border p-1 font-semibold">${c.E||'-'}</td>
-    <td class="border p-1">${c.C||'-'}</td>
-    <td class="border p-1">${c.T||'-'}</td>
-    <td class="border p-1 text-[8px] text-slate-600">${c.Di||DIMEN}</td>
-  </tr>`).join(''):`<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada CP/TP untuk ${k}</td></tr>`)+
-  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
-}
-
-function rDAtp(){
-  const k=getRombelKelas();
-  const list=D.cp.filter(c=>!c.K||c.K===k);
-  $('dAtpContent').innerHTML=`<div class="text-center mb-3">
-    <h2 class="text-sm font-bold uppercase">ALUR TUJUAN PEMBELAJARAN (ATP)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • Fase ${getFase(k)} • TA ${v('fTA')}</p>
-  </div>
-  <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 w-10">Smt</th>
-    <th class="border p-1">Elemen</th><th class="border p-1 min-w-[180px]">Tujuan Pembelajaran</th>
-    <th class="border p-1">Metode</th><th class="border p-1 w-8">JP</th>
-  </tr></thead><tbody>`+
-  (list.length?list.map((c,i)=>`<tr>
-    <td class="border p-1 text-center">${i+1}</td>
-    <td class="border p-1 text-center">${c.S==='Semester 2'?'2':'1'}</td>
-    <td class="border p-1 font-semibold">${c.E||'-'}</td>
-    <td class="border p-1">${c.T||'-'}</td>
-    <td class="border p-1 text-center">${c.M||METODE[0]}</td>
-    <td class="border p-1 text-center font-bold">${c.P||2}</td>
-  </tr>`).join(''):`<tr><td colspan="6" class="text-center p-4 text-slate-400">Belum ada TP untuk ${k}</td></tr>`)+
-  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
-}
-
-function rDProta(){
-  const k=getRombelKelas();
-  const list=D.cp.filter(c=>!c.K||c.K===k);
-  let tot1=0,tot2=0;
-  list.forEach(c=>{if(c.S==='Semester 2')tot2+=c.P||2;else tot1+=c.P||2});
-  $('dProtaContent').innerHTML=`<div class="text-center mb-3">
-    <h2 class="text-sm font-bold uppercase">PROGRAM TAHUNAN (PROTA)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • TA ${v('fTA')}</p>
-  </div>
-  <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 w-12">Smt</th>
-    <th class="border p-1">Elemen</th><th class="border p-1 min-w-[200px]">Tujuan Pembelajaran</th>
-    <th class="border p-1 w-12">Alokasi Waktu</th>
-  </tr></thead><tbody>`+
-  (list.length?list.map((c,i)=>`<tr>
-    <td class="border p-1 text-center">${i+1}</td>
-    <td class="border p-1 text-center font-semibold">${c.S==='Semester 2'?'2':'1'}</td>
-    <td class="border p-1 font-semibold">${c.E||'-'}</td>
-    <td class="border p-1">${c.T||'-'}</td>
-    <td class="border p-1 text-center font-bold">${c.P||2} JP</td>
-  </tr>`).join(''):`<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada TP</td></tr>`)+
-  `<tr class="bg-slate-50 font-bold">
-    <td colspan="4" class="border p-1 text-right">Total Semester 1:</td>
-    <td class="border p-1 text-center text-blue-600">${tot1} JP</td>
-  </tr>
-  <tr class="bg-slate-50 font-bold">
-    <td colspan="4" class="border p-1 text-right">Total Semester 2:</td>
-    <td class="border p-1 text-center text-blue-600">${tot2} JP</td>
-  </tr>
-  <tr class="bg-blue-50 font-bold text-xs">
-    <td colspan="4" class="border p-1 text-right text-blue-800">TOTAL ALOKASI WAKTU 1 TAHUN:</td>
-    <td class="border p-1 text-center text-blue-800">${tot1+tot2} JP</td>
-  </tr></tbody></table>${makeTTD(getTTDPerencanaan())}`;
-}
-
-function rDPromes(){
-  const smt=ST.ps===2?'Semester 2':'Semester 1';
-  const blns=ST.ps===2?['Januari','Februari','Maret','April','Mei','Juni']:['Juli','Agustus','September','Oktober','November','Desember'];
-  const k=getRombelKelas();
-  const list=D.cp.filter(c=>(!c.K||c.K===k)&&c.S===smt);
-  
-  let html=`<div class="text-center mb-3">
-    <h2 class="text-sm font-bold uppercase">PROGRAM SEMESTER (PROMES)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • ${smt} TA ${v('fTA')}</p>
-  </div>
-  <div class="overflow-x-auto"><table class="w-full text-[8px]"><thead class="bg-slate-100">
-  <tr><th class="border p-1" rowspan="2">No</th><th class="border p-1" rowspan="2">Elemen</th>
-  <th class="border p-1 min-w-[120px]" rowspan="2">Tujuan Pembelajaran</th>
-  <th class="border p-1" rowspan="2">JP</th>`;
-  blns.forEach(b=>html+=`<th class="border p-0.5 text-center" colspan="4">${b.substr(0,3)}</th>`);
-  html+=`</tr><tr>`;
-  blns.forEach(()=>html+=`<th class="border p-0.5 w-3">1</th><th class="border p-0.5 w-3">2</th><th class="border p-0.5 w-3">3</th><th class="border p-0.5 w-3">4</th>`);
-  html+=`</tr></thead><tbody>`;
-
-  if(!list.length){
-    html+=`<tr><td colspan="${4+24}" class="border p-4 text-center text-slate-400">Belum ada TP untuk ${smt}</td></tr>`;
-  } else {
-    list.forEach((c,i)=>{
-      html+=`<tr><td class="border p-0.5 text-center">${i+1}</td>
-        <td class="border p-0.5 font-semibold">${c.E||'-'}</td>
-        <td class="border p-0.5">${c.T||'-'}</td>
-        <td class="border p-0.5 text-center font-bold">${c.P||2}</td>`;
-      const targetBlnIdx=i%blns.length;
-      blns.forEach((b,bi)=>{
-        for(let w=1;w<=4;w++){
-          const active=bi===targetBlnIdx&&(w===1||w===2);
-          html+=`<td class="border p-0 text-center ${active?'bg-blue-200 font-bold text-blue-800':''}">${active?'✓':''}</td>`;
-        }
-      });
-      html+=`</tr>`;
-    });
-  }
-  html+=`</tbody></table></div>${makeTTD(getTTDPerencanaan())}`;
-  $('dPromesContent').innerHTML=html;
-}
-
-function rDModul(){
-  const k=getRombelKelas();
-  const list=D.cp.filter(c=>!c.K||c.K===k);
-  const sel=$('modulTPSelect');
-  if(sel){
-    sel.innerHTML=list.map((c,i)=>`<option value="${i}" ${i===ST.modulTPIdx?'selected':''}>TP ${i+1}: ${(c.T||'').substr(0,60)}...</option>`).join('');
-  }
-  const tp=list[ST.modulTPIdx]||list[0]||{};
-  
-  $('dModulContent').innerHTML=`<div class="border-2 border-slate-800 p-4 space-y-3 text-[10px]">
-    <div class="text-center border-b pb-2">
-      <h2 class="text-sm font-bold uppercase">MODUL AJAR DEEP LEARNING (MIND, HEART, HAND)</h2>
-      <p class="font-semibold">${v('fS')} • TA ${v('fTA')}</p>
+// ============ PROFILE MODAL ============
+function openProfile(){
+  if(!CU||!UD)return;
+  const sm={
+    approved:'<span class="sb bg-emerald-100 text-emerald-700">Disetujui</span>',
+    pending:'<span class="sb bg-amber-100 text-amber-700">Menunggu</span>',
+    rejected:'<span class="sb bg-red-100 text-red-700">Ditolak</span>'
+  };
+  $('mProfile').classList.remove('hidden');
+  $('mProfile').innerHTML=`<div class="modal-box modal-sm">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-5 text-center">
+      <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-user text-2xl"></i></div>
+      <b class="text-sm">${UD.name||'-'}</b>
+      <p class="text-blue-200 text-[10px]">${CU.email}</p>
     </div>
-    
-    <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2 border rounded">
-      <div><b>Mata Pelajaran:</b> ${ST.mapel}</div><div><b>Kelas / Fase:</b> ${k} / Fase ${getFase(k)}</div>
-      <div><b>Alokasi Waktu:</b> ${tp.P||2} JP (${(tp.P||2)*getJPDur(v('fJn'))} Menit)</div><div><b>Metode:</b> ${tp.M||METODE[0]}</div>
-      <div><b>Elemen:</b> ${tp.E||'-'}</div><div><b>Dimensi PL:</b> ${tp.Di||DIMEN}</div>
-    </div>
-
-    <div>
-      <h4 class="section-title bg-blue-100 text-blue-800">I. TUJUAN PEMBELAJARAN (TP)</h4>
-      <p class="p-1.5 border rounded bg-white">${tp.T||'Belum ada TP terpilih'}</p>
-    </div>
-
-    <div>
-      <h4 class="section-title bg-emerald-100 text-emerald-800">II. KEGIATAN PEMBELAJARAN (DEEP LEARNING)</h4>
-      <div class="space-y-1.5">
-        <div class="border p-2 rounded">
-          <b class="text-blue-700">A. Pendahuluan (Mindful Engagement - 10 menit):</b>
-          <ul class="list-disc pl-4 text-slate-600">
-            <li>Guru membuka pelajaran dengan salam, doa, dan apersepsi kontekstual.</li>
-            <li>Orientasi bermakna untuk mengunggah minat dan keterlibatan emosional siswa.</li>
-          </ul>
-        </div>
-        <div class="border p-2 rounded">
-          <b class="text-purple-700">B. Kegiatan Inti (Deep Processing & Heart Connection - ${((tp.P||2)*getJPDur(v('fJn')))-20} menit):</b>
-          <ul class="list-disc pl-4 text-slate-600">
-            <li><b>Mind (Pemahaman Konsep):</b> Siswa mengamati, menganalisis, dan memecahkan masalah terkait ${tp.E||'materi'}.</li>
-            <li><b>Heart (Internalisasi Nilai):</b> Diskusi kelompok dan refleksi nilai-nilai karakter dalam kehidupan sehari-hari.</li>
-            <li><b>Hand (Aksi & Karya):</b> Praktik/Pengerjaan proyek kolaboratif berbasis ${tp.M||METODE[0]}.</li>
-          </ul>
-        </div>
-        <div class="border p-2 rounded">
-          <b class="text-amber-700">C. Penutup (Reflection & Joyful Closing - 10 menit):</b>
-          <ul class="list-disc pl-4 text-slate-600">
-            <li>Siswa dan guru menyimpulkan poin-poin utama pembelajaran.</li>
-            <li>Refleksi diri (perasaan dan pemahaman baru) serta tindak lanjut tugas mandiri.</li>
-          </ul>
-        </div>
+    <div class="p-4 space-y-2 text-xs">
+      <div class="flex justify-between"><span class="text-slate-500">Status:</span>${sm[UD.status]||sm.pending}</div>
+      <div class="flex justify-between"><span class="text-slate-500">Role:</span><b>${UD.role==='admin'?'Administrator':'Pengguna'}</b></div>
+      <div class="flex justify-between"><span class="text-slate-500">Sekolah:</span><b>${UD.school||'-'}</b></div>
+      <div class="flex justify-between"><span class="text-slate-500">NPSN:</span><b>${UD.npsn||'-'}</b></div>
+      <div class="flex justify-between"><span class="text-slate-500">Tipe:</span><b>${UD.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}</b></div>
+      <div class="flex justify-between"><span class="text-slate-500">Mapel:</span><b>${(UD.mapelList||[]).join(', ')||'-'}</b></div>
+      <div class="pt-2 space-y-1">
+        <button onclick="doLogout()" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-bold text-sm">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i>Keluar
+        </button>
+        <button onclick="closeM('mProfile')" class="w-full bg-slate-100 hover:bg-slate-200 py-2 rounded-lg font-bold text-sm">Tutup</button>
       </div>
     </div>
-
-    <div>
-      <h4 class="section-title bg-slate-100 text-slate-800">III. ASESMEN PEMBELAJARAN</h4>
-      <div class="grid grid-cols-3 gap-1 text-center">
-        <div class="border p-1 bg-slate-50"><b class="block border-b mb-1">Diagnostik</b>Kuis Awal / Tanya Jawab</div>
-        <div class="border p-1 bg-slate-50"><b class="block border-b mb-1">Formatif</b>Observasi & Performa Unjuk Kerja</div>
-        <div class="border p-1 bg-slate-50"><b class="block border-b mb-1">Sumatif</b>Tes Tulis / Penilaian Produk</div>
-      </div>
-    </div>
-
-    ${makeTTD(getTTDPerencanaan())}
   </div>`;
-}
-
-function rDKktp(){
-  const k=getRombelKelas();
-  const list=D.cp.filter(c=>!c.K||c.K===k);
-  $('dKktpContent').innerHTML=`<div class="text-center mb-3">
-    <h2 class="text-sm font-bold uppercase">KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)</h2>
-    <p class="text-[10px] font-semibold">${v('fS')} • ${ST.mapel} • ${k} • TA ${v('fTA')}</p>
-  </div>
-  <table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
-    <th class="border p-1 w-6">No</th><th class="border p-1 min-w-[150px]">Tujuan Pembelajaran (TP)</th>
-    <th class="border p-1 w-20">Perlu Bimbingan (0-60)</th>
-    <th class="border p-1 w-20">Cukup (61-70)</th>
-    <th class="border p-1 w-20">Baik (71-85)</th>
-    <th class="border p-1 w-20">Sangat Baik (86-100)</th>
-  </tr></thead><tbody>`+
-  (list.length?list.map((c,i)=>`<tr>
-    <td class="border p-1 text-center font-bold">${i+1}</td>
-    <td class="border p-1">${c.T||'-'}</td>
-    <td class="border p-1 text-[8px] bg-red-50 text-red-700">Belum mencapai TP, perlu remedial di seluruh bagian</td>
-    <td class="border p-1 text-[8px] bg-amber-50 text-amber-700">Belum mencapai TP, perlu remedial di bagian tertentu</td>
-    <td class="border p-1 text-[8px] bg-blue-50 text-blue-700">Sudah mencapai TP, tidak perlu remedial</td>
-    <td class="border p-1 text-[8px] bg-emerald-50 text-emerald-700">Sudah mencapai TP, perlu pengayaan/tantangan lebih</td>
-  </tr>`).join(''):`<tr><td colspan="6" class="text-center p-4 text-slate-400">Belum ada TP</td></tr>`)+
-  `</tbody></table>${makeTTD(getTTDPerencanaan())}`;
-}
-
-// ============ PROMPT GENERATOR ============
-function genPrompts(){
-  const k=getRombelKelas();
-  $('prCP').innerText=`Buatkan CSV untuk Capaian Pembelajaran (CP) dan Tujuan Pembelajaran (TP) Kurikulum Merdeka dengan header tepat sebagai berikut:
-Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan
-
-Ketentuan:
-- Mata Pelajaran: ${ST.mapel}
-- Kelas: ${k}
-- Gunakan bahasa Indonesia baku dan sesuai standar Kemendikbudristek terbaru.`;
-
-  $('prKl').innerText=`Buatkan CSV Kalender Pendidikan untuk Tahun Ajaran ${v('fTA')} dengan format header:
-Semester,Tanggal,Agenda,Kategori
-
-Sertakan hari libur nasional, PTS, PAS, dan agenda penting sekolah lainnya.`;
-
-  $('prLK').innerText=`Buatkan Modul Ajar Deep Learning (Mind, Heart, Hand) dan LKPD Visual untuk Mata Pelajaran ${ST.mapel} Kelas ${k}. Lengkap dengan langkah pembelajaran bermakna, instruksi diskusi, dan rubrik asesmen.`;
 }
 
 // ============ ADMIN PANEL ============
 async function loadAdmin(){
   if(AL!=='admin')return;
   $('aLoad').classList.remove('hidden');
+  $('aBody').innerHTML='';
   try{
-    const snap=await db.collection('users').get();
-    let total=0,app=0,pend=0;
-    let html='';
-    snap.docs.forEach(doc=>{
-      total++;
-      const u=doc.data();
-      if(u.status==='approved')app++;else pend++;
-      html+=`<tr class="border-b">
-        <td class="p-2"><b class="text-xs">${u.name||'-'}</b><br><span class="text-[9px] text-slate-400">${u.email}</span></td>
-        <td class="p-2 text-center">${u.school||'-'}<br><span class="text-[8px] text-slate-400">NPSN: ${u.npsn||'-'}</span></td>
-        <td class="p-2 text-center uppercase font-semibold text-[9px]">${u.guruType||'mapel'}</td>
-        <td class="p-2 text-center">${u.status==='approved'?'<span class="sb bg-emerald-100 text-emerald-700">Approved</span>':'<span class="sb bg-amber-100 text-amber-700">Pending</span>'}</td>
-        <td class="p-2 text-center">
-          ${u.status==='pending'?`<button onclick="setAppr('${doc.id}',true)" class="bg-emerald-600 text-white text-[9px] px-2 py-1 rounded font-bold mr-1">Setujui</button>`:`<button onclick="setAppr('${doc.id}',false)" class="bg-amber-600 text-white text-[9px] px-2 py-1 rounded font-bold mr-1">Cabut</button>`}
-          <button onclick="delUsr('${doc.id}')" class="bg-red-600 text-white text-[9px] px-2 py-1 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
-        </td>
-      </tr>`;
-    });
+    const snap=await db.collection('users').orderBy('createdAt','desc').get();
+    const users=[];snap.forEach(d=>users.push({id:d.id,...d.data()}));
+    $('aLoad').classList.add('hidden');
+    const t=users.length,p=users.filter(u=>u.status==='pending').length,a=users.filter(u=>u.status==='approved').length,r=users.filter(u=>u.status==='rejected').length;
     $('aSt').innerHTML=`
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center"><p class="text-[9px] text-blue-600 font-bold">TOTAL USER</p><p class="text-lg font-black text-blue-800">${total}</p></div>
-      <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center"><p class="text-[9px] text-emerald-600 font-bold">DISETUJUI</p><p class="text-lg font-black text-emerald-800">${app}</p></div>
-      <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center"><p class="text-[9px] text-amber-600 font-bold">PENDING</p><p class="text-lg font-black text-amber-800">${pend}</p></div>
-      <div class="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center"><p class="text-[9px] text-purple-600 font-bold">ADMIN</p><p class="text-lg font-black text-purple-800">1</p></div>
-    `;
-    $('aBody').innerHTML=html;
-  }catch(e){toast('error','Admin Load Failed',e.message)}
-  $('aLoad').classList.add('hidden');
+      <div class="bg-blue-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${t}</div><div class="text-[9px]">Total User</div></div>
+      <div class="bg-amber-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${p}</div><div class="text-[9px]">Pending</div></div>
+      <div class="bg-emerald-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${a}</div><div class="text-[9px]">Approved</div></div>
+      <div class="bg-red-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${r}</div><div class="text-[9px]">Rejected</div></div>`;
+    $('aBody').innerHTML=users.map(u=>{
+      const me=u.email===ADMIN_EMAIL;
+      const sc={pending:'bg-amber-100 text-amber-700',approved:'bg-emerald-100 text-emerald-700',rejected:'bg-red-100 text-red-700'};
+      let act='';
+      if(!me){
+        if(u.status!=='approved')act+=`<button onclick="setSt('${u.id}','approved')" class="bg-emerald-500 text-white px-1.5 py-0.5 rounded text-[9px] mr-0.5" title="Setujui"><i class="fa-solid fa-check"></i></button>`;
+        if(u.status!=='rejected')act+=`<button onclick="setSt('${u.id}','rejected')" class="bg-red-500 text-white px-1.5 py-0.5 rounded text-[9px] mr-0.5" title="Tolak"><i class="fa-solid fa-xmark"></i></button>`;
+        act+=`<button onclick="if(confirm('Hapus user?'))delU('${u.id}')" class="bg-slate-200 hover:bg-red-200 text-red-500 px-1.5 py-0.5 rounded text-[9px]" title="Hapus"><i class="fa-solid fa-trash"></i></button>`;
+      }else act='<span class="text-[9px] text-red-500 font-bold">ADMIN UTAMA</span>';
+      return `<tr class="hover:bg-slate-50 ${u.status==='pending'?'bg-amber-50/50':''}">
+        <td class="p-2"><b class="text-[11px]">${u.name||'-'}</b><br><span class="text-[9px] text-slate-400">${u.email}</span></td>
+        <td class="p-2 text-[10px]">${u.school||'-'}<br>NPSN: ${u.npsn||'-'}</td>
+        <td class="p-2 text-[10px]">${u.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}<br><span class="text-[8px]">${(u.mapelList||[]).join(', ')}</span></td>
+        <td class="p-2 text-center"><span class="sb ${sc[u.status]||sc.pending}">${u.status}</span></td>
+        <td class="p-2 text-center">${act}</td>
+      </tr>`;
+    }).join('');
+  }catch(e){$('aLoad').classList.add('hidden');toast('error','',e.message)}
 }
-
-async function setAppr(uid,appr){
+async function setSt(uid,st){
   try{
-    await db.collection('users').doc(uid).update({status:appr?'approved':'pending'});
-    toast('success','Updated','Status user diperbarui');
+    await db.collection('users').doc(uid).update({status:st});
+    toast('success','Status diubah',st);
     loadAdmin();
   }catch(e){toast('error','',e.message)}
 }
+async function delU(uid){
+  try{await db.collection('users').doc(uid).delete();toast('success','Terhapus','');loadAdmin()}
+  catch(e){toast('error','',e.message)}
+}
+// ============ RENDER ALL DOCUMENT OUTPUTS ============
+function renderAll(){
+  const rom=ST.activeDocRombel||ST.rombel;
+  const kelas=getRombelKelas();
+  const fase=getFase(kelas);
+  const mp=ST.mapel;
+  const sub=`${v('fS')} (NPSN: ${v('fNP')}) • ${mp} • Rombel ${rom||'-'} (${kelas} Fase ${fase}) • TA ${v('fTA')}`;
+  const ttdPlan=makeTTD(getTTDPerencanaan());
+  const cpK=D.cp.filter(c=>c.K===kelas);
+  const cp1=cpK.filter(c=>c.S==='Semester 1');
+  const cp2=cpK.filter(c=>c.S==='Semester 2');
+  const JP=2;
 
-async function delUsr(uid){
-  if(!confirm('Hapus user ini?'))return;
-  try{
-    await db.collection('users').doc(uid).delete();
-    toast('success','Deleted','User dihapus');
-    loadAdmin();
-  }catch(e){toast('error','',e.message)}
+  // ===== KALENDER PENDIDIKAN =====
+  $('dKalContent').innerHTML=`
+    <h2 class="text-sm font-bold text-center uppercase">KALENDER PENDIDIKAN TA ${v('fTA')}</h2>
+    <p class="text-[10px] text-center font-semibold text-slate-600 mb-2">${v('fS')} — Rombel ${rom||'-'}</p>
+    <table class="w-full text-[10px]">
+      <thead class="bg-slate-100"><tr>
+        <th class="border p-1">No</th><th class="border p-1">Semester</th>
+        <th class="border p-1">Tanggal</th><th class="border p-1">Agenda</th><th class="border p-1">Kategori</th>
+      </tr></thead>
+      <tbody>${D.kal.map((k,i)=>{
+        const cc={'Libur Nasional':'bg-red-50','Asesmen':'bg-blue-50','Kegiatan Sekolah':'bg-emerald-50','Libur Semester':'bg-amber-50','Hari Besar':'bg-purple-50'};
+        return `<tr class="border ${cc[k.K]||''}"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${k.S}</td><td class="border p-1">${k.T}</td><td class="border p-1">${k.A}</td><td class="border p-1 text-[9px] font-semibold">${k.K}</td></tr>`;
+      }).join('')}</tbody>
+    </table>${ttdPlan}`;
+
+  // ===== ACP (Analisis CP) =====
+  const eg={};
+  cpK.forEach(c=>{
+    if(!eg[c.E])eg[c.E]={cp:'',s1:[],s2:[],di:new Set()};
+    if(c.C)eg[c.E].cp=c.C;
+    if(c.S==='Semester 1')eg[c.E].s1.push(c.T);else eg[c.E].s2.push(c.T);
+    if(c.Di)c.Di.split(';').forEach(d=>eg[c.E].di.add(d.trim()));
+  });
+  let an=0;
+  $('dAcpContent').innerHTML=`
+    <h2 class="text-sm font-bold text-center uppercase">ANALISIS CAPAIAN PEMBELAJARAN (ACP)</h2>
+    <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>
+    <table class="w-full text-[9px]">
+      <thead class="bg-slate-100"><tr>
+        <th class="border p-1">No</th><th class="border p-1">Elemen</th>
+        <th class="border p-1">Capaian Pembelajaran (CP)</th>
+        <th class="border p-1">TP Semester 1</th>
+        <th class="border p-1">TP Semester 2</th>
+        <th class="border p-1">Dimensi Profil Lulusan</th>
+      </tr></thead>
+      <tbody>${Object.entries(eg).map(([e,d])=>{
+        an++;
+        return `<tr class="border"><td class="border p-1 text-center">${an}</td><td class="border p-1 font-semibold">${e}</td><td class="border p-1 text-[8px]">${d.cp}</td><td class="border p-1 text-[8px]">${d.s1.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${d.s2.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${[...d.di].join('; ')}</td></tr>`;
+      }).join('')}</tbody>
+    </table>${ttdPlan}`;
+
+  // ===== ATP =====
+  $('dAtpContent').innerHTML=`
+    <h2 class="text-sm font-bold text-center uppercase">ALUR TUJUAN PEMBELAJARAN (ATP)</h2>
+    <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>
+    <table class="w-full text-[9px]">
+      <thead class="bg-slate-100"><tr>
+        <th class="border p-1">No</th><th class="border p-1">Elemen</th>
+        <th class="border p-1">Tujuan Pembelajaran</th>
+        <th class="border p-1">Smt</th><th class="border p-1">Prt</th>
+        <th class="border p-1">Metode</th><th class="border p-1">Dimensi PL</th>
+      </tr></thead>
+      <tbody>${cpK.map((c,i)=>`<tr class="border ${i%2?'bg-slate-50/30':''}"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${c.S==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-[8px]">${c.M||METODE[0]}</td><td class="border p-1 text-[8px]">${c.Di}</td></tr>`).join('')}</tbody>
+    </table>${ttdPlan}`;
+
+  // ===== PROTA =====
+  let ph='';
+  [['Semester 1','bg-blue-50',cp1],['Semester 2','bg-emerald-50',cp2]].forEach(([lb,bg,data])=>{
+    if(!data.length)return;
+    ph+=`<tr class="${bg} font-bold"><td colspan="6" class="border p-1 text-center">${lb.toUpperCase()}</td></tr>`;
+    let tot=0;
+    data.forEach((c,i)=>{
+      const jp=(c.P||1)*JP;tot+=jp;
+      ph+=`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${lb==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-center">${jp} JP</td></tr>`;
+    });
+    ph+=`<tr class="${bg} font-bold"><td colspan="5" class="border p-1 text-right">Total ${lb}:</td><td class="border p-1 text-center">${tot} JP</td></tr>`;
+  });
+  $('dProtaContent').innerHTML=`
+    <h2 class="text-sm font-bold text-center uppercase">PROGRAM TAHUNAN (PROTA)</h2>
+    <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>
+    <table class="w-full text-[9px]">
+      <thead class="bg-slate-100"><tr>
+        <th class="border p-1">No</th><th class="border p-1">Elemen</th>
+        <th class="border p-1">Tujuan Pembelajaran</th>
+        <th class="border p-1">Smt</th><th class="border p-1">Prt</th><th class="border p-1">JP</th>
+      </tr></thead>
+      <tbody>${ph}</tbody>
+    </table>${ttdPlan}`;
+
+  // ===== PROMES DENGAN TANGGAL REAL =====
+  renderPromes(sub,ttdPlan,cp1,cp2,JP,rom);
+
+  // ===== MODUL AJAR DEEP LEARNING (LENGKAP) =====
+  renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase);
+
+  // ===== KKTP =====
+  $('dKktpContent').innerHTML=`
+    <h2 class="text-sm font-bold text-center uppercase">KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)</h2>
+    <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>
+    <table class="w-full text-[9px]">
+      <thead class="bg-slate-100"><tr>
+        <th class="border p-1">No</th><th class="border p-1">Tujuan Pembelajaran</th>
+        <th class="border p-1 bg-red-50">Perlu Bimbingan (0-60)</th>
+        <th class="border p-1 bg-amber-50">Cukup (61-75)</th>
+        <th class="border p-1 bg-blue-50">Baik (76-88)</th>
+        <th class="border p-1 bg-emerald-50">Sangat Baik (89-100)</th>
+      </tr></thead>
+      <tbody>${cpK.map((c,i)=>{
+        const t=(c.T||'').toLowerCase().substring(0,50);
+        return `<tr class="border ${i%2?'bg-slate-50/30':''}">
+          <td class="border p-1 text-center font-bold">${i+1}</td>
+          <td class="border p-1">${c.T}</td>
+          <td class="border p-1 text-[8px] text-red-600">Peserta didik belum mampu ${t}... meskipun sudah dibimbing guru.</td>
+          <td class="border p-1 text-[8px] text-amber-600">Peserta didik mampu ${t}... dengan bimbingan penuh dari guru.</td>
+          <td class="border p-1 text-[8px] text-blue-600">Peserta didik mampu ${t}... secara mandiri.</td>
+          <td class="border p-1 text-[8px] text-emerald-600 font-semibold">Peserta didik mampu ${t}... secara mandiri dan mampu membantu temannya.</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>${ttdPlan}`;
+
+  $('pgS').textContent=docTabs.includes(getCurrentTab())?`Rombel: ${rom||'-'}`:'-';
 }
 
-// INITIALIZATION
-window.onload=()=>{
-  updKelas();updJPDuration();
-};
+// ============ PROMES DENGAN TANGGAL REAL ============
+function getMengajarDates(bulanIdx,tahun,rombel){
+  const mapelLC=ST.mapel.toLowerCase();
+  const mengajarHari=new Set();
+  D.jadwal.forEach(r=>{
+    if(r.j==='ist'||!r.h)return;
+    getDays().forEach(d=>{
+      const val=r.h[d]||'';
+      const parts=val.split('\n');
+      const mp=(parts[0]||'').toLowerCase();
+      const rb=(parts[1]||'').trim();
+      if(mp.includes(mapelLC)&&(!rombel||rb===rombel))mengajarHari.add(DAY_MAP[d]);
+    });
+  });
+  const dates=[];
+  const daysInMonth=new Date(tahun,bulanIdx+1,0).getDate();
+  for(let d=1;d<=daysInMonth;d++){
+    const dt=new Date(tahun,bulanIdx,d);
+    if(mengajarHari.has(dt.getDay()))dates.push(d);
+  }
+  return dates;
+}
+
+function renderPromes(sub,ttdPlan,cp1,cp2,JP,rom){
+  $('bS1').className=`text-[10px] px-3 py-1 rounded-full border font-bold ${ST.ps===1?'bg-blue-100 text-blue-700':'bg-slate-100'}`;
+  $('bS2').className=`text-[10px] px-3 py-1 rounded-full border font-bold ${ST.ps===2?'bg-blue-100 text-blue-700':'bg-slate-100'}`;
+  const smD=ST.ps===1?cp1:cp2;
+  const ta=v('fTA');
+  const yr1=parseInt(ta.split('/')[0])||2026;
+  const yr2=parseInt(ta.split('/')[1])||2027;
+  const monConfig=ST.ps===1
+    ?[{n:'Jul',idx:6,yr:yr1},{n:'Ags',idx:7,yr:yr1},{n:'Sep',idx:8,yr:yr1},{n:'Okt',idx:9,yr:yr1},{n:'Nov',idx:10,yr:yr1},{n:'Des',idx:11,yr:yr1}]
+    :[{n:'Jan',idx:0,yr:yr2},{n:'Feb',idx:1,yr:yr2},{n:'Mar',idx:2,yr:yr2},{n:'Apr',idx:3,yr:yr2},{n:'Mei',idx:4,yr:yr2},{n:'Jun',idx:5,yr:yr2}];
+  const allDates=[];
+  monConfig.forEach(m=>{
+    const dates=getMengajarDates(m.idx,m.yr,rom);
+    dates.forEach(d=>allDates.push({bulan:m.n,bulanIdx:m.idx,yr:m.yr,tgl:d}));
+  });
+  if(!allDates.length){
+    $('dPromesContent').innerHTML=`
+      <h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER (PROMES)</h2>
+      <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>
+      <div class="bg-amber-50 border border-amber-200 rounded p-3 text-center text-[11px] text-amber-700">
+        <i class="fa-solid fa-exclamation-triangle mr-1"></i>Belum ada jadwal mengajar untuk rombel <b>${rom||'-'}</b>. 
+        Isi jadwal dulu di menu <b>Jadwal Pelajaran</b>.
+      </div>${ttdPlan}`;
+    return;
+  }
+  const monthGroups={};
+  allDates.forEach(d=>{if(!monthGroups[d.bulan])monthGroups[d.bulan]=[];monthGroups[d.bulan].push(d.tgl)});
+  let monHeader='',tglHeader='';
+  Object.entries(monthGroups).forEach(([m,tgls])=>{
+    monHeader+=`<th class="border p-0.5 text-[8px] bg-blue-50" colspan="${tgls.length}">${m.toUpperCase()}</th>`;
+  });
+  allDates.forEach(d=>{tglHeader+=`<th class="border p-0.5 text-[7px]">${d.tgl}</th>`});
+  const totalDates=allDates.length;
+  let dateIdx=0;
+  const rows=smD.map((c,idx)=>{
+    const prt=c.P||1;
+    let cells='';
+    for(let di=0;di<totalDates;di++){
+      if(di>=dateIdx&&di<dateIdx+prt){
+        cells+=`<td class="border p-0.5 bg-emerald-100 text-emerald-700 font-bold text-[7px]">✓</td>`;
+      }else{
+        cells+=`<td class="border p-0.5"></td>`;
+      }
+    }
+    dateIdx+=prt;
+    return `<tr class="border"><td class="border p-0.5 text-center font-bold">${idx+1}</td><td class="border p-0.5 text-left text-[8px]">${c.T}</td><td class="border p-0.5 text-center font-bold">${prt*JP}</td>${cells}</tr>`;
+  }).join('');
+  $('dPromesContent').innerHTML=`
+    <h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER (PROMES)</h2>
+    <p class="text-[10px] text-center font-semibold mb-1">${sub}</p>
+    <p class="text-[9px] text-center text-slate-500 mb-2 italic">Tanggal pertemuan berdasarkan jadwal mengajar ${ST.mapel} di rombel ${rom}</p>
+    <div class="overflow-x-auto">
+      <table class="w-full text-[8px] text-center">
+        <thead class="bg-slate-100">
+          <tr>
+            <th class="border p-0.5" rowspan="2">No</th>
+            <th class="border p-0.5 text-left" rowspan="2" style="min-width:150px">Tujuan Pembelajaran</th>
+            <th class="border p-0.5" rowspan="2">JP</th>
+            ${monHeader}
+          </tr>
+          <tr class="bg-slate-50">${tglHeader}</tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <p class="text-[9px] text-slate-500 mt-2 italic">
+      Total: <b>${totalDates}</b> pertemuan (${totalDates*JP} JP) di semester ${ST.ps} 
+      <br>Ceklis (✓) = tanggal pertemuan pembelajaran TP tersebut
+    </p>${ttdPlan}`;
+}
+
+// ============ MODUL AJAR DEEP LEARNING (SANGAT LENGKAP) ============
+function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
+  // Populate TP selector
+  const modulSel=$('modulTPSelect');
+  if(cpK.length===0){
+    modulSel.innerHTML='<option>-Belum ada TP-</option>';
+    $('dModulContent').innerHTML=`<div class="bg-amber-50 border border-amber-200 rounded p-3 text-center text-[11px] text-amber-700">
+      <i class="fa-solid fa-exclamation-triangle mr-1"></i>Belum ada TP untuk kelas ini. Tambahkan CP/TP dulu.
+    </div>`;
+    return;
+  }
+  modulSel.innerHTML=cpK.map((c,i)=>`<option value="${i}" ${i===ST.modulTPIdx?'selected':''}>TP-${i+1}: ${(c.T||'').substring(0,60)}</option>`).join('');
+  
+  const tp=cpK[ST.modulTPIdx]||cpK[0];
+  const met=tp?.M||METODE[0];
+  const totalMenit=(tp?.P||1)*2*getJPDur(v('fJn'));
+  const introMenit=15,penutupMenit=15;
+  const intiMenit=totalMenit-introMenit-penutupMenit;
+  
+  // Deep description per metode
+  const metodeDetail={
+    'PBL (Problem Based Learning)':{
+      desc:'Model pembelajaran berbasis masalah nyata (autentik) yang mendorong peserta didik berpikir kritis untuk menganalisis dan mencari solusi secara kolaboratif.',
+      sintaks:[
+        {tahap:'Orientasi Peserta Didik pada Masalah',uraian:'Guru menyajikan permasalahan otentik/kontekstual terkait TP. Peserta didik diarahkan untuk mengamati dan memahami masalah.',waktu:'15 menit'},
+        {tahap:'Mengorganisasikan Peserta Didik',uraian:'Guru membagi peserta didik dalam kelompok heterogen 4-5 orang, membantu merumuskan pertanyaan investigasi, dan menyusun rencana kerja.',waktu:'10 menit'},
+        {tahap:'Membimbing Penyelidikan Individual & Kelompok',uraian:'Peserta didik mengumpulkan informasi dari berbagai sumber (buku, internet, wawancara), berdiskusi, dan menganalisis data untuk membangun pemahaman.',waktu:'25 menit'},
+        {tahap:'Mengembangkan & Menyajikan Hasil Karya',uraian:'Kelompok menyusun laporan/produk hasil investigasi dan mempresentasikannya di depan kelas dengan berbagai media (poster, PPT, video).',waktu:'15 menit'},
+        {tahap:'Menganalisis & Mengevaluasi Proses',uraian:'Guru memfasilitasi refleksi bersama tentang proses berpikir, kesulitan yang dihadapi, dan pembelajaran yang diperoleh.',waktu:'10 menit'}
+      ]
+    },
+    'PjBL (Project Based Learning)':{
+      desc:'Model pembelajaran berbasis proyek nyata yang menghasilkan produk/karya, memberikan otonomi belajar dan mengintegrasikan berbagai kompetensi.',
+      sintaks:[
+        {tahap:'Menentukan Pertanyaan Mendasar',uraian:'Guru mengajukan pertanyaan esensial yang menantang dan bermakna, terkait dengan proyek yang akan dikerjakan.',waktu:'10 menit'},
+        {tahap:'Mendesain Perencanaan Proyek',uraian:'Peserta didik dan guru berdiskusi merancang proyek: tujuan, langkah kerja, jadwal, alat/bahan, dan pembagian tugas.',waktu:'15 menit'},
+        {tahap:'Menyusun Jadwal Kegiatan',uraian:'Peserta didik menyusun timeline kegiatan proyek dengan tenggat waktu yang jelas untuk setiap tahapan.',waktu:'10 menit'},
+        {tahap:'Memantau Kemajuan Proyek',uraian:'Peserta didik melaksanakan proyek dengan didampingi guru sebagai fasilitator. Guru mendokumentasikan proses.',waktu:'25 menit'},
+        {tahap:'Menguji Hasil (Assess)',uraian:'Peserta didik mempresentasikan produk/karya. Guru dan siswa lain memberikan umpan balik konstruktif.',waktu:'10 menit'},
+        {tahap:'Evaluasi Pengalaman',uraian:'Refleksi bersama: apa yang berhasil, apa yang perlu diperbaiki, pelajaran hidup yang diperoleh.',waktu:'5 menit'}
+      ]
+    },
+    'Inquiry Based Learning':{
+      desc:'Model pembelajaran berbasis penyelidikan/inkuiri yang mendorong peserta didik untuk bertanya, menyelidiki, dan menemukan sendiri konsep pembelajaran.',
+      sintaks:[
+        {tahap:'Orientasi',uraian:'Guru menciptakan iklim belajar yang responsif, menyampaikan topik, tujuan, dan hasil belajar yang diharapkan.',waktu:'10 menit'},
+        {tahap:'Merumuskan Masalah',uraian:'Peserta didik dibimbing untuk merumuskan masalah/pertanyaan yang menantang dan bermakna terkait TP.',waktu:'10 menit'},
+        {tahap:'Merumuskan Hipotesis',uraian:'Peserta didik menyusun jawaban sementara (hipotesis) berdasarkan pengetahuan awal mereka.',waktu:'10 menit'},
+        {tahap:'Mengumpulkan Data',uraian:'Peserta didik melakukan aktivitas penyelidikan: eksperimen, observasi, membaca literatur, atau wawancara.',waktu:'25 menit'},
+        {tahap:'Menguji Hipotesis',uraian:'Peserta didik menganalisis data dan membandingkannya dengan hipotesis awal untuk membuktikan kebenaran.',waktu:'10 menit'},
+        {tahap:'Merumuskan Kesimpulan',uraian:'Peserta didik menyimpulkan hasil penyelidikan dan mengomunikasikan temuan mereka.',waktu:'10 menit'}
+      ]
+    },
+    'Cooperative Learning':{
+      desc:'Model pembelajaran kelompok kecil yang menekankan kerjasama, saling ketergantungan positif, dan tanggung jawab individu dalam mencapai tujuan bersama.',
+      sintaks:[
+        {tahap:'Menyampaikan Tujuan & Motivasi',uraian:'Guru menyampaikan tujuan pembelajaran, memotivasi, dan menjelaskan sistem kerja kelompok.',waktu:'10 menit'},
+        {tahap:'Menyajikan Informasi',uraian:'Guru memberikan informasi/materi awal melalui presentasi, demonstrasi, atau bahan bacaan.',waktu:'15 menit'},
+        {tahap:'Mengorganisasi Peserta Didik dalam Kelompok',uraian:'Guru membagi kelompok heterogen 4-5 siswa dan menjelaskan peran masing-masing anggota.',waktu:'10 menit'},
+        {tahap:'Membimbing Kelompok Bekerja & Belajar',uraian:'Peserta didik berdiskusi, saling mengajar, dan menyelesaikan tugas kelompok. Guru sebagai fasilitator.',waktu:'25 menit'},
+        {tahap:'Evaluasi',uraian:'Setiap kelompok mempresentasikan hasil kerja. Guru mengevaluasi baik proses maupun hasil.',waktu:'15 menit'},
+        {tahap:'Memberikan Penghargaan',uraian:'Guru memberikan apresiasi/penghargaan pada kelompok/individu yang menunjukkan prestasi.',waktu:'5 menit'}
+      ]
+    },
+    'Discovery Learning':{
+      desc:'Model pembelajaran penemuan di mana peserta didik menemukan sendiri konsep, prinsip, atau prosedur melalui eksplorasi terbimbing.',
+      sintaks:[
+        {tahap:'Stimulation (Pemberian Rangsangan)',uraian:'Guru menyajikan stimulus (video, gambar, cerita, fenomena) untuk memancing rasa ingin tahu peserta didik.',waktu:'10 menit'},
+        {tahap:'Problem Statement (Identifikasi Masalah)',uraian:'Peserta didik mengidentifikasi masalah/pertanyaan dari stimulus dan merumuskannya dalam bentuk hipotesis.',waktu:'10 menit'},
+        {tahap:'Data Collection (Pengumpulan Data)',uraian:'Peserta didik mengumpulkan informasi/data dari berbagai sumber untuk membuktikan hipotesis.',waktu:'20 menit'},
+        {tahap:'Data Processing (Pengolahan Data)',uraian:'Peserta didik mengolah data dengan cara mengklasifikasi, membandingkan, dan menganalisis.',waktu:'15 menit'},
+        {tahap:'Verification (Pembuktian)',uraian:'Peserta didik memverifikasi kebenaran hipotesis dengan data yang telah diolah.',waktu:'10 menit'},
+        {tahap:'Generalization (Menarik Kesimpulan)',uraian:'Peserta didik menyimpulkan pola/prinsip umum yang berlaku dari hasil penemuan.',waktu:'10 menit'}
+      ]
+    }
+  };
+  const md=metodeDetail[met]||metodeDetail['PBL (Problem Based Learning)'];
+  
+  // Dimensi Profil Lulusan breakdown
+  const dimList=(tp?.Di||DIMEN).split(';').map(d=>d.trim()).filter(Boolean);
+  const dimBreakdown={
+    'keimanan dan ketakwaan':'Peserta didik menunjukkan sikap religius dengan berdoa sebelum & sesudah pembelajaran, menghormati nilai-nilai keimanan.',
+    'kewargaan':'Peserta didik menunjukkan sikap sebagai warga negara yang baik: menghargai perbedaan, taat aturan, cinta tanah air.',
+    'penalaran kritis':'Peserta didik menganalisis informasi, mengevaluasi argumen, dan mengambil kesimpulan berdasarkan bukti.',
+    'kreativitas':'Peserta didik menghasilkan ide/karya orisinal, memodifikasi, dan mengombinasikan gagasan dengan cara baru.',
+    'kolaborasi':'Peserta didik bekerja sama dalam kelompok, saling menghargai, dan berkontribusi mencapai tujuan bersama.',
+    'kemandirian':'Peserta didik mengelola diri, mengambil inisiatif, dan bertanggung jawab atas pembelajarannya sendiri.',
+    'kesehatan':'Peserta didik menjaga kesehatan fisik, mental, dan emosional selama proses pembelajaran.',
+    'komunikasi':'Peserta didik menyampaikan gagasan dengan jelas baik lisan maupun tulisan, dan mendengarkan aktif.'
+  };
+  
+  $('dModulContent').innerHTML=`
+    <div class="text-center border-b-2 border-blue-600 pb-2 mb-3">
+      <h2 class="text-lg font-bold uppercase">MODUL AJAR DEEP LEARNING</h2>
+      <p class="text-[10px] text-slate-600 mt-0.5">Kurikulum Merdeka • Pendekatan Deep Learning</p>
+    </div>
+
+    <!-- IDENTITAS -->
+    <div class="mb-3">
+      <div class="section-title bg-slate-700 text-white">I. INFORMASI UMUM</div>
+      <table class="w-full text-[10px] border">
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold w-1/4">Nama Sekolah</td><td class="border p-1.5">${v('fS')} (NPSN: ${v('fNP')})</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Nama Penyusun</td><td class="border p-1.5">${v('fG')} (NIP. ${v('fNI')})</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Mata Pelajaran</td><td class="border p-1.5">${ST.mapel}</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Fase / Kelas / Rombel</td><td class="border p-1.5">Fase ${fase} / ${kelas} / Rombel ${rom||'-'}</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Semester</td><td class="border p-1.5">${tp?.S||'Semester 1'} — TA ${v('fTA')}</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Elemen</td><td class="border p-1.5">${tp?.E||'-'}</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Alokasi Waktu</td><td class="border p-1.5"><b>${tp?.P||1} Pertemuan</b> × ${getJPDur(v('fJn'))} menit × 2 JP = <b>${totalMenit} menit</b></td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Model/Metode Pembelajaran</td><td class="border p-1.5 text-blue-700 font-semibold">${met}</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Moda Pembelajaran</td><td class="border p-1.5">Tatap Muka (Luring)</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Sarana & Prasarana</td><td class="border p-1.5">Buku teks, LCD Proyektor, Laptop, LKPD, Alat tulis, Media pendukung sesuai materi</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Target Peserta Didik</td><td class="border p-1.5">Peserta didik reguler (heterogen — mampu mengikuti pembelajaran secara umum)</td></tr>
+      </table>
+    </div>
+
+    <!-- KOMPETENSI INTI / CAPAIAN PEMBELAJARAN -->
+    <div class="mb-3">
+      <div class="section-title bg-blue-600 text-white">II. KOMPETENSI INTI</div>
+      
+      <div class="mb-2">
+        <b class="text-[10px] block bg-blue-50 p-1 rounded">A. Capaian Pembelajaran (CP) Fase ${fase}:</b>
+        <p class="text-[10px] p-2 border rounded mt-1 leading-relaxed">${tp?.C||'-'}</p>
+      </div>
+
+      <div class="mb-2">
+        <b class="text-[10px] block bg-blue-50 p-1 rounded">B. Tujuan Pembelajaran (TP):</b>
+        <p class="text-[10px] p-2 border rounded mt-1 leading-relaxed font-semibold">${tp?.T||'-'}</p>
+      </div>
+
+      <div class="mb-2">
+        <b class="text-[10px] block bg-blue-50 p-1 rounded">C. Indikator Ketercapaian Tujuan Pembelajaran (IKTP):</b>
+        <ol class="text-[10px] p-2 border rounded mt-1 list-decimal pl-5 space-y-0.5">
+          <li>Peserta didik mampu menjelaskan konsep/materi terkait TP dengan bahasa sendiri.</li>
+          <li>Peserta didik mampu mengidentifikasi contoh penerapan TP dalam kehidupan sehari-hari.</li>
+          <li>Peserta didik mampu menerapkan konsep TP dalam menyelesaikan permasalahan kontekstual.</li>
+          <li>Peserta didik menunjukkan sikap yang mencerminkan Profil Lulusan sesuai dimensi yang dituju.</li>
+        </ol>
+      </div>
+
+      <div class="mb-2">
+        <b class="text-[10px] block bg-blue-50 p-1 rounded">D. Pemahaman Bermakna:</b>
+        <p class="text-[10px] p-2 border rounded mt-1 leading-relaxed italic">
+          Peserta didik memahami bahwa materi <b>"${tp?.T||''}"</b> memiliki relevansi langsung dengan kehidupan sehari-hari mereka. 
+          Pemahaman ini menjadi bekal untuk membentuk karakter, mengembangkan potensi diri, dan berkontribusi positif bagi masyarakat 
+          sesuai nilai-nilai Profil Lulusan Kurikulum Merdeka.
+        </p>
+      </div>
+
+      <div class="mb-2">
+        <b class="text-[10px] block bg-blue-50 p-1 rounded">E. Pertanyaan Pemantik:</b>
+        <ol class="text-[10px] p-2 border rounded mt-1 list-decimal pl-5 space-y-1">
+          <li>Apakah kalian pernah mengalami/melihat hal yang berkaitan dengan materi ini dalam kehidupan sehari-hari? Ceritakan!</li>
+          <li>Mengapa materi <b>"${tp?.E||'ini'}"</b> penting untuk kita pelajari?</li>
+          <li>Bagaimana jika kita tidak memahami/menerapkan hal ini? Apa dampaknya?</li>
+          <li>Apa yang ingin kalian ketahui lebih dalam tentang materi ini?</li>
+          <li>Bagaimana kalian akan menggunakan pengetahuan ini setelah pembelajaran hari ini?</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- DIMENSI PROFIL LULUSAN -->
+    <div class="mb-3">
+      <div class="section-title bg-emerald-600 text-white">III. DIMENSI PROFIL LULUSAN YANG DIKEMBANGKAN</div>
+      <table class="w-full text-[10px] border">
+        <thead class="bg-emerald-50"><tr>
+          <th class="border p-1 w-1/4">Dimensi</th>
+          <th class="border p-1">Elaborasi (Implementasi dalam Pembelajaran)</th>
+        </tr></thead>
+        <tbody>
+          ${dimList.map(d=>`<tr><td class="border p-1.5 font-semibold capitalize">${d}</td><td class="border p-1.5">${dimBreakdown[d.toLowerCase()]||'Dikembangkan melalui aktivitas pembelajaran dan interaksi kelas.'}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- KEGIATAN PEMBELAJARAN DEEP LEARNING -->
+    <div class="mb-3">
+      <div class="section-title bg-purple-600 text-white">IV. KEGIATAN PEMBELAJARAN DEEP LEARNING</div>
+      
+      <div class="bg-purple-50 border border-purple-200 rounded p-2 mb-2 text-[10px]">
+        <b class="text-purple-700">📘 Model Pembelajaran: ${met}</b>
+        <p class="mt-0.5 italic">${md.desc}</p>
+      </div>
+
+      <!-- PENDAHULUAN -->
+      <div class="mb-3">
+        <div class="bg-emerald-100 border-l-4 border-emerald-500 p-2 mb-1">
+          <b class="text-[11px] text-emerald-700">🟢 A. KEGIATAN PENDAHULUAN (${introMenit} menit)</b>
+        </div>
+        <table class="w-full text-[10px] border">
+          <thead class="bg-slate-50"><tr>
+            <th class="border p-1 w-8">No</th>
+            <th class="border p-1">Kegiatan Guru & Peserta Didik</th>
+            <th class="border p-1 w-16">Waktu</th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="border p-1 text-center">1</td><td class="border p-1.5"><b>Pembukaan:</b> Guru mengucap salam, memimpin doa, dan menanyakan kabar peserta didik. Guru mengecek kehadiran dan kesiapan belajar.</td><td class="border p-1 text-center">3'</td></tr>
+            <tr><td class="border p-1 text-center">2</td><td class="border p-1.5"><b>Apersepsi:</b> Guru mengaitkan materi sebelumnya dengan materi yang akan dipelajari. Mengajak siswa mengingat pengalaman terkait.</td><td class="border p-1 text-center">3'</td></tr>
+            <tr><td class="border p-1 text-center">3</td><td class="border p-1.5"><b>Motivasi:</b> Guru menyampaikan pentingnya materi hari ini serta manfaatnya dalam kehidupan. Menampilkan gambar/video pemantik.</td><td class="border p-1 text-center">3'</td></tr>
+            <tr><td class="border p-1 text-center">4</td><td class="border p-1.5"><b>Pertanyaan Pemantik:</b> Guru mengajukan 1-2 pertanyaan pemantik untuk memancing rasa ingin tahu peserta didik.</td><td class="border p-1 text-center">3'</td></tr>
+            <tr><td class="border p-1 text-center">5</td><td class="border p-1.5"><b>Penyampaian Tujuan:</b> Guru menyampaikan tujuan pembelajaran, cakupan materi, dan alur kegiatan yang akan dilakukan hari ini.</td><td class="border p-1 text-center">3'</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- KEGIATAN INTI - Deep Learning + Sintaks Metode -->
+      <div class="mb-3">
+        <div class="bg-blue-100 border-l-4 border-blue-500 p-2 mb-1">
+          <b class="text-[11px] text-blue-700">🔵 B. KEGIATAN INTI (${intiMenit} menit) — Deep Learning: 4 Fase + Sintaks ${met.split('(')[0].trim()}</b>
+        </div>
+        
+        <div class="mb-2 bg-slate-50 border rounded p-2">
+          <p class="text-[10px] font-semibold mb-1">📌 Empat Fase Deep Learning:</p>
+          <div class="grid grid-cols-2 gap-1 text-[9px]">
+            <div class="border rounded p-1.5 bg-white"><b class="text-blue-600">1. Experiencing (Mengalami):</b> Peserta didik mengamati fenomena/data/pengalaman langsung.</div>
+            <div class="border rounded p-1.5 bg-white"><b class="text-purple-600">2. Reflecting (Merefleksikan):</b> Peserta didik memaknai pengalaman melalui refleksi mendalam.</div>
+            <div class="border rounded p-1.5 bg-white"><b class="text-emerald-600">3. Conceptualizing (Membangun Konsep):</b> Peserta didik menyusun konsep berdasarkan hasil refleksi.</div>
+            <div class="border rounded p-1.5 bg-white"><b class="text-amber-600">4. Applying (Menerapkan):</b> Peserta didik menerapkan konsep dalam konteks baru/kehidupan nyata.</div>
+          </div>
+        </div>
+
+        <p class="text-[10px] font-semibold mb-1 mt-2">🎯 Sintaks Pembelajaran (${met}) — Integrasi 4 Fase Deep Learning:</p>
+        <table class="w-full text-[10px] border">
+          <thead class="bg-slate-50"><tr>
+            <th class="border p-1 w-8">Tahap</th>
+            <th class="border p-1 w-1/4">Sintaks</th>
+            <th class="border p-1">Aktivitas Pembelajaran (Deep Learning)</th>
+            <th class="border p-1 w-16">Waktu</th>
+          </tr></thead>
+          <tbody>
+            ${md.sintaks.map((s,i)=>{
+              const fase=['🔵 Experiencing','🟣 Reflecting','🟢 Conceptualizing','🟡 Applying','🔵 Experiencing','🟣 Reflecting'][i]||'🔵 Experiencing';
+              return `<tr><td class="border p-1 text-center font-bold">${i+1}</td><td class="border p-1.5"><b>${s.tahap}</b><br><span class="text-[8px] text-slate-500">${fase}</span></td><td class="border p-1.5">${s.uraian}</td><td class="border p-1 text-center">${s.waktu}</td></tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PENUTUP -->
+      <div class="mb-3">
+        <div class="bg-amber-100 border-l-4 border-amber-500 p-2 mb-1">
+          <b class="text-[11px] text-amber-700">🟡 C. KEGIATAN PENUTUP (${penutupMenit} menit)</b>
+        </div>
+        <table class="w-full text-[10px] border">
+          <thead class="bg-slate-50"><tr>
+            <th class="border p-1 w-8">No</th>
+            <th class="border p-1">Kegiatan</th>
+            <th class="border p-1 w-16">Waktu</th>
+          </tr></thead>
+          <tbody>
+            <tr><td class="border p-1 text-center">1</td><td class="border p-1.5"><b>Kesimpulan:</b> Guru bersama peserta didik menyimpulkan pembelajaran hari ini. Peserta didik diminta menyampaikan poin-poin penting yang telah dipelajari.</td><td class="border p-1 text-center">4'</td></tr>
+            <tr><td class="border p-1 text-center">2</td><td class="border p-1.5"><b>Asesmen Formatif:</b> Guru memberikan 3-5 pertanyaan lisan/kuis singkat untuk mengecek pemahaman peserta didik.</td><td class="border p-1 text-center">4'</td></tr>
+            <tr><td class="border p-1 text-center">3</td><td class="border p-1.5"><b>Refleksi:</b> Peserta didik merefleksikan pembelajaran: apa yang sudah dipahami, apa yang masih membingungkan, bagaimana perasaan mereka.</td><td class="border p-1 text-center">4'</td></tr>
+            <tr><td class="border p-1 text-center">4</td><td class="border p-1.5"><b>Tindak Lanjut:</b> Guru memberi tugas rumah/proyek lanjutan dan menyampaikan materi pertemuan berikutnya.</td><td class="border p-1 text-center">2'</td></tr>
+            <tr><td class="border p-1 text-center">5</td><td class="border p-1.5"><b>Penutup:</b> Guru mengajak siswa berdoa dan mengucap salam penutup.</td><td class="border p-1 text-center">1'</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ASESMEN -->
+    <div class="mb-3">
+      <div class="section-title bg-red-600 text-white">V. ASESMEN PEMBELAJARAN</div>
+      <table class="w-full text-[10px] border">
+        <thead class="bg-slate-50"><tr>
+          <th class="border p-1 w-1/6">Jenis Asesmen</th>
+          <th class="border p-1 w-1/4">Bentuk</th>
+          <th class="border p-1">Deskripsi</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="border p-1.5 font-semibold bg-blue-50">Asesmen Diagnostik</td>
+            <td class="border p-1.5">Pertanyaan Lisan / Kuis Pemantik</td>
+            <td class="border p-1.5">Dilakukan di awal pembelajaran untuk mengetahui pengetahuan awal peserta didik dan kesiapan belajar. Contoh: "Sebutkan apa yang kamu ketahui tentang ...?"</td>
+          </tr>
+          <tr>
+            <td class="border p-1.5 font-semibold bg-emerald-50">Asesmen Formatif</td>
+            <td class="border p-1.5">Observasi, Diskusi, LKPD, Presentasi</td>
+            <td class="border p-1.5">Dilakukan selama proses pembelajaran untuk memantau kemajuan belajar. Guru mengamati partisipasi, kualitas jawaban, dan interaksi peserta didik.</td>
+          </tr>
+          <tr>
+            <td class="border p-1.5 font-semibold bg-amber-50">Asesmen Sumatif</td>
+            <td class="border p-1.5">Tes Tertulis, Proyek, Produk Karya</td>
+            <td class="border p-1.5">Dilakukan di akhir pembelajaran/materi untuk mengukur pencapaian TP. Bentuk: soal pilihan ganda, uraian, atau produk kreatif.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mt-3">
+        <b class="text-[10px] block bg-slate-100 p-1 rounded">Rubrik Penilaian Sikap (Profil Lulusan):</b>
+        <table class="w-full text-[10px] border mt-1">
+          <thead class="bg-slate-50"><tr>
+            <th class="border p-1">Kriteria</th>
+            <th class="border p-1 bg-red-50">Perlu Bimbingan (60)</th>
+            <th class="border p-1 bg-amber-50">Cukup (75)</th>
+            <th class="border p-1 bg-blue-50">Baik (85)</th>
+            <th class="border p-1 bg-emerald-50">Sangat Baik (95)</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="border p-1.5 font-semibold">Partisipasi</td>
+              <td class="border p-1.5 text-[9px]">Pasif, jarang berkontribusi</td>
+              <td class="border p-1.5 text-[9px]">Kadang berpartisipasi jika didorong</td>
+              <td class="border p-1.5 text-[9px]">Aktif berpartisipasi</td>
+              <td class="border p-1.5 text-[9px]">Sangat aktif dan menginisiasi diskusi</td>
+            </tr>
+            <tr>
+              <td class="border p-1.5 font-semibold">Kolaborasi</td>
+              <td class="border p-1.5 text-[9px]">Sulit bekerjasama</td>
+              <td class="border p-1.5 text-[9px]">Bekerjasama jika diminta</td>
+              <td class="border p-1.5 text-[9px]">Bekerjasama dengan baik</td>
+              <td class="border p-1.5 text-[9px]">Kolaborator ulung, membantu teman</td>
+            </tr>
+            <tr>
+              <td class="border p-1.5 font-semibold">Penalaran Kritis</td>
+              <td class="border p-1.5 text-[9px]">Belum mampu menganalisis</td>
+              <td class="border p-1.5 text-[9px]">Menganalisis dengan bimbingan</td>
+              <td class="border p-1.5 text-[9px]">Menganalisis secara mandiri</td>
+              <td class="border p-1.5 text-[9px]">Analisis mendalam dan orisinil</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PENGAYAAN & REMEDIAL -->
+    <div class="mb-3">
+      <div class="section-title bg-teal-600 text-white">VI. PENGAYAAN & REMEDIAL</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="border rounded p-2 bg-emerald-50">
+          <b class="text-[10px] text-emerald-700">📈 Pengayaan (bagi yang sudah mencapai TP):</b>
+          <ul class="text-[10px] list-disc pl-4 mt-1 space-y-0.5">
+            <li>Diberikan tugas mendalam terkait aplikasi TP dalam konteks lebih kompleks.</li>
+            <li>Diberi peran sebagai tutor sebaya untuk membantu teman.</li>
+            <li>Diberikan proyek/riset mini terkait tema.</li>
+          </ul>
+        </div>
+        <div class="border rounded p-2 bg-amber-50">
+          <b class="text-[10px] text-amber-700">📉 Remedial (bagi yang belum mencapai TP):</b>
+          <ul class="text-[10px] list-disc pl-4 mt-1 space-y-0.5">
+            <li>Bimbingan individu/kelompok kecil di luar jam pelajaran.</li>
+            <li>Pemberian materi tambahan dengan pendekatan berbeda.</li>
+            <li>Penugasan ulang dengan tingkat kesulitan disesuaikan.</li>
+            <li>Kolaborasi dengan tutor sebaya (teman yang sudah menguasai).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAMPIRAN -->
+    <div class="mb-3">
+      <div class="section-title bg-indigo-600 text-white">VII. LAMPIRAN</div>
+      <ol class="text-[10px] list-decimal pl-5 space-y-0.5">
+        <li><b>Lembar Kerja Peserta Didik (LKPD):</b> Terlampir (disusun terpisah dengan format visual menarik)</li>
+        <li><b>Materi Ajar:</b> Handout / slide presentasi terkait TP</li>
+        <li><b>Media Pembelajaran:</b> Video, gambar, poster, alat peraga</li>
+        <li><b>Instrumen Asesmen:</b> Soal-soal formatif dan sumatif beserta kunci jawaban</li>
+        <li><b>Rubrik Penilaian:</b> Rubrik penilaian sikap, keterampilan, dan pengetahuan</li>
+        <li><b>Daftar Referensi:</b>
+          <ul class="list-disc pl-4 mt-0.5">
+            <li>Buku Teks ${ST.mapel} Kelas ${kelas.replace('Kelas ','')} Kurikulum Merdeka</li>
+            <li>Sumber digital: video pembelajaran, artikel edukasi, konten Youtube edukatif</li>
+            <li>Sumber otentik: pengalaman peserta didik, lingkungan sekitar</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
+    ${ttdPlan}`;
+}
+
+// ============ PROMPTS AI ============
+function genPrompts(){
+  const mp=ST.mapel;
+  const kl=getRombelKelas();
+  const fase=getFase(kl);
+  const jn=v('fJn');
+  const ta=v('fTA');
+  
+  $('prCP').textContent=`Saya guru ${mp} jenjang ${jn}.
+Buatkan CSV lengkap Capaian Pembelajaran (CP) dan Tujuan Pembelajaran (TP) sesuai Kurikulum Merdeka.
+
+FORMAT CSV (header persis ini di baris 1):
+Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan
+
+KETENTUAN:
+- Kelas: "${kl}"
+- Semester: "Semester 1" atau "Semester 2"
+- Elemen: Elemen CP mapel ${mp}
+- CP: Capaian Pembelajaran Fase ${fase} sesuai Permendikbudristek
+- TP: Tujuan Pembelajaran spesifik, terukur, bertahap
+- Dimensi Profil Lulusan (pilih 2-4, pisahkan titik koma):
+  ${DIMEN}
+- Metode: pilih SATU model Deep Learning yang paling cocok:
+  ${METODE.join(', ')}
+- Pertemuan: angka 1-3
+
+ATURAN PENTING:
+1. Minimal 10 TP per semester (total 20 TP)
+2. Setiap elemen harus ada di kedua semester
+3. TP bertahap dari mudah → kompleks
+4. Total pertemuan/semester sekitar 16-18
+5. JANGAN gunakan koma dalam isi kolom (ganti dengan titik koma)
+6. Sesuaikan Metode dengan karakteristik materi
+
+Buatkan sekarang untuk: ${mp} ${kl} Fase ${fase} ${jn}.`;
+
+  $('prKl').textContent=`Buatkan CSV Kalender Pendidikan TA ${ta} jenjang ${jn}.
+
+FORMAT (header di baris 1):
+Semester,Tanggal,Agenda,Kategori
+
+KETENTUAN:
+- Kategori: "Kegiatan Sekolah" / "Libur Nasional" / "Asesmen" / "Libur Semester" / "Hari Besar"
+- Semester 1: Juli - Desember ${ta.split('/')[0]||2026}
+- Semester 2: Januari - Juni ${ta.split('/')[1]||2027}
+- Minimal 15 agenda per semester
+- Sertakan: MPLS, PTS/STS, PAS/SAS, libur nasional (17 Agustus, dll), hari besar agama, penerimaan rapor
+- JANGAN gunakan koma dalam isi kolom`;
+
+  const tp1=D.cp.filter(c=>c.K===kl)[ST.modulTPIdx]||D.cp.filter(c=>c.K===kl)[0];
+  $('prLK').textContent=`Guru ${mp} jenjang ${jn}, kelas ${kl} (Fase ${fase}).
+Buatkan LKPD (Lembar Kerja Peserta Didik) VISUAL yang terintegrasi dengan Modul Ajar Deep Learning.
+
+KONTEKS MODUL AJAR:
+- Sekolah: ${v('fS')} (NPSN: ${v('fNP')})
+- Guru: ${v('fG')}
+- TP: ${tp1?.T||'[sesuaikan dengan TP yang dipilih]'}
+- CP: ${tp1?.C||'[sesuaikan]'}
+- Elemen: ${tp1?.E||'[sesuaikan]'}
+- Metode/Model: ${tp1?.M||METODE[0]}
+- Dimensi Profil Lulusan: ${tp1?.Di||DIMEN}
+- Alokasi: ${tp1?.P||2} pertemuan (${(tp1?.P||2)*2*getJPDur(jn)} menit total)
+
+INSTRUKSI PEMBUATAN LKPD (BUAT SANGAT DETAIL & VISUAL):
+
+1. IDENTITAS LKPD:
+   - Judul menarik dan sesuai TP
+   - Nama sekolah, mapel, kelas/fase, semester
+   - Nama siswa, tanggal, alokasi waktu
+   - Desain header/banner dengan warna cerah dan ilustrasi tema
+
+2. PETUNJUK PENGGUNAAN:
+   - Petunjuk umum dan khusus jelas
+   - Simbol/ikon untuk tiap jenis kegiatan
+   - Legenda warna
+
+3. KOMPETENSI & TUJUAN:
+   - CP, TP, IKTP
+   - Peta konsep singkat
+
+4. AKTIVITAS PEMBELAJARAN (5-7 aktivitas bertahap sesuai Deep Learning):
+
+   AKTIVITAS 1: EXPERIENCING (Mengalami)
+   - Sajikan gambar/ilustrasi/foto/video terkait (DESKRIPSIKAN DETAIL visualnya untuk AI image generator)
+   - Tabel observasi yang harus diisi
+   - Pertanyaan pemantik pengamatan (3-5 pertanyaan)
+
+   AKTIVITAS 2: REFLECTING (Merefleksikan)
+   - Mind mapping / concept mapping
+   - Pertanyaan refleksi mendalam (LOTS → HOTS)
+   - Kolom "pertanyaan yang muncul di benakku"
+   - Emoticon self-assessment
+
+   AKTIVITAS 3: CONCEPTUALIZING (Membangun Konsep)
+   - Tabel data yang harus dilengkapi
+   - Studi kasus bergambar (deskripsi visual detail)
+   - Diagram Venn / tabel perbandingan
+   - Puzzle / teka-teki edukatif
+
+   AKTIVITAS 4: APPLYING (Menerapkan)
+   - Proyek mini / eksperimen nyata
+   - Template presentasi mini
+   - Checklist pengerjaan
+   - Refleksi penerapan dalam kehidupan sehari-hari
+
+   AKTIVITAS 5: EVALUASI
+   - 5-10 soal pilihan ganda BERGAMBAR (deskripsikan setiap gambar)
+   - 3-5 soal uraian bertingkat (LOTS-MOTS-HOTS)
+   - Rubrik jawaban
+
+   AKTIVITAS 6: REFLEKSI DIRI
+   - Kolom: "Yang sudah saya pahami: ..."
+   - Kolom: "Yang masih membingungkan: ..."
+   - Kolom: "Rencana tindak lanjut saya: ..."
+   - Skala emoticon (😞😐🙂😄🤩)
+
+5. ELEMEN VISUAL WAJIB (deskripsi detail untuk AI image generator):
+   - Header/banner tema
+   - Karakter maskot (opsional, ceria & edukatif)
+   - Ikon-ikon di setiap bagian
+   - Border/frame dekoratif
+   - Tabel dengan warna kontras
+   - Box info/tips menarik
+   - QR Code placeholder untuk sumber video
+
+6. RUBRIK PENILAIAN:
+   - Rubrik per aktivitas
+   - Skor + deskriptor jelas
+   - Kolom nilai + tanda tangan
+
+7. FORMAT:
+   - Ukuran A4, portrait
+   - Font mudah dibaca (Comic Sans/Arial 12)
+   - Total 6-10 halaman
+   - Bagian bawah setiap halaman: nomor halaman + footer
+
+BUAT SEKARANG lengkap dengan deskripsi visual detail untuk SETIAP ilustrasi.
+Sertakan konsep desain warna keseluruhan (misal: biru-kuning ceria untuk SD).`;
+}
+
+// ============ EVENTS ============
+document.querySelectorAll('#fProfil input,#fProfil select').forEach(el=>{
+  el.addEventListener('input',()=>{renderAll();genPrompts()});
+});
+$('lP').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin()});
+$('lE').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeM('mProfile');closeM('mLock');closeM('mImport');closeM('mWA');
+  }
+});
+
+// ============ INIT ============
+updKelas();
+updJPDuration();
+rt();
+renderAll();
+genPrompts();
 </script>
+
 </body>
 </html>
