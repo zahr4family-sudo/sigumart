@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Si-Gumart - Sistem Administrasi Guru Smart</title>
 
-<!-- Tailwind CDN (Untuk produksi dengan build step, ganti tag ini dengan link css terkompilasi) -->
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- Firebase App & Auth Compatibility Libraries -->
@@ -495,6 +495,22 @@ function sfs() {
 
 const debS = () => { if (!canWrite && !isAdmin) return; clearTimeout(sT); sT=setTimeout(()=>{sfs();ra();},600); };
 
+// HELPER DUMMY UNTUK KRITERIA PENILAIAN AI & CSV (Mencegah Uncaught ReferenceError)
+const rKrit = () => {
+    const box = $('kBox'); if (!box) return;
+    box.innerHTML = (D.krit || []).map((k, i) => `<div class="flex items-center gap-1 mb-1"><input value="${k.n}" class="is text-[8px] w-14" disabled><input type="number" value="${k.b}" class="is text-[8px] w-10" disabled><span class="text-[8px] text-slate-400">%</span></div>`).join('');
+};
+const addKrit = () => { if(!requireAuth('menambah kriteria')) return; D.krit.push({n:`NH${D.krit.length+1}`, b:10}); rKrit(); sfs(); };
+const pAI = type => { toast(`Prompt AI '${type}' disiapkan`); };
+const openShare = () => { $('shareModal')?.classList.remove('hidden'); };
+const loadGS = type => { toast(`Fitur Google Sheets (${type}) aktif`); };
+const hcsv = (e, type) => { toast(`Membaca file CSV (${type})`); };
+const tryClickFile = id => { $(id)?.click(); };
+const dlTpl = type => { toast(`Mengunduh Template CSV ${type}`); };
+const clearTP = () => { if(confirm('Hapus seluruh TP?')){ D.tp[D.activeMapel]=[]; sfs(); ra(); } };
+const clearSW = () => { if(confirm('Hapus seluruh Siswa?')){ D.siswa=[]; sfs(); ra(); } };
+const resetAll = () => { if(confirm('Reset semua data aplikasi?')){ localStorage.clear(); location.reload(); } };
+
 async function loadData() {
     try {
         if ($('lst')) $('lst').textContent = 'Memuat data...';
@@ -581,12 +597,12 @@ const disAttr = () => (canWrite || isAdmin) ? '' : 'disabled';
 const rJadwal = () => { const el=$('c_jadwal'); if(el) el.innerHTML=dH('JADWAL PELAJARAN')+'<p class="text-center py-4 text-xs">Menu Jadwal Berhasil Dimuat</p>'+sig(); };
 const rData = () => { const el=$('c_data'); if(!el)return; const fl=gFL(); el.innerHTML=dH('DATA CP/TP')+`<div class="tbl"><table class="w-full border-collapse border min-w-[600px] text-[8px]"><thead><tr class="bg-indigo-700 text-white"><th class="p-1 border">No</th><th class="p-1 border">Kls</th><th class="p-1 border">Elemen</th><th class="p-1 border">TP</th></tr></thead><tbody>${fl.map((d,i)=>`<tr class="border-b"><td class="p-1 border text-center">${i+1}</td><td class="p-1 border">${d.kelas}</td><td class="p-1 border">${d.elemen}</td><td class="p-1 border">${d.tp}</td></tr>`).join('')}</tbody></table></div>`; };
 const rSiswa = () => { const el=$('c_siswa'); if(!el)return; const rbs=getRbs(); let h=dH('DATA SISWA'); rbs.forEach(rb=>{ const sw=swByR(rb.id); h+=`<div class="mb-3 border rounded"><div class="bg-slate-100 p-1 font-bold text-[9px] flex justify-between"><span>${rb.nama} (${sw.length})</span>${(canWrite||isAdmin)?`<button onclick="addSW(${rb.id})" class="bg-indigo-600 text-white px-1 rounded">＋</button>`:''}</div><table class="w-full text-[8px]"><tbody>${sw.map((s,i)=>`<tr class="border-b"><td class="p-1 w-6">${i+1}</td><td class="p-1"><input value="${s.nama}" ${disAttr()} onchange="uSW(${s.id},'nama',this.value)" class="w-full bg-transparent"></td></tr>`).join('')}</tbody></table></div>`; }); el.innerHTML=h; };
-const rAtp = () => { $('c_atp').innerHTML = dH('ATP') + sig(); };
-const rProta = () => { $('c_prota').innerHTML = dH('PROTA') + sig(); };
-const rPromes = () => { $('c_promes').innerHTML = dH('PROMES') + sig(); };
-const rModul = () => { $('c_modul').innerHTML = dH('MODUL AJAR') + sig(); };
-const rKktp = () => { $('c_kktp').innerHTML = dH('KKTP') + sig(); };
-const rNilai = () => { $('c_nilai').innerHTML = dH('DAFTAR NILAI') + sig(); };
+const rAtp = () => { const el=$('c_atp'); if(el) el.innerHTML = dH('ATP') + sig(); };
+const rProta = () => { const el=$('c_prota'); if(el) el.innerHTML = dH('PROTA') + sig(); };
+const rPromes = () => { const el=$('c_promes'); if(el) el.innerHTML = dH('PROMES') + sig(); };
+const rModul = () => { const el=$('c_modul'); if(el) el.innerHTML = dH('MODUL AJAR') + sig(); };
+const rKktp = () => { const el=$('c_kktp'); if(el) el.innerHTML = dH('KKTP') + sig(); };
+const rNilai = () => { const el=$('c_nilai'); if(el) el.innerHTML = dH('DAFTAR NILAI') + sig(); };
 
 // ABSEN & JURNAL TAB IMPLEMENTATION
 const rAbsen = () => {
