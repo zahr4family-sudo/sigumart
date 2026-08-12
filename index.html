@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SI-GUMART v5 - Sistem Administrasi Guru Smart</title>
+  <title>SI-GUMART v6 - Sistem Administrasi Guru Smart</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
-    @media print{.no-print{display:none!important}.print-area{margin:0;padding:8px;width:100%;box-shadow:none;border:none}body{background:#fff;font-size:9pt}}
+    @media print{.no-print{display:none!important}.print-area{margin:0;padding:8px;width:100%;box-shadow:none;border:none;page-break-inside:avoid}body{background:#fff;font-size:9pt}@page{margin:1cm}}
     .active-nav{background:#2563eb;color:#fff}
     .toast{position:fixed;bottom:16px;right:16px;z-index:9999;transform:translateY(120px);opacity:0;transition:all .35s}
     .toast.show{transform:translateY(0);opacity:1}
@@ -22,12 +22,17 @@
     @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     .sb{font-size:9px;padding:2px 7px;border-radius:9999px;font-weight:600}
     ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:3px}
-    .jd-self{background:#dcfce7!important;font-weight:700}
-    .jd-conflict{background:#fecaca!important;outline:2px solid #ef4444}
-    .ef:disabled{background:#f8fafc;opacity:.65;cursor:not-allowed}
-    table{border-color:#cbd5e1}
-    th{border-color:#cbd5e1}
-    td{border-color:#e2e8f0}
+    .jd-cell{min-width:80px;text-align:center;vertical-align:middle;padding:6px 4px;font-size:11px;border:1px solid #cbd5e1}
+    .jd-mapel{color:#2563eb;font-weight:700;font-size:12px}
+    .jd-rombel{color:#9ca3af;font-size:10px}
+    .jd-ist{background:#fef3c7;color:#92400e;font-weight:700;text-align:center}
+    .jd-empty{color:#d1d5db}
+    .jd-header{background:#f1f5f9;font-weight:700;color:#475569;text-align:center;padding:8px 4px;border:1px solid #cbd5e1}
+    .ef:disabled{background:#f8fafc;opacity:.6;cursor:not-allowed}
+    table{border-collapse:collapse}th,td{border:1px solid #e2e8f0}
+    .rombel-tab{cursor:pointer;padding:4px 12px;border-radius:9999px;font-size:10px;font-weight:700;border:1px solid #e2e8f0;transition:all .2s}
+    .rombel-tab.active{background:#2563eb;color:#fff;border-color:#2563eb}
+    .rombel-tab:hover{border-color:#93c5fd}
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row">
@@ -42,39 +47,35 @@
   <div class="text-center mb-5 fade-in">
     <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-600 rounded-2xl shadow-xl mb-2"><i class="fa-solid fa-graduation-cap text-2xl text-white"></i></div>
     <h1 class="text-2xl font-extrabold text-white">SI-GUMART</h1>
-    <p class="text-blue-300 text-[11px]">Sistem Administrasi Guru Smart v5</p>
-    <p class="text-blue-400/50 text-[9px] mt-0.5">Semua Mapel • Kelas 1-12 • Kurikulum Merdeka • Deep Learning</p>
+    <p class="text-blue-300 text-[11px]">Sistem Administrasi Guru Smart</p>
   </div>
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in">
     <div class="flex border-b">
-      <button onclick="authTab('login')" id="aTabL" class="flex-1 py-2 text-xs font-bold text-blue-600 border-b-2 border-blue-600"><i class="fa-solid fa-right-to-bracket mr-1"></i>Masuk</button>
-      <button onclick="authTab('register')" id="aTabR" class="flex-1 py-2 text-xs font-bold text-slate-400 border-b-2 border-transparent"><i class="fa-solid fa-user-plus mr-1"></i>Daftar</button>
+      <button onclick="authTab('login')" id="aTabL" class="flex-1 py-2 text-xs font-bold text-blue-600 border-b-2 border-blue-600">Masuk</button>
+      <button onclick="authTab('register')" id="aTabR" class="flex-1 py-2 text-xs font-bold text-slate-400 border-b-2 border-transparent">Daftar</button>
     </div>
-    <div id="loginForm" class="p-4 space-y-2.5">
+    <div id="loginForm" class="p-4 space-y-2">
       <div><label class="block text-[10px] font-semibold mb-0.5">Email</label><input type="email" id="lE" class="w-full border rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-400"></div>
       <div><label class="block text-[10px] font-semibold mb-0.5">Password</label><input type="password" id="lP" class="w-full border rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-400"></div>
-      <button onclick="doLogin()" id="btnL" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm"><i class="fa-solid fa-right-to-bracket mr-1"></i>Masuk</button>
-      <button onclick="doGoogle()" class="w-full border-2 hover:bg-slate-50 text-slate-700 py-2 rounded-lg font-bold text-sm flex items-center justify-center space-x-1">
-        <svg width="14" height="14" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H42V20H24v8h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.2 8 3l5.7-5.7C34 6 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.2 8 3l5.7-5.7C34 6 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
-        <span>Google</span>
-      </button>
-      <button onclick="doReset()" class="w-full text-[10px] text-blue-500">Lupa password?</button>
+      <button onclick="doLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-sm">Masuk</button>
+      <button onclick="doGoogle()" class="w-full border-2 hover:bg-slate-50 text-slate-700 py-2 rounded-lg font-bold text-sm">Google Login</button>
     </div>
-    <div id="regForm" class="p-4 space-y-2.5 hidden">
-      <div><label class="block text-[10px] font-semibold mb-0.5">Nama Lengkap</label><input id="rN" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">Email</label><input type="email" id="rE" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
+    <div id="regForm" class="p-4 space-y-2 hidden">
+      <div class="grid grid-cols-2 gap-2">
+        <div><label class="block text-[10px] font-semibold mb-0.5">Nama</label><input id="rN" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
+        <div><label class="block text-[10px] font-semibold mb-0.5">Email</label><input type="email" id="rE" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
+      </div>
       <div><label class="block text-[10px] font-semibold mb-0.5">Password (min 6)</label><input type="password" id="rP" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
       <div class="grid grid-cols-2 gap-2">
         <div><label class="block text-[10px] font-semibold mb-0.5">Sekolah</label><input id="rS" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
-        <div><label class="block text-[10px] font-semibold mb-0.5">NPSN</label><input id="rNP" class="w-full border rounded-lg p-2 text-sm outline-none" placeholder="8 digit"></div>
+        <div><label class="block text-[10px] font-semibold mb-0.5">NPSN</label><input id="rNP" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
       </div>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <div><label class="block text-[10px] font-semibold mb-0.5">Jenjang</label><select id="rJ" class="w-full border rounded-lg p-2 text-sm"><option>SD/MI</option><option>SMP/MTs</option><option>SMA/MA/SMK</option></select></div>
-        <div><label class="block text-[10px] font-semibold mb-0.5">Tipe Guru</label><select id="rTG" class="w-full border rounded-lg p-2 text-sm"><option value="mapel">Guru Mapel</option><option value="kelas">Guru Kelas</option></select></div>
+        <div><label class="block text-[10px] font-semibold mb-0.5">Tipe</label><select id="rTG" class="w-full border rounded-lg p-2 text-sm"><option value="mapel">Guru Mapel</option><option value="kelas">Guru Kelas</option></select></div>
+        <div><label class="block text-[10px] font-semibold mb-0.5">Mapel</label><input id="rM" class="w-full border rounded-lg p-2 text-sm outline-none" placeholder="PAI"></div>
       </div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">Mata Pelajaran Utama</label><input id="rM" class="w-full border rounded-lg p-2 text-sm outline-none" placeholder="PAI dan Budi Pekerti"></div>
-      <button onclick="doRegister()" id="btnR" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-bold text-sm"><i class="fa-solid fa-user-plus mr-1"></i>Daftar</button>
-      <p class="text-[9px] text-center text-slate-400">Akses edit/cetak diaktifkan admin.</p>
+      <button onclick="doRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-bold text-sm">Daftar</button>
     </div>
   </div>
   <div class="text-center mt-3"><button onclick="enterGuest()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-eye mr-1"></i>Tamu</button></div>
@@ -83,11 +84,20 @@
 
 <!-- PENDING -->
 <div id="pendingScr" class="fixed inset-0 bg-gradient-to-br from-amber-50 to-orange-50 z-50 flex items-center justify-center p-4 hidden">
-<div class="bg-white rounded-2xl shadow-xl p-5 max-w-sm text-center space-y-2">
+<div class="bg-white rounded-2xl shadow-xl p-5 max-w-sm text-center space-y-3">
   <div class="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-clock text-2xl text-amber-500"></i></div>
-  <h2 class="font-bold">Menunggu Persetujuan Admin</h2>
-  <p class="text-xs text-slate-500">Hubungi: <b>kkgpainagreg@gmail.com</b></p>
-  <div class="flex space-x-2 pt-1"><button onclick="enterViewOnly()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-xs font-bold">Mode Lihat</button><button onclick="doLogout()" class="flex-1 bg-slate-200 py-2 rounded-lg text-xs font-bold">Keluar</button></div>
+  <h2 class="font-bold text-lg">Menunggu Persetujuan</h2>
+  <p class="text-xs text-slate-500">Akun terdaftar. Hubungi Admin untuk persetujuan:</p>
+  <div id="waContactArea" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+    <a id="waLink" href="#" target="_blank" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-bold text-sm transition">
+      <i class="fa-brands fa-whatsapp text-lg"></i><span>Hubungi Admin via WhatsApp</span>
+    </a>
+    <p id="waPreview" class="text-[10px] text-slate-500 mt-2 italic"></p>
+  </div>
+  <div class="flex space-x-2 pt-1">
+    <button onclick="enterViewOnly()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-xs font-bold">Mode Lihat</button>
+    <button onclick="doLogout()" class="flex-1 bg-slate-200 py-2 rounded-lg text-xs font-bold">Keluar</button>
+  </div>
 </div>
 </div>
 
@@ -96,11 +106,12 @@
 <div id="mImport" class="modal-bg hidden"></div>
 <div id="mLock" class="modal-bg hidden no-print">
   <div class="bg-white rounded-2xl p-5 max-w-sm text-center space-y-2 mx-4">
-    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-lock text-xl text-red-500"></i></div>
-    <h3 class="font-bold text-sm">Akses Terbatas</h3><p class="text-xs text-slate-500">Login & dapatkan izin admin.</p>
+    <i class="fa-solid fa-lock text-3xl text-red-400"></i>
+    <h3 class="font-bold text-sm">Akses Terbatas</h3>
     <div class="flex space-x-2"><button onclick="showAuth()" class="flex-1 bg-blue-600 text-white py-1.5 rounded-lg text-xs font-bold">Login</button><button onclick="closeM('mLock')" class="flex-1 bg-slate-100 py-1.5 rounded-lg text-xs font-bold">Tutup</button></div>
   </div>
 </div>
+<div id="mAdminWA" class="modal-bg hidden"></div>
 
 <!-- MOBILE BAR -->
 <div class="md:hidden bg-slate-900 text-white p-3 flex justify-between items-center no-print">
@@ -110,9 +121,9 @@
 
 <!-- SIDEBAR -->
 <aside id="sidebar" class="w-full md:w-56 bg-slate-900 text-slate-200 p-2.5 hidden md:flex md:flex-col no-print shrink-0 overflow-y-auto" style="max-height:100vh">
-  <div class="flex items-center space-x-2 pb-2.5 border-b border-slate-700 mb-2.5">
+  <div class="flex items-center space-x-2 pb-2 border-b border-slate-700 mb-2">
     <div class="bg-blue-600 p-1.5 rounded-lg"><i class="fa-solid fa-graduation-cap text-white text-sm"></i></div>
-    <div><h1 class="font-bold text-white text-xs">SI-GUMART v5</h1><p class="text-[8px] text-slate-400">Administrasi Guru Smart</p></div>
+    <div><h1 class="font-bold text-white text-xs">SI-GUMART v6</h1><p class="text-[8px] text-slate-400">Administrasi Guru Smart</p></div>
   </div>
   <div id="sideUser" class="bg-slate-800 rounded-lg p-2 mb-2 hidden">
     <div class="flex items-center space-x-2">
@@ -123,8 +134,7 @@
   </div>
   <div id="selArea" class="mb-2 space-y-1.5 hidden">
     <div><label class="text-[8px] text-slate-500 uppercase font-bold">Mapel</label><div class="flex space-x-0.5 mt-0.5"><select id="selMap" onchange="onMapChange()" class="flex-1 bg-slate-800 border border-slate-600 text-white text-[10px] rounded p-1 outline-none"></select><button onclick="addMapel()" class="bg-emerald-600 text-white px-1 rounded text-[9px]"><i class="fa-solid fa-plus"></i></button></div></div>
-    <div><label class="text-[8px] text-slate-500 uppercase font-bold">Rombel</label><div class="flex space-x-0.5 mt-0.5"><select id="selRom" onchange="onRomChange()" class="flex-1 bg-slate-800 border border-slate-600 text-white text-[10px] rounded p-1 outline-none"></select><button onclick="addRombel()" class="bg-emerald-600 text-white px-1 rounded text-[9px]"><i class="fa-solid fa-plus"></i></button></div></div>
-    <div class="text-[8px] text-slate-500"><i class="fa-solid fa-user-tag mr-0.5"></i>Tipe: <b id="sGuruType" class="text-slate-300">-</b></div>
+    <div><label class="text-[8px] text-slate-500 uppercase font-bold">Rombel Aktif</label><div class="flex space-x-0.5 mt-0.5"><select id="selRom" onchange="onRomChange()" class="flex-1 bg-slate-800 border border-slate-600 text-white text-[10px] rounded p-1 outline-none"></select><button onclick="addRombel()" class="bg-emerald-600 text-white px-1 rounded text-[9px]"><i class="fa-solid fa-plus"></i></button></div></div>
   </div>
 
   <nav class="space-y-2 text-[11px] flex-1">
@@ -138,7 +148,7 @@
         <button onclick="go('prompt')" id="btn-prompt" class="nav-btn w-full text-left px-2 py-1.5 rounded hover:bg-slate-800 text-amber-400"><i class="fa-solid fa-robot w-4"></i>Prompt AI</button>
       </div>
     </div>
-    <div><div class="text-[8px] font-bold text-slate-500 uppercase mb-0.5 px-1">📄 Dokumen</div>
+    <div><div class="text-[8px] font-bold text-slate-500 uppercase mb-0.5 px-1">📄 Dokumen (Per Rombel)</div>
       <div class="space-y-0.5">
         <button onclick="go('dKal')" id="btn-dKal" class="nav-btn w-full text-left px-2 py-1.5 rounded hover:bg-slate-800"><i class="fa-regular fa-calendar-check w-4"></i>Kalender</button>
         <button onclick="go('dAcp')" id="btn-dAcp" class="nav-btn w-full text-left px-2 py-1.5 rounded hover:bg-slate-800"><i class="fa-solid fa-chart-pie w-4"></i>ACP</button>
@@ -149,7 +159,7 @@
         <button onclick="go('dKktp')" id="btn-dKktp" class="nav-btn w-full text-left px-2 py-1.5 rounded hover:bg-slate-800 text-emerald-400"><i class="fa-solid fa-list-check w-4"></i>KKTP</button>
       </div>
     </div>
-    <div><div class="text-[8px] font-bold text-slate-500 uppercase mb-0.5 px-1">📊 Penilaian</div>
+    <div><div class="text-[8px] font-bold text-slate-500 uppercase mb-0.5 px-1">📊 Penilaian (Per Rombel)</div>
       <div class="space-y-0.5">
         <button onclick="go('absen')" id="btn-absen" class="nav-btn w-full text-left px-2 py-1.5 rounded hover:bg-slate-800"><i class="fa-solid fa-clipboard-user w-4"></i>Absen</button>
         <button onclick="go('nilai')" id="btn-nilai" class="nav-btn w-full text-left px-2 py-1.5 rounded hover:bg-slate-800"><i class="fa-solid fa-star w-4"></i>Nilai</button>
@@ -161,17 +171,21 @@
     </div>
   </nav>
   <div class="mt-2 pt-2 border-t border-slate-700 space-y-1">
-    <div id="gBtn" class="hidden"><button onclick="showAuth()" class="w-full bg-blue-600 text-white py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-right-to-bracket mr-1"></i>Login</button></div>
-    <div id="oBtn" class="hidden"><button onclick="doLogout()" class="w-full bg-red-600/20 text-red-400 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-right-from-bracket mr-1"></i>Keluar</button></div>
-    <p class="text-[8px] text-slate-600 text-center">v5.0 Firebase</p>
+    <div id="gBtn" class="hidden"><button onclick="showAuth()" class="w-full bg-blue-600 text-white py-1 rounded text-[10px] font-bold">Login</button></div>
+    <div id="oBtn" class="hidden"><button onclick="doLogout()" class="w-full bg-red-600/20 text-red-400 py-1 rounded text-[10px] font-bold">Keluar</button></div>
   </div>
 </aside>
 
 <!-- MAIN -->
 <main class="flex-1 p-3 md:p-4 overflow-y-auto">
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3 no-print bg-white p-3 rounded-xl shadow-sm border">
-    <div><h2 id="pgT" class="text-sm font-bold">Profil</h2><p class="text-[10px] text-slate-500" id="pgS">-</p></div>
+    <div>
+      <h2 id="pgT" class="text-sm font-bold">Profil</h2>
+      <p class="text-[10px] text-slate-500" id="pgS">-</p>
+    </div>
     <div class="flex items-center space-x-1 flex-wrap gap-0.5">
+      <!-- Rombel Tabs for doc/penilaian pages -->
+      <div id="rombelTabs" class="flex space-x-1 mr-2 hidden"></div>
       <span id="accB" class="text-[8px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500"><i class="fa-solid fa-eye mr-0.5"></i>LIHAT</span>
       <button onclick="saveCloud()" id="bSave" class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold hidden"><i class="fa-solid fa-cloud-arrow-up mr-0.5"></i>Simpan</button>
       <button onclick="handlePrint()" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-print mr-0.5"></i>Cetak</button>
@@ -182,34 +196,31 @@
   <div id="tab-profil" class="tab-c bg-white p-4 rounded-xl border fade-in">
     <h3 class="font-bold text-sm mb-3 border-b pb-2"><i class="fa-solid fa-school text-blue-500 mr-1"></i>Profil Sekolah & Guru</h3>
     <form id="fProfil" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-sm">
-      <div><label class="block text-[10px] font-semibold mb-0.5">Nama Sekolah</label><input id="fS" value="SDN Nagreg 05" class="w-full border rounded-lg p-1.5 text-sm ef"></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">NPSN</label><input id="fNP" value="20254123" class="w-full border rounded-lg p-1.5 text-sm ef"></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">Guru</label><input id="fG" value="Apipudin, S.Pd.I." class="w-full border rounded-lg p-1.5 text-sm ef"></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">NIP</label><input id="fNI" value="19880520 201212 2 004" class="w-full border rounded-lg p-1.5 text-sm ef"></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">Kepala Sekolah</label><input id="fKS" value="Aep Sudrajat, S.Pd" class="w-full border rounded-lg p-1.5 text-sm ef"></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">NIP Kepsek</label><input id="fNK" value="19750812 199803 1 002" class="w-full border rounded-lg p-1.5 text-sm ef"></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">Jenjang</label><select id="fJn" onchange="updKelas();renderAll()" class="w-full border rounded-lg p-1.5 text-sm ef"><option>SD/MI</option><option>SMP/MTs</option><option>SMA/MA/SMK</option></select></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">Kelas</label><select id="fKl" onchange="renderAll()" class="w-full border rounded-lg p-1.5 text-sm ef"></select></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">Tipe Guru</label><select id="fTG" onchange="renderAll()" class="w-full border rounded-lg p-1.5 text-sm ef"><option value="mapel">Guru Mata Pelajaran</option><option value="kelas">Guru Kelas</option></select></div>
-      <div><label class="block text-[10px] font-semibold mb-0.5">TA & TTD</label><div class="grid grid-cols-2 gap-1"><input id="fTA" value="2026/2027" class="border rounded-lg p-1.5 text-sm ef"><input id="fTD" value="Nagreg, 13 Juli 2026" class="border rounded-lg p-1.5 text-sm ef"></div></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">Nama Sekolah</label><input id="fS" value="SDN Nagreg 05" class="w-full border rounded-lg p-1.5 ef"></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">NPSN</label><input id="fNP" value="20254123" class="w-full border rounded-lg p-1.5 ef"></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">Guru</label><input id="fG" value="Apipudin, S.Pd.I." class="w-full border rounded-lg p-1.5 ef"></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">NIP</label><input id="fNI" value="19880520 201212 2 004" class="w-full border rounded-lg p-1.5 ef"></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">Kepala Sekolah</label><input id="fKS" value="Aep Sudrajat, S.Pd" class="w-full border rounded-lg p-1.5 ef"></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">NIP Kepsek</label><input id="fNK" value="19750812 199803 1 002" class="w-full border rounded-lg p-1.5 ef"></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">Jenjang</label><select id="fJn" onchange="updKelas();updJPDuration();renderAll()" class="w-full border rounded-lg p-1.5 ef"><option>SD/MI</option><option>SMP/MTs</option><option>SMA/MA/SMK</option></select></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">Tipe Guru</label><select id="fTG" onchange="renderAll()" class="w-full border rounded-lg p-1.5 ef"><option value="mapel">Guru Mata Pelajaran</option><option value="kelas">Guru Kelas</option></select></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">Hari Masuk</label><select id="fHari" onchange="renderAll()" class="w-full border rounded-lg p-1.5 ef"><option value="5">Senin - Jumat (5 hari)</option><option value="6">Senin - Sabtu (6 hari)</option></select></div>
+      <div><label class="block text-[10px] font-semibold mb-0.5">Durasi JP: <b id="jpDurLabel">35 menit</b></label><input id="fTA" value="2026/2027" placeholder="Tahun Ajaran" class="w-full border rounded-lg p-1.5 ef"></div>
+      <div class="md:col-span-2"><label class="block text-[10px] font-semibold mb-0.5">TTD Perencanaan</label><input id="fTD" value="Nagreg, 13 Juli 2026" class="w-full border rounded-lg p-1.5 ef"></div>
     </form>
-    <div id="viewN" class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-[10px] text-amber-700 hidden"><i class="fa-solid fa-lock mr-1"></i><b>Mode Lihat.</b> Login & minta akses admin.</div>
   </div>
 
   <!-- KALENDER -->
   <div id="tab-kalender" class="tab-c hidden space-y-2 fade-in">
     <div class="bg-white p-3 rounded-xl border">
-      <h3 class="font-bold text-xs mb-1"><i class="fa-solid fa-file-csv text-emerald-500 mr-1"></i>Import Kalender (CSV / Google Sheet)</h3>
-      <div class="flex space-x-1 mb-1">
-        <input id="csvLinkKal" placeholder="URL Google Sheet CSV atau paste CSV" class="flex-1 border rounded p-1.5 text-[11px] ef">
-        <button onclick="ok()&&loadFromLink('kal')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-link mr-0.5"></i>Link</button>
-      </div>
+      <h3 class="font-bold text-xs mb-1"><i class="fa-solid fa-file-csv text-emerald-500 mr-1"></i>Import Kalender</h3>
+      <div class="flex space-x-1 mb-1"><input id="csvLinkKal" placeholder="URL Google Sheet CSV" class="flex-1 border rounded p-1.5 text-[11px] ef"><button onclick="ok()&&loadLink('kal')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-link"></i></button></div>
       <textarea id="csvKal" rows="2" placeholder="Semester,Tanggal,Agenda,Kategori" class="w-full border rounded p-1.5 text-[10px] font-mono bg-slate-50 ef"></textarea>
-      <button onclick="ok()&&procCSV('kal')" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded mt-1"><i class="fa-solid fa-upload mr-0.5"></i>Proses CSV</button>
+      <button onclick="ok()&&procCSV('kal')" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded mt-1">Proses</button>
     </div>
     <div class="bg-white p-3 rounded-xl border overflow-x-auto">
       <div class="flex justify-between mb-1"><h3 class="font-bold text-xs">Data Kalender</h3><button onclick="ok()&&D.kal.push({S:'Semester 1',T:'',A:'',K:''})+rt()" class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded">+</button></div>
-      <table class="w-full text-[10px] border-collapse"><thead class="bg-slate-100"><tr><th class="p-1 text-left">Smt</th><th class="p-1 text-left">Tanggal</th><th class="p-1 text-left">Agenda</th><th class="p-1 text-left">Kategori</th><th class="p-1 w-6"></th></tr></thead><tbody id="tbKal"></tbody></table>
+      <table class="w-full text-[10px]"><thead class="bg-slate-100"><tr><th class="p-1 text-left">Smt</th><th class="p-1 text-left">Tanggal</th><th class="p-1 text-left">Agenda</th><th class="p-1 text-left">Kategori</th><th class="p-1 w-6"></th></tr></thead><tbody id="tbKal"></tbody></table>
     </div>
   </div>
 
@@ -217,27 +228,21 @@
   <div id="tab-cptp" class="tab-c hidden space-y-2 fade-in">
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-1">
-        <h3 class="font-bold text-xs"><i class="fa-solid fa-file-csv text-emerald-500 mr-1"></i>Import CP/TP</h3>
-        <div class="flex space-x-1">
-          <button onclick="ok()&&openImport()" class="bg-teal-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-download mr-0.5"></i>Guru Lain</button>
-        </div>
+        <h3 class="font-bold text-xs">Import CP/TP</h3>
+        <button onclick="ok()&&openImport()" class="bg-teal-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-download mr-0.5"></i>Guru Lain</button>
       </div>
-      <div class="flex space-x-1 mb-1">
-        <input id="csvLinkCP" placeholder="URL Google Sheet CSV" class="flex-1 border rounded p-1.5 text-[11px] ef">
-        <button onclick="ok()&&loadFromLink('cp')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-link mr-0.5"></i>Link</button>
-      </div>
+      <div class="flex space-x-1 mb-1"><input id="csvLinkCP" placeholder="URL Google Sheet CSV" class="flex-1 border rounded p-1.5 text-[11px] ef"><button onclick="ok()&&loadLink('cp')" class="bg-purple-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-link"></i></button></div>
       <textarea id="csvCP" rows="3" placeholder="Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan" class="w-full border rounded p-1.5 text-[10px] font-mono bg-slate-50 ef"></textarea>
-      <button onclick="ok()&&procCSV('cp')" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded mt-1"><i class="fa-solid fa-upload mr-0.5"></i>Proses</button>
+      <button onclick="ok()&&procCSV('cp')" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded mt-1">Proses</button>
     </div>
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex flex-wrap gap-1 items-center mb-2">
-        <h3 class="font-bold text-xs">Data CP/TP</h3>
         <select id="fK" onchange="rCP()" class="border rounded p-1 text-[10px]"><option value="">Kelas</option></select>
         <select id="fSm" onchange="rCP()" class="border rounded p-1 text-[10px]"><option value="">Smt</option><option>Semester 1</option><option>Semester 2</option></select>
         <select id="fEl" onchange="rCP()" class="border rounded p-1 text-[10px]"><option value="">Elemen</option></select>
-        <button onclick="ok()&&D.cp.push({K:v('fKl'),S:'Semester 1',E:'',C:'',T:'',Di:'',M:'PBL',P:2})+rCP()" class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded ml-auto">+ TP</button>
+        <button onclick="ok()&&D.cp.push({K:getRombelKelas(),S:'Semester 1',E:'',C:'',T:'',Di:'',M:'PBL (Problem Based Learning)',P:2})+rCP()" class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded ml-auto">+ TP</button>
       </div>
-      <div class="overflow-x-auto"><table class="w-full text-[9px] border-collapse"><thead class="bg-slate-100"><tr><th class="p-1">Kls</th><th class="p-1">Smt</th><th class="p-1">Elemen</th><th class="p-1 min-w-[120px]">CP</th><th class="p-1 min-w-[120px]">TP</th><th class="p-1">Dimensi PL</th><th class="p-1">Metode</th><th class="p-1 w-8">Prt</th><th class="p-1 w-6"></th></tr></thead><tbody id="tbCP"></tbody></table></div>
+      <div class="overflow-x-auto"><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="p-1">Kls</th><th class="p-1">Smt</th><th class="p-1">Elemen</th><th class="p-1 min-w-[120px]">CP</th><th class="p-1 min-w-[120px]">TP</th><th class="p-1">Dimensi PL</th><th class="p-1">Metode</th><th class="p-1 w-8">Prt</th><th class="p-1 w-6"></th></tr></thead><tbody id="tbCP"></tbody></table></div>
       <p class="text-[9px] text-slate-400 mt-1" id="cpI"></p>
     </div>
   </div>
@@ -246,18 +251,18 @@
   <div id="tab-siswa" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex justify-between items-center mb-2">
-        <h3 class="font-bold text-xs"><i class="fa-solid fa-users text-blue-500 mr-1"></i>Siswa — <span class="text-blue-600" id="swR">-</span></h3>
+        <h3 class="font-bold text-xs"><i class="fa-solid fa-users text-blue-500 mr-1"></i>Siswa Rombel: <b class="text-blue-600" id="swR">-</b></h3>
         <div class="flex space-x-1">
           <button onclick="ok()&&addSiswa()" class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded">+</button>
           <button onclick="$('csvSwA').classList.toggle('hidden')" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-upload"></i></button>
         </div>
       </div>
       <div id="csvSwA" class="hidden mb-2">
-        <div class="flex space-x-1 mb-1"><input id="csvLinkSw" placeholder="URL Google Sheet CSV" class="flex-1 border rounded p-1 text-[10px] ef"><button onclick="ok()&&loadFromLink('siswa')" class="bg-purple-600 text-white text-[9px] px-2 rounded"><i class="fa-solid fa-link"></i></button></div>
+        <div class="flex space-x-1 mb-1"><input id="csvLinkSw" placeholder="URL Google Sheet" class="flex-1 border rounded p-1 text-[10px] ef"><button onclick="ok()&&loadLink('siswa')" class="bg-purple-600 text-white text-[9px] px-2 rounded"><i class="fa-solid fa-link"></i></button></div>
         <textarea id="csvSw" rows="2" placeholder="NIS,Nama,L/P" class="w-full border rounded p-1.5 text-[10px] font-mono bg-slate-50 ef"></textarea>
         <button onclick="ok()&&procCSV('siswa')" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded mt-1">Proses</button>
       </div>
-      <table class="w-full text-[10px] border-collapse"><thead class="bg-slate-100"><tr><th class="p-1 w-6">No</th><th class="p-1">NIS</th><th class="p-1">Nama</th><th class="p-1 w-8">L/P</th><th class="p-1 w-6"></th></tr></thead><tbody id="tbSw"></tbody></table>
+      <table class="w-full text-[10px]"><thead class="bg-slate-100"><tr><th class="p-1 w-6">No</th><th class="p-1">NIS</th><th class="p-1">Nama</th><th class="p-1 w-8">L/P</th><th class="p-1 w-6"></th></tr></thead><tbody id="tbSw"></tbody></table>
       <p class="text-[9px] text-slate-400 mt-1" id="swI"></p>
     </div>
   </div>
@@ -266,93 +271,46 @@
   <div id="tab-jadwal" class="tab-c hidden space-y-2 fade-in">
     <div class="bg-white p-3 rounded-xl border">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2">
-        <h3 class="font-bold text-xs"><i class="fa-solid fa-clock text-blue-500 mr-1"></i>Jadwal Mingguan — <span class="text-blue-600" id="jdLabel">-</span></h3>
+        <h3 class="font-bold text-xs"><i class="fa-solid fa-clock text-blue-500 mr-1"></i>Jadwal Pelajaran — <span id="jdGuruInfo" class="text-blue-600"></span></h3>
         <div class="flex space-x-1 flex-wrap gap-0.5">
-          <button onclick="ok()&&addJRow()" class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded">+ Jam</button>
-          <button onclick="ok()&&addIst()" class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded">+ Istirahat</button>
-          <button onclick="ok()&&shareJadwal()" class="bg-teal-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-share-nodes mr-0.5"></i>Share</button>
-          <button onclick="ok()&&pullJadwal()" class="bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-download mr-0.5"></i>Ambil</button>
+          <button onclick="ok()&&addJP()" class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded">+ JP</button>
+          <button onclick="ok()&&addIstirahat()" class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded">+ Istirahat</button>
+          <button onclick="ok()&&shareJd()" class="bg-teal-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-share-nodes mr-0.5"></i>Share</button>
+          <button onclick="ok()&&pullJd()" class="bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-download mr-0.5"></i>Ambil</button>
         </div>
       </div>
-      <div class="overflow-x-auto" id="jdArea"></div>
-      <div class="mt-1 bg-blue-50 border border-blue-200 rounded p-2 text-[9px] text-blue-700">
-        <i class="fa-solid fa-info-circle mr-0.5"></i><b>Guru Mapel:</b> Rekap semua rombel. <b>Guru Kelas:</b> Rekap semua mapel. Sel <span class="bg-emerald-200 px-1 rounded">hijau</span> = mapel Anda. <span class="bg-red-200 px-1 rounded">Merah</span> = bentrok.
-      </div>
+      <div class="overflow-x-auto print-area" id="jdArea"></div>
     </div>
   </div>
 
   <!-- PROMPT AI -->
   <div id="tab-prompt" class="tab-c hidden space-y-2 fade-in">
-    <div class="bg-white p-3 rounded-xl border"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-xs"><i class="fa-solid fa-robot text-amber-500 mr-1"></i>Prompt: CSV CP/TP</h3><button onclick="copyEl('prCP')" class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-copy mr-0.5"></i>Salin</button></div><pre id="prCP" class="bg-slate-900 text-emerald-400 p-3 rounded text-[10px] font-mono whitespace-pre-wrap max-h-[300px] overflow-y-auto"></pre></div>
-    <div class="bg-white p-3 rounded-xl border"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-xs"><i class="fa-solid fa-robot text-blue-500 mr-1"></i>Prompt: CSV Kalender</h3><button onclick="copyEl('prKl')" class="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-copy mr-0.5"></i>Salin</button></div><pre id="prKl" class="bg-slate-900 text-sky-400 p-3 rounded text-[10px] font-mono whitespace-pre-wrap max-h-[200px] overflow-y-auto"></pre></div>
-    <div class="bg-white p-3 rounded-xl border"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-xs"><i class="fa-solid fa-robot text-purple-500 mr-1"></i>Prompt: LKPD Visual + Modul Ajar</h3><button onclick="copyEl('prLK')" class="bg-purple-500 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-copy mr-0.5"></i>Salin</button></div><pre id="prLK" class="bg-slate-900 text-purple-400 p-3 rounded text-[10px] font-mono whitespace-pre-wrap max-h-[350px] overflow-y-auto"></pre></div>
+    <div class="bg-white p-3 rounded-xl border"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-xs"><i class="fa-solid fa-robot text-amber-500 mr-1"></i>CSV CP/TP</h3><button onclick="copyEl('prCP')" class="bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-copy"></i></button></div><pre id="prCP" class="bg-slate-900 text-emerald-400 p-2 rounded text-[10px] font-mono whitespace-pre-wrap max-h-[250px] overflow-y-auto"></pre></div>
+    <div class="bg-white p-3 rounded-xl border"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-xs"><i class="fa-solid fa-robot text-blue-500 mr-1"></i>CSV Kalender</h3><button onclick="copyEl('prKl')" class="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-copy"></i></button></div><pre id="prKl" class="bg-slate-900 text-sky-400 p-2 rounded text-[10px] font-mono whitespace-pre-wrap max-h-[150px] overflow-y-auto"></pre></div>
+    <div class="bg-white p-3 rounded-xl border"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-xs"><i class="fa-solid fa-robot text-purple-500 mr-1"></i>LKPD Visual + Modul</h3><button onclick="copyEl('prLK')" class="bg-purple-500 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-copy"></i></button></div><pre id="prLK" class="bg-slate-900 text-purple-400 p-2 rounded text-[10px] font-mono whitespace-pre-wrap max-h-[300px] overflow-y-auto"></pre></div>
   </div>
 
-  <!-- DOC OUTPUTS -->
-  <div id="tab-dKal" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in">
-    <h2 class="text-sm font-bold text-center uppercase" id="oKJ"></h2><p class="text-[10px] text-center font-semibold text-slate-600 mb-2" id="oKS"></p>
-    <table class="w-full text-[10px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Smt</th><th class="border p-1">Tanggal</th><th class="border p-1">Agenda</th><th class="border p-1">Kategori</th></tr></thead><tbody id="oKB"></tbody></table><div class="mt-6 ttd"></div>
-  </div>
-
-  <div id="tab-dAcp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in">
-    <h2 class="text-sm font-bold text-center uppercase">ANALISIS CAPAIAN PEMBELAJARAN (ACP)</h2><p class="text-[10px] text-center font-semibold mb-2" id="oAS"></p>
-    <table class="w-full text-[9px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">CP</th><th class="border p-1">TP Smt 1</th><th class="border p-1">TP Smt 2</th><th class="border p-1">Dimensi Profil Lulusan</th></tr></thead><tbody id="oAB"></tbody></table><div class="mt-6 ttd"></div>
-  </div>
-
-  <div id="tab-dAtp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in">
-    <h2 class="text-sm font-bold text-center uppercase">ALUR TUJUAN PEMBELAJARAN (ATP)</h2><p class="text-[10px] text-center font-semibold mb-2" id="oTS"></p>
-    <table class="w-full text-[9px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">TP</th><th class="border p-1">Smt</th><th class="border p-1">Prt</th><th class="border p-1">Metode</th><th class="border p-1">Dimensi PL</th></tr></thead><tbody id="oTB"></tbody></table><div class="mt-6 ttd"></div>
-  </div>
-
-  <div id="tab-dProta" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in">
-    <h2 class="text-sm font-bold text-center uppercase">PROGRAM TAHUNAN (PROTA)</h2><p class="text-[10px] text-center font-semibold mb-2" id="oPtS"></p>
-    <table class="w-full text-[9px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">TP</th><th class="border p-1">Smt</th><th class="border p-1">Prt</th><th class="border p-1">JP</th></tr></thead><tbody id="oPtB"></tbody></table><div class="mt-6 ttd"></div>
-  </div>
-
+  <!-- DOC OUTPUTS (per Rombel) -->
+  <div id="tab-dKal" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dKalContent"></div></div>
+  <div id="tab-dAcp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dAcpContent"></div></div>
+  <div id="tab-dAtp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dAtpContent"></div></div>
+  <div id="tab-dProta" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dProtaContent"></div></div>
   <div id="tab-dPromes" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in">
-    <h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER (PROMES)</h2><p class="text-[10px] text-center font-semibold mb-1" id="oPsS"></p>
     <div class="flex gap-1 mb-1 no-print"><button onclick="ST.ps=1;renderAll()" id="bS1" class="text-[10px] px-2 py-0.5 rounded-full border font-bold bg-blue-100 text-blue-700">Smt 1</button><button onclick="ST.ps=2;renderAll()" id="bS2" class="text-[10px] px-2 py-0.5 rounded-full border font-bold bg-slate-100">Smt 2</button></div>
-    <div class="overflow-x-auto" id="oPsA"></div><div class="mt-6 ttd"></div>
+    <div id="dPromesContent"></div>
   </div>
-
-  <div id="tab-dModul" class="tab-c hidden bg-white p-4 rounded-xl border print-area text-[10px] space-y-2 fade-in">
-    <h2 class="text-base font-bold text-center border-b pb-1">MODUL AJAR DEEP LEARNING</h2>
-    <div class="bg-slate-50 p-2 rounded border grid grid-cols-2 gap-1"><div><b>Sekolah:</b> <span id="mS"></span></div><div><b>Mapel:</b> <span id="mM"></span></div><div><b>Guru:</b> <span id="mG"></span></div><div><b>Kelas:</b> <span id="mK"></span></div></div>
-    <div><h4 class="font-bold bg-slate-200 p-1 rounded">A. TUJUAN PEMBELAJARAN</h4><p id="mTP" class="p-1.5 border rounded mt-0.5"></p></div>
-    <div><h4 class="font-bold bg-blue-100 p-1 rounded">B. METODE / MODEL PEMBELAJARAN</h4><p id="mMet" class="p-1.5 border rounded mt-0.5"></p></div>
-    <div><h4 class="font-bold bg-amber-100 p-1 rounded">C. PERTANYAAN PEMANTIK</h4><p class="p-1.5 border rounded mt-0.5">1. Mengapa materi ini penting?<br>2. Bagaimana penerapannya?<br>3. Apa dampaknya?</p></div>
-    <div><h4 class="font-bold bg-slate-200 p-1 rounded">D. DIMENSI PROFIL LULUSAN</h4><p id="mDi" class="p-1.5 border rounded mt-0.5"></p></div>
-    <div><h4 class="font-bold bg-emerald-100 p-1 rounded">E. KEGIATAN DEEP LEARNING</h4>
-      <div class="mt-0.5 space-y-1">
-        <div class="border rounded p-1.5"><b>🟢 Pendahuluan (15'):</b> Salam, doa, apersepsi, motivasi, tujuan</div>
-        <div class="border rounded p-1.5"><b>🔵 Inti - Deep Learning (90'):</b><br>
-          • <b>Experiencing:</b> Mengalami langsung, mengamati fenomena<br>
-          • <b>Reflecting:</b> Refleksi mendalam, diskusi makna<br>
-          • <b>Conceptualizing:</b> Membangun konsep dari pengalaman<br>
-          • <b>Applying:</b> Menerapkan dalam konteks baru & nyata<br>
-          <span id="mMetDetail" class="text-blue-600 italic"></span>
-        </div>
-        <div class="border rounded p-1.5"><b>🟡 Penutup (15'):</b> Kesimpulan, asesmen formatif, refleksi, doa</div>
-      </div>
-    </div>
-    <div><h4 class="font-bold bg-red-100 p-1 rounded">F. ASESMEN</h4><p class="p-1.5 border rounded mt-0.5">Diagnostik • Formatif • Sumatif</p></div>
-    <div class="mt-6 ttd"></div>
-  </div>
-
-  <div id="tab-dKktp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in">
-    <h2 class="text-sm font-bold text-center uppercase">KKTP</h2><p class="text-[10px] text-center font-semibold mb-2" id="oKkS"></p>
-    <table class="w-full text-[9px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">TP</th><th class="border p-1 bg-red-50">Perlu Bimbingan<br>(0-60)</th><th class="border p-1 bg-amber-50">Cukup<br>(61-75)</th><th class="border p-1 bg-blue-50">Baik<br>(76-88)</th><th class="border p-1 bg-emerald-50">Sangat Baik<br>(89-100)</th></tr></thead><tbody id="oKkB"></tbody></table><div class="mt-6 ttd"></div>
-  </div>
+  <div id="tab-dModul" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dModulContent"></div></div>
+  <div id="tab-dKktp" class="tab-c hidden bg-white p-4 rounded-xl border print-area fade-in"><div id="dKktpContent"></div></div>
 
   <!-- ABSEN (per Rombel) -->
   <div id="tab-absen" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2">
-        <h3 class="font-bold text-xs"><i class="fa-solid fa-clipboard-user text-blue-500 mr-1"></i>Absensi — <span class="text-blue-600" id="abR">-</span></h3>
+        <h3 class="font-bold text-xs"><i class="fa-solid fa-clipboard-user text-blue-500 mr-1"></i>Absen Rombel: <b class="text-blue-600" id="abR">-</b></h3>
         <select id="abBln" onchange="rAbsen()" class="border rounded p-1 text-[10px]"><option>Juli</option><option>Agustus</option><option>September</option><option>Oktober</option><option>November</option><option>Desember</option><option>Januari</option><option>Februari</option><option>Maret</option><option>April</option><option>Mei</option><option>Juni</option></select>
       </div>
       <div class="overflow-x-auto" id="abArea"></div>
-      <div class="mt-4 ttd"></div>
+      <div class="mt-4" id="abTTD"></div>
     </div>
   </div>
 
@@ -360,35 +318,38 @@
   <div id="tab-nilai" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex flex-wrap justify-between items-center gap-1 mb-2">
-        <h3 class="font-bold text-xs"><i class="fa-solid fa-star text-amber-500 mr-1"></i>Daftar Nilai — <span class="text-blue-600" id="nlR">-</span></h3>
+        <h3 class="font-bold text-xs"><i class="fa-solid fa-star text-amber-500 mr-1"></i>Nilai Rombel: <b class="text-blue-600" id="nlR">-</b></h3>
         <button onclick="ok()&&addKrit()" class="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded">+ Kriteria</button>
       </div>
       <div class="mb-2 space-y-1" id="krArea"></div>
       <div class="overflow-x-auto" id="nlArea"></div>
-      <div class="mt-4 ttd"></div>
+      <div class="mt-4" id="nlTTD"></div>
     </div>
   </div>
 
-  <!-- JURNAL (cetak per bulan, ada kolom rombel) -->
+  <!-- JURNAL (per bulan, semua rombel) -->
   <div id="tab-jurnal" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
-      <h3 class="font-bold text-xs mb-1"><i class="fa-solid fa-book-open text-emerald-500 mr-1"></i>Jurnal Pembelajaran</h3>
       <div class="flex items-center space-x-2 mb-2 no-print">
+        <h3 class="font-bold text-xs"><i class="fa-solid fa-book-open text-emerald-500 mr-1"></i>Jurnal</h3>
         <select id="jrBln" onchange="rJurnal()" class="border rounded p-1 text-[10px]"><option>Juli</option><option>Agustus</option><option>September</option><option>Oktober</option><option>November</option><option>Desember</option><option>Januari</option><option>Februari</option><option>Maret</option><option>April</option><option>Mei</option><option>Juni</option></select>
       </div>
-      <h2 class="text-sm font-bold text-center uppercase print-area">JURNAL PEMBELAJARAN</h2>
-      <p class="text-[10px] text-center font-semibold mb-2" id="jrSub"></p>
-      <table class="w-full text-[9px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Hari/Tgl</th><th class="border p-1">Rombel</th><th class="border p-1">Jam</th><th class="border p-1">TP / Materi</th><th class="border p-1">Kegiatan</th><th class="border p-1">H</th><th class="border p-1">S</th><th class="border p-1">I</th><th class="border p-1">A</th><th class="border p-1">Catatan</th></tr></thead><tbody id="jrB"></tbody></table>
-      <div class="mt-4" id="jrTTD"></div>
+      <div id="jrContent"></div>
     </div>
   </div>
 
   <!-- ADMIN -->
   <div id="tab-admin" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border">
-      <div class="flex justify-between items-center mb-2"><h3 class="font-bold text-sm"><i class="fa-solid fa-shield-halved text-red-500 mr-1"></i>Admin</h3><button onclick="loadAdmin()" class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-sync mr-0.5"></i>Refresh</button></div>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold text-sm"><i class="fa-solid fa-shield-halved text-red-500 mr-1"></i>Admin</h3>
+        <div class="flex space-x-1">
+          <button onclick="openWASettings()" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-brands fa-whatsapp mr-0.5"></i>Seting WA</button>
+          <button onclick="loadAdmin()" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded"><i class="fa-solid fa-sync"></i></button>
+        </div>
+      </div>
       <div class="grid grid-cols-4 gap-1.5 mb-3" id="aSt"></div>
-      <div class="overflow-x-auto"><table class="w-full text-[10px]"><thead class="bg-slate-100"><tr><th class="p-2 text-left">User</th><th class="p-2">Sekolah/NPSN</th><th class="p-2">Tipe</th><th class="p-2">Status</th><th class="p-2">Aksi</th></tr></thead><tbody id="aBody"></tbody></table></div>
+      <div class="overflow-x-auto"><table class="w-full text-[10px]"><thead class="bg-slate-100"><tr><th class="p-2 text-left">User</th><th class="p-2">Sekolah</th><th class="p-2">Tipe</th><th class="p-2">Status</th><th class="p-2">Aksi</th></tr></thead><tbody id="aBody"></tbody></table></div>
       <div id="aLoad" class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div>
     </div>
   </div>
@@ -396,509 +357,354 @@
 </main>
 
 <script>
-// ===== FIREBASE =====
 firebase.initializeApp({apiKey:"AIzaSyCTEbggjJ5cguXAlq-QpbY5mO2G16S7rvQ",authDomain:"si-gumart.firebaseapp.com",projectId:"si-gumart",storageBucket:"si-gumart.firebasestorage.app",messagingSenderId:"544375918988",appId:"1:544375918988:web:a8459825c68810f22546a9"});
 const auth=firebase.auth(),db=firebase.firestore();
-const ADMIN='kkgpainagreg@gmail.com';
+const ADMIN_EMAIL='kkgpainagreg@gmail.com';
 const DIMEN='keimanan dan ketakwaan; kewargaan; penalaran kritis; kreativitas; kolaborasi; kemandirian; kesehatan; komunikasi';
-const METODE_LIST=['PBL (Problem Based Learning)','PjBL (Project Based Learning)','Inquiry Based Learning','Cooperative Learning','Discovery Learning'];
-const DAYS=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const METODE=['PBL (Problem Based Learning)','PjBL (Project Based Learning)','Inquiry Based Learning','Cooperative Learning','Discovery Learning'];
+const ALLDAYS=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN=['Juli','Agustus','September','Oktober','November','Desember','Januari','Februari','Maret','April','Mei','Juni'];
+const BULAN_HARI=[31,31,30,31,30,31,31,28,31,30,31,30];
 
 let CU=null,UD=null,AL='guest';
-let ST={ps:1,mapel:'PAI dan Budi Pekerti',rombel:'6A',mapelList:[],rombelList:[],guruType:'mapel'};
+let ST={ps:1,mapel:'PAI dan Budi Pekerti',rombel:'1A',mapelList:[],rombelList:[],guruType:'mapel',activeDocRombel:''};
 let D={kal:[],cp:[],siswa:{},jadwal:[],absen:{},nilai:{},jurnal:{},kriteria:[]};
+let adminWAConfig={phone:'6281234567890',template:"Assalamu'alaikum saudara Admin yang terhormat, mohon email saya \"{email}\" disetujui akses SI-GUMART. Terima kasih."};
 
-// ===== HELPERS =====
 const $=id=>document.getElementById(id);
 const v=id=>$(id)?.value||'';
-const toast=(t,ti,m)=>{$('tI').textContent={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'}[t]||'ℹ️';$('tT').textContent=ti;$('tM').textContent=m;const e=$('toast');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3e3)};
+const toast=(t,ti,m)=>{$('tI').textContent={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'}[t]||'ℹ️';$('tT').textContent=ti;$('tM').textContent=m||'';const e=$('toast');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3e3)};
 const closeM=id=>$(id).classList.add('hidden');
 const showAuth=()=>$('authScreen').classList.remove('hidden');
 const hideAuth=()=>$('authScreen').classList.add('hidden');
 const getFase=k=>{const n=parseInt(String(k).replace(/\D/g,''));return n<=2?'A':n<=4?'B':n<=6?'C':n<=8?'D':n<=10?'E':'F'};
 const kelasRange=j=>j==='SD/MI'?[1,2,3,4,5,6]:j==='SMP/MTs'?[7,8,9]:[10,11,12];
-const copyEl=id=>{navigator.clipboard.writeText($(id).innerText);toast('success','Disalin!','')};
+const getJPDur=j=>j==='SD/MI'?35:j==='SMP/MTs'?40:45;
+const copyEl=id=>{navigator.clipboard.writeText($(id).innerText);toast('success','Disalin!')};
 const ok=()=>{if(AL==='approved'||AL==='admin')return true;$('mLock').classList.remove('hidden');return false};
 const handlePrint=()=>{if(ok())window.print()};
 const pcsv=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){q=!q;continue}if(ch===','&&!q){r.push(c.trim());c='';continue}c+=ch}r.push(c.trim());return r};
-function updKelas(){const s=$('fKl'),c=s.value;s.innerHTML=kelasRange(v('fJn')).map(k=>`<option value="Kelas ${k}">Kelas ${k}</option>`).join('');if([...s.options].some(o=>o.value===c))s.value=c;const f=$('fK');f.innerHTML='<option value="">Kelas</option>'+kelasRange(v('fJn')).map(k=>`<option>Kelas ${k}</option>`).join('')}
+const getDays=()=>ALLDAYS.slice(0,parseInt(v('fHari'))||5);
+const getRombelKelas=()=>{const r=ST.rombel;const n=parseInt(r.replace(/\D/g,''));return n?'Kelas '+n:v('fKl')||'Kelas 1'};
 
+function updKelas(){const s=$('fK');s.innerHTML='<option value="">Kelas</option>'+kelasRange(v('fJn')).map(k=>`<option>Kelas ${k}</option>`).join('')}
+function updJPDuration(){$('jpDurLabel').textContent=getJPDur(v('fJn'))+' menit'}
 function authTab(t){$('loginForm').classList.toggle('hidden',t!=='login');$('regForm').classList.toggle('hidden',t!=='register');$('aTabL').className=`flex-1 py-2 text-xs font-bold border-b-2 ${t==='login'?'text-blue-600 border-blue-600':'text-slate-400 border-transparent'}`;$('aTabR').className=`flex-1 py-2 text-xs font-bold border-b-2 ${t==='register'?'text-blue-600 border-blue-600':'text-slate-400 border-transparent'}`}
 
-// ===== AUTH =====
-async function doLogin(){const e=$('lE').value.trim(),p=$('lP').value;if(!e||!p)return toast('warning','','Isi email & password');try{await auth.signInWithEmailAndPassword(e,p);toast('success','OK','')}catch(er){toast('error','Gagal',er.message)}}
-async function doGoogle(){try{const r=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const u=r.user;const d=await db.collection('users').doc(u.uid).get();if(!d.exists){const ia=u.email===ADMIN;await db.collection('users').doc(u.uid).set({email:u.email,name:u.displayName||'',school:'',npsn:'',jenjang:'SD/MI',mapel:'',mapelList:[],rombelList:[],guruType:'mapel',role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()})}toast('success','OK','')}catch(e){if(e.code!=='auth/popup-closed-by-user')toast('error','',e.message)}}
-async function doRegister(){const nm=$('rN').value.trim(),em=$('rE').value.trim(),pw=$('rP').value,sc=$('rS').value.trim(),np=$('rNP').value.trim(),jn=$('rJ').value,tg=$('rTG').value,mp=$('rM').value.trim();if(!nm||!em||!pw)return toast('warning','','Isi semua');if(pw.length<6)return toast('warning','','Min 6 char');try{const cr=await auth.createUserWithEmailAndPassword(em,pw);await cr.user.updateProfile({displayName:nm});const ia=em===ADMIN;await db.collection('users').doc(cr.user.uid).set({email:em,name:nm,school:sc,npsn:np,jenjang:jn,guruType:tg,mapel:mp,mapelList:mp?[mp]:[],rombelList:[],role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});toast('success','Terdaftar!','')}catch(e){toast('error','',e.message)}}
-async function doReset(){const e=$('lE').value.trim();if(!e)return toast('warning','','Isi email');try{await auth.sendPasswordResetEmail(e);toast('success','Terkirim','')}catch(e){toast('error','',e.message)}}
+// Get last non-holiday weekday of month
+function getLastWorkday(bln){
+  const mi=BULAN.indexOf(bln);
+  const yr=mi<6?parseInt((v('fTA').split('/')[0])||2026):parseInt((v('fTA').split('/')[1])||2027);
+  const monthNum=mi<6?mi+7:mi-5; // Jul=7, Aug=8,...Jun=6
+  const lastDay=BULAN_HARI[mi]||30;
+  // Simple: go backwards from lastDay until we hit a weekday
+  for(let d=lastDay;d>=1;d--){
+    const dt=new Date(yr,monthNum-1,d);
+    const dow=dt.getDay(); // 0=Sun,6=Sat
+    if(dow>=1&&dow<=5)return `${d} ${bln} ${yr}`;
+    if(dow===6&&parseInt(v('fHari'))===6)return `${d} ${bln} ${yr}`;
+  }
+  return `${lastDay} ${bln} ${yr}`;
+}
+
+function getTTDPelaporan(bln){
+  const loc=v('fTD').split(',')[0]||'Nagreg';
+  return `${loc}, ${getLastWorkday(bln)}`;
+}
+function getTTDPerencanaan(){return v('fTD')}
+
+function makeTTD(tanggal){
+  return `<div class="flex justify-between pt-4 text-[10px] text-center"><div><p>Mengetahui,</p><p class="font-semibold">Kepala ${v('fS')}</p><div class="h-14"></div><p class="font-bold underline">${v('fKS')}</p><p>NIP. ${v('fNK')}</p></div><div><p>${tanggal}</p><p class="font-semibold">Guru ${ST.mapel}</p><div class="h-14"></div><p class="font-bold underline">${v('fG')}</p><p>NIP. ${v('fNI')}</p></div></div>`;
+}
+
+// AUTH
+async function doLogin(){const e=$('lE').value.trim(),p=$('lP').value;if(!e||!p)return toast('warning','Isi email & password');try{await auth.signInWithEmailAndPassword(e,p);toast('success','OK')}catch(er){toast('error','Gagal',er.message)}}
+async function doGoogle(){try{const r=await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());const u=r.user;const d=await db.collection('users').doc(u.uid).get();if(!d.exists){const ia=u.email===ADMIN_EMAIL;await db.collection('users').doc(u.uid).set({email:u.email,name:u.displayName||'',school:'',npsn:'',jenjang:'SD/MI',mapel:'',mapelList:[],rombelList:[],guruType:'mapel',role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()})}}catch(e){if(e.code!=='auth/popup-closed-by-user')toast('error','',e.message)}}
+async function doRegister(){const nm=$('rN').value.trim(),em=$('rE').value.trim(),pw=$('rP').value,sc=$('rS').value.trim(),np=$('rNP').value.trim(),jn=$('rJ').value,tg=$('rTG').value,mp=$('rM').value.trim();if(!nm||!em||!pw)return toast('warning','Isi semua');if(pw.length<6)return toast('warning','Min 6 char');try{const cr=await auth.createUserWithEmailAndPassword(em,pw);await cr.user.updateProfile({displayName:nm});const ia=em===ADMIN_EMAIL;await db.collection('users').doc(cr.user.uid).set({email:em,name:nm,school:sc,npsn:np,jenjang:jn,guruType:tg,mapel:mp,mapelList:mp?[mp]:[],rombelList:[],role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});toast('success','Terdaftar!')}catch(e){toast('error','',e.message)}}
 async function doLogout(){await auth.signOut();CU=null;UD=null;AL='guest';showAuth();updUI()}
-function enterGuest(){AL='guest';CU=null;UD=null;hideAuth();$('pendingScr').classList.add('hidden');updUI();loadCloud()}
+function enterGuest(){AL='guest';CU=null;hideAuth();$('pendingScr').classList.add('hidden');updUI();loadCloud()}
 function enterViewOnly(){$('pendingScr').classList.add('hidden');hideAuth();updUI()}
 
-auth.onAuthStateChanged(async u=>{if(u){CU=u;let d=await db.collection('users').doc(u.uid).get();if(!d.exists){const ia=u.email===ADMIN;const nd={email:u.email,name:u.displayName||'',school:'',npsn:'',jenjang:'SD/MI',guruType:'mapel',mapel:'',mapelList:[],rombelList:[],role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()};await db.collection('users').doc(u.uid).set(nd);UD=nd}else UD=d.data();if(u.email===ADMIN){UD.role='admin';UD.status='approved';await db.collection('users').doc(u.uid).update({role:'admin',status:'approved'})}AL=UD.role==='admin'?'admin':UD.status==='approved'?'approved':'pending';ST.mapelList=UD.mapelList||[];ST.rombelList=UD.rombelList||[];ST.guruType=UD.guruType||'mapel';if(UD.mapel&&!ST.mapelList.includes(UD.mapel))ST.mapelList.push(UD.mapel);if(ST.mapelList.length)ST.mapel=ST.mapelList[0];if(ST.rombelList.length)ST.rombel=ST.rombelList[0];if(UD.jenjang)$('fJn').value=UD.jenjang;if(UD.npsn)$('fNP').value=UD.npsn;if(UD.school)$('fS').value=UD.school;if(UD.guruType)$('fTG').value=UD.guruType;updKelas();hideAuth();if(AL==='pending')$('pendingScr').classList.remove('hidden');else $('pendingScr').classList.add('hidden');updUI();loadCloud()}else showAuth()});
+// WA Contact Config
+async function loadWAConfig(){
+  try{const d=await db.collection('config').doc('waContact').get();if(d.exists){adminWAConfig=d.data()}}catch(e){}
+}
 
-// ===== MAPEL/ROMBEL =====
-function renderSel(){$('selMap').innerHTML=ST.mapelList.map(m=>`<option ${m===ST.mapel?'selected':''}>${m}</option>`).join('');$('selRom').innerHTML=ST.rombelList.map(r=>`<option ${r===ST.rombel?'selected':''}>${r}</option>`).join('');$('selArea').classList.toggle('hidden',!CU);$('sGuruType').textContent=ST.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}
+function updateWALink(){
+  const email=CU?.email||'';
+  const msg=adminWAConfig.template.replace('{email}',email);
+  const encoded=encodeURIComponent(msg);
+  const phone=adminWAConfig.phone||'6281234567890';
+  $('waLink').href=`https://wa.me/${phone}?text=${encoded}`;
+  $('waPreview').textContent=msg;
+}
+
+function openWASettings(){
+  $('mAdminWA').classList.remove('hidden');
+  $('mAdminWA').innerHTML=`<div class="bg-white rounded-2xl w-full max-w-md mx-4 p-5 space-y-3">
+    <h3 class="font-bold text-sm"><i class="fa-brands fa-whatsapp text-emerald-500 mr-1"></i>Seting WhatsApp Kontak</h3>
+    <div><label class="block text-[10px] font-semibold mb-0.5">Nomor WA (format: 628xxx)</label><input id="waPhone" value="${adminWAConfig.phone}" class="w-full border rounded-lg p-2 text-sm"></div>
+    <div><label class="block text-[10px] font-semibold mb-0.5">Template Pesan (gunakan {email} untuk email user)</label><textarea id="waTemplate" rows="3" class="w-full border rounded-lg p-2 text-sm">${adminWAConfig.template}</textarea></div>
+    <div class="flex space-x-2">
+      <button onclick="saveWAConfig()" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-bold text-sm">Simpan</button>
+      <button onclick="closeM('mAdminWA')" class="flex-1 bg-slate-100 py-2 rounded-lg font-bold text-sm">Batal</button>
+    </div>
+  </div>`;
+}
+
+async function saveWAConfig(){
+  adminWAConfig.phone=$('waPhone').value.trim();
+  adminWAConfig.template=$('waTemplate').value;
+  try{await db.collection('config').doc('waContact').set(adminWAConfig);toast('success','WA Config tersimpan');closeM('mAdminWA')}catch(e){toast('error','',e.message)}
+}
+
+auth.onAuthStateChanged(async u=>{
+  if(u){CU=u;let d=await db.collection('users').doc(u.uid).get();
+    if(!d.exists){const ia=u.email===ADMIN_EMAIL;const nd={email:u.email,name:u.displayName||'',school:'',npsn:'',jenjang:'SD/MI',guruType:'mapel',mapel:'',mapelList:[],rombelList:[],role:ia?'admin':'user',status:ia?'approved':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()};await db.collection('users').doc(u.uid).set(nd);UD=nd}else UD=d.data();
+    if(u.email===ADMIN_EMAIL){UD.role='admin';UD.status='approved';await db.collection('users').doc(u.uid).update({role:'admin',status:'approved'})}
+    AL=UD.role==='admin'?'admin':UD.status==='approved'?'approved':'pending';
+    ST.mapelList=UD.mapelList||[];ST.rombelList=UD.rombelList||[];ST.guruType=UD.guruType||'mapel';
+    if(UD.mapel&&!ST.mapelList.includes(UD.mapel))ST.mapelList.push(UD.mapel);
+    if(ST.mapelList.length)ST.mapel=ST.mapelList[0];
+    if(ST.rombelList.length){ST.rombel=ST.rombelList[0];ST.activeDocRombel=ST.rombelList[0]}
+    if(UD.jenjang)$('fJn').value=UD.jenjang;if(UD.npsn)$('fNP').value=UD.npsn;if(UD.school)$('fS').value=UD.school;if(UD.guruType)$('fTG').value=UD.guruType;
+    updKelas();updJPDuration();hideAuth();
+    await loadWAConfig();
+    if(AL==='pending'){$('pendingScr').classList.remove('hidden');updateWALink()}
+    else $('pendingScr').classList.add('hidden');
+    updUI();loadCloud()
+  }else showAuth()
+});
+
+// MAPEL/ROMBEL
+function renderSel(){$('selMap').innerHTML=ST.mapelList.map(m=>`<option ${m===ST.mapel?'selected':''}>${m}</option>`).join('');$('selRom').innerHTML=ST.rombelList.map(r=>`<option ${r===ST.rombel?'selected':''}>${r}</option>`).join('');$('selArea').classList.toggle('hidden',!CU)}
 function onMapChange(){ST.mapel=$('selMap').value;loadCloud()}
-function onRomChange(){ST.rombel=$('selRom').value;renderAll();rAbsen();rNilai();rJurnal()}
+function onRomChange(){ST.rombel=$('selRom').value;ST.activeDocRombel=ST.rombel;renderAll();rAbsen();rNilai();rJurnal()}
 async function addMapel(){if(!ok())return;const m=prompt('Mapel baru:');if(!m)return;ST.mapelList.push(m.trim());ST.mapel=m.trim();if(CU)await db.collection('users').doc(CU.uid).update({mapelList:ST.mapelList});renderSel();D.cp=[];D.kal=[];rt();renderAll();toast('success','',m)}
-async function addRombel(){if(!ok())return;const r=prompt('Rombel baru (cth: 6A):');if(!r)return;ST.rombelList.push(r.trim());ST.rombel=r.trim();if(CU)await db.collection('users').doc(CU.uid).update({rombelList:ST.rombelList});if(!D.siswa[r.trim()])D.siswa[r.trim()]=[];renderSel();renderAll();toast('success','',r)}
+async function addRombel(){if(!ok())return;const r=prompt('Rombel baru (contoh: 1A, 5B):');if(!r)return;ST.rombelList.push(r.trim());ST.rombel=r.trim();ST.activeDocRombel=r.trim();if(CU)await db.collection('users').doc(CU.uid).update({rombelList:ST.rombelList});if(!D.siswa[r.trim()])D.siswa[r.trim()]=[];renderSel();renderAll();toast('success','',r)}
 
-// ===== UI =====
-function updUI(){const ie=AL==='approved'||AL==='admin',ia=AL==='admin',il=!!CU;const b=$('accB');if(ia){b.innerHTML='<i class="fa-solid fa-shield-halved mr-0.5"></i>ADMIN';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-red-100 text-red-700'}else if(ie){b.innerHTML='<i class="fa-solid fa-pen mr-0.5"></i>PENUH';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700'}else if(il){b.innerHTML='<i class="fa-solid fa-clock mr-0.5"></i>TUNGGU';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-700'}else{b.innerHTML='<i class="fa-solid fa-eye mr-0.5"></i>LIHAT';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500'}$('bSave').classList.toggle('hidden',!ie);$('navAdmin').classList.toggle('hidden',!ia);$('gBtn').classList.toggle('hidden',il);$('oBtn').classList.toggle('hidden',!il);$('viewN').classList.toggle('hidden',ie);const ui=$('sideUser');if(il&&UD){ui.classList.remove('hidden');const n=UD.name||CU.email.split('@')[0];$('sName').textContent=n;$('sAvatar').textContent=n.charAt(0).toUpperCase();if(ia){$('sRole').textContent='Admin';$('sDot').className='pulse-dot bg-red-500'}else if(ie){$('sRole').textContent='Akses Penuh';$('sDot').className='pulse-dot bg-emerald-500'}else{$('sRole').textContent='Menunggu';$('sDot').className='pulse-dot bg-amber-400'}}else ui.classList.add('hidden');document.querySelectorAll('.ef').forEach(el=>{el.disabled=!ie});renderSel()}
+// Rombel tabs for doc pages
+function renderRombelTabs(show){
+  const el=$('rombelTabs');
+  if(!show||!ST.rombelList.length){el.classList.add('hidden');return}
+  el.classList.remove('hidden');
+  el.innerHTML=ST.rombelList.map(r=>`<span class="rombel-tab ${r===ST.activeDocRombel?'active':''}" onclick="ST.activeDocRombel='${r}';renderAll();renderRombelTabs(true)">${r}</span>`).join('');
+}
 
-// ===== CLOUD =====
+// UI
+function updUI(){
+  const ie=AL==='approved'||AL==='admin',ia=AL==='admin',il=!!CU;
+  const b=$('accB');
+  if(ia){b.innerHTML='<i class="fa-solid fa-shield-halved mr-0.5"></i>ADMIN';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-red-100 text-red-700'}
+  else if(ie){b.innerHTML='<i class="fa-solid fa-pen mr-0.5"></i>PENUH';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700'}
+  else if(il){b.innerHTML='<i class="fa-solid fa-clock mr-0.5"></i>TUNGGU';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-700'}
+  else{b.innerHTML='<i class="fa-solid fa-eye mr-0.5"></i>LIHAT';b.className='text-[8px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500'}
+  $('bSave').classList.toggle('hidden',!ie);$('navAdmin').classList.toggle('hidden',!ia);$('gBtn').classList.toggle('hidden',il);$('oBtn').classList.toggle('hidden',!il);
+  const ui=$('sideUser');if(il&&UD){ui.classList.remove('hidden');const n=UD.name||CU.email.split('@')[0];$('sName').textContent=n;$('sAvatar').textContent=n.charAt(0).toUpperCase();if(ia){$('sRole').textContent='Admin';$('sDot').className='pulse-dot bg-red-500'}else if(ie){$('sRole').textContent='Penuh';$('sDot').className='pulse-dot bg-emerald-500'}else{$('sRole').textContent='Tunggu';$('sDot').className='pulse-dot bg-amber-400'}}else ui.classList.add('hidden');
+  document.querySelectorAll('.ef').forEach(el=>{el.disabled=!ie});renderSel()
+}
+
+// CLOUD
 function gp(){return CU?`u/${CU.uid}/m/${ST.mapel.replace(/[^a-zA-Z0-9]/g,'_')}`:'_g'}
-async function saveCloud(){if(!ok()||!CU)return;try{const p=gp();await db.doc(`${p}/d/profil`).set({s:v('fS'),np:v('fNP'),g:v('fG'),ni:v('fNI'),ks:v('fKS'),nk:v('fNK'),jn:v('fJn'),kl:v('fKl'),tg:v('fTG'),ta:v('fTA'),td:v('fTD'),mp:ST.mapel});await db.doc(`${p}/d/kal`).set({i:D.kal});await db.doc(`${p}/d/cp`).set({i:D.cp});await db.doc(`${p}/d/sw`).set(D.siswa||{});await db.doc(`${p}/d/jd`).set({i:D.jadwal});await db.doc(`${p}/d/ab`).set(D.absen||{});await db.doc(`${p}/d/nl`).set(D.nilai||{});await db.doc(`${p}/d/kr`).set({i:D.kriteria});await db.doc(`${p}/d/jr`).set(D.jurnal||{});toast('success','Tersimpan!','')}catch(e){toast('error','',e.message)}}
+async function saveCloud(){if(!ok()||!CU)return;try{const p=gp();await db.doc(`${p}/d/profil`).set({s:v('fS'),np:v('fNP'),g:v('fG'),ni:v('fNI'),ks:v('fKS'),nk:v('fNK'),jn:v('fJn'),tg:v('fTG'),hari:v('fHari'),ta:v('fTA'),td:v('fTD'),mp:ST.mapel});await db.doc(`${p}/d/kal`).set({i:D.kal});await db.doc(`${p}/d/cp`).set({i:D.cp});await db.doc(`${p}/d/sw`).set(D.siswa);await db.doc(`${p}/d/jd`).set({i:D.jadwal});await db.doc(`${p}/d/ab`).set(D.absen);await db.doc(`${p}/d/nl`).set(D.nilai);await db.doc(`${p}/d/kr`).set({i:D.kriteria});await db.doc(`${p}/d/jr`).set(D.jurnal);toast('success','Tersimpan!')}catch(e){toast('error','',e.message)}}
 
-async function loadCloud(){if(!CU){rt();renderAll();return}try{const p=gp();const pd=await db.doc(`${p}/d/profil`).get();if(pd.exists){const d=pd.data();if(d.s)$('fS').value=d.s;if(d.np)$('fNP').value=d.np;if(d.g)$('fG').value=d.g;if(d.ni)$('fNI').value=d.ni;if(d.ks)$('fKS').value=d.ks;if(d.nk)$('fNK').value=d.nk;if(d.jn){$('fJn').value=d.jn;updKelas()}if(d.kl)$('fKl').value=d.kl;if(d.tg)$('fTG').value=d.tg;if(d.ta)$('fTA').value=d.ta;if(d.td)$('fTD').value=d.td;ST.guruType=d.tg||'mapel'}const kd=await db.doc(`${p}/d/kal`).get();if(kd.exists&&kd.data().i)D.kal=kd.data().i;const cd=await db.doc(`${p}/d/cp`).get();if(cd.exists&&cd.data().i)D.cp=cd.data().i;const sd=await db.doc(`${p}/d/sw`).get();if(sd.exists)D.siswa=sd.data();const jdd=await db.doc(`${p}/d/jd`).get();if(jdd.exists&&jdd.data().i)D.jadwal=jdd.data().i;const ad=await db.doc(`${p}/d/ab`).get();if(ad.exists)D.absen=ad.data();const nd=await db.doc(`${p}/d/nl`).get();if(nd.exists)D.nilai=nd.data();const krd=await db.doc(`${p}/d/kr`).get();if(krd.exists&&krd.data().i)D.kriteria=krd.data().i;const jrd=await db.doc(`${p}/d/jr`).get();if(jrd.exists)D.jurnal=jrd.data()}catch(e){console.log('No cloud data')}if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];rt();renderAll();updElFlt();genPrompts()}
+async function loadCloud(){if(!CU){rt();renderAll();return}try{const p=gp();const pd=await db.doc(`${p}/d/profil`).get();if(pd.exists){const d=pd.data();if(d.s)$('fS').value=d.s;if(d.np)$('fNP').value=d.np;if(d.g)$('fG').value=d.g;if(d.ni)$('fNI').value=d.ni;if(d.ks)$('fKS').value=d.ks;if(d.nk)$('fNK').value=d.nk;if(d.jn){$('fJn').value=d.jn;updKelas();updJPDuration()}if(d.tg)$('fTG').value=d.tg;if(d.hari)$('fHari').value=d.hari;if(d.ta)$('fTA').value=d.ta;if(d.td)$('fTD').value=d.td}const kd=await db.doc(`${p}/d/kal`).get();if(kd.exists&&kd.data().i)D.kal=kd.data().i;const cd=await db.doc(`${p}/d/cp`).get();if(cd.exists&&cd.data().i)D.cp=cd.data().i;const sd=await db.doc(`${p}/d/sw`).get();if(sd.exists)D.siswa=sd.data();const jdd=await db.doc(`${p}/d/jd`).get();if(jdd.exists&&jdd.data().i)D.jadwal=jdd.data().i;const ad=await db.doc(`${p}/d/ab`).get();if(ad.exists)D.absen=ad.data();const nd=await db.doc(`${p}/d/nl`).get();if(nd.exists)D.nilai=nd.data();const krd=await db.doc(`${p}/d/kr`).get();if(krd.exists&&krd.data().i)D.kriteria=krd.data().i;const jrd=await db.doc(`${p}/d/jr`).get();if(jrd.exists)D.jurnal=jrd.data()}catch(e){console.log('No data')}if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];rt();renderAll();updElFlt();genPrompts()}
 
-// ===== LOAD CSV FROM LINK (Google Sheet) =====
-async function loadFromLink(type){
-  const inputId=type==='kal'?'csvLinkKal':type==='cp'?'csvLinkCP':'csvLinkSw';
-  let url=$(inputId).value.trim();
-  if(!url)return toast('warning','','Masukkan URL');
-  // Convert Google Sheet URL to CSV export
-  if(url.includes('docs.google.com/spreadsheets')){
-    const match=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if(match)url=`https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv`;
-  }
-  try{
-    toast('info','Mengunduh...','');
-    const res=await fetch(url);
-    if(!res.ok)throw new Error('HTTP '+res.status);
-    const text=await res.text();
-    const targetId=type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw';
-    $(targetId).value=text;
-    procCSV(type);
-  }catch(e){toast('error','Gagal',e.message+' — Pastikan sheet bersifat publik (Anyone with link)')}
-}
+async function loadLink(type){const inputId=type==='kal'?'csvLinkKal':type==='cp'?'csvLinkCP':'csvLinkSw';let url=$(inputId).value.trim();if(!url)return toast('warning','Masukkan URL');if(url.includes('docs.google.com/spreadsheets')){const m=url.match(/\/d\/([a-zA-Z0-9_-]+)/);if(m)url=`https://docs.google.com/spreadsheets/d/${m[1]}/export?format=csv`}try{toast('info','Mengunduh...');const res=await fetch(url);const text=await res.text();$(type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw').value=text;procCSV(type)}catch(e){toast('error','Gagal',e.message)}}
 
-// ===== DEFAULT JADWAL =====
+// DEFAULT JADWAL
 function defJadwal(){
-  return [{j:1,w:'07.00-07.35',h:{}},{j:2,w:'07.35-08.10',h:{}},{j:3,w:'08.10-08.45',h:{}},{j:'ist',w:'08.45-09.15',h:{}},{j:4,w:'09.15-09.50',h:{}},{j:5,w:'09.50-10.25',h:{}},{j:'ist',w:'10.25-10.45',h:{}},{j:6,w:'10.45-11.20',h:{}}];
+  const dur=getJPDur(v('fJn'));
+  let t=7*60; // 07:00
+  const rows=[];
+  for(let j=1;j<=4;j++){const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;rows.push({j,w:`${s}-${e}`,h:{}});} 
+  rows.push({j:'ist',w:`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`,h:{}});t+=30;
+  const s2=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;
+  for(let j=5;j<=8;j++){const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;rows.push({j,w:`${s}-${e}`,h:{}});}
+  return rows;
 }
 
-// ===== TABS =====
-function go(id){document.querySelectorAll('.tab-c').forEach(e=>e.classList.add('hidden'));const t=$('tab-'+id);if(t)t.classList.remove('hidden');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-nav'));const b=$('btn-'+id);if(b)b.classList.add('active-nav');const ti={profil:['Profil','Identitas'],kalender:['Kalender','Input'],cptp:['CP/TP','Input'],siswa:['Data Siswa','Per rombel'],jadwal:['Jadwal','Rekap mingguan'],prompt:['Prompt AI','Generator'],dKal:['Kalender','Dokumen'],dAcp:['ACP','Dokumen'],dAtp:['ATP','Dokumen'],dProta:['Prota','Dokumen'],dPromes:['Promes','Dokumen'],dModul:['Modul Ajar','Deep Learning'],dKktp:['KKTP','Dokumen'],absen:['Absen','Per rombel'],nilai:['Nilai','Per rombel'],jurnal:['Jurnal','Per bulan + rombel'],admin:['Admin','Kelola user']};const tt=ti[id]||['',''];$('pgT').textContent=tt[0];$('pgS').textContent=tt[1];renderAll();genPrompts();if(id==='admin')loadAdmin();if(id==='absen')rAbsen();if(id==='nilai')rNilai();if(id==='jurnal')rJurnal();if(id==='jadwal')rJadwal();if(window.innerWidth<768)$('sidebar').classList.add('hidden')}
+// TABS
+const docTabs=['dKal','dAcp','dAtp','dProta','dPromes','dModul','dKktp','absen','nilai','jurnal'];
+function go(id){document.querySelectorAll('.tab-c').forEach(e=>e.classList.add('hidden'));const t=$('tab-'+id);if(t)t.classList.remove('hidden');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-nav'));const b=$('btn-'+id);if(b)b.classList.add('active-nav');$('pgT').textContent={profil:'Profil',kalender:'Kalender',cptp:'CP/TP',siswa:'Data Siswa',jadwal:'Jadwal',prompt:'Prompt AI',dKal:'Kalender',dAcp:'ACP',dAtp:'ATP',dProta:'Prota',dPromes:'Promes',dModul:'Modul Ajar',dKktp:'KKTP',absen:'Absen',nilai:'Nilai',jurnal:'Jurnal',admin:'Admin'}[id]||'';$('pgS').textContent=docTabs.includes(id)?`Rombel: ${ST.activeDocRombel||ST.rombel}`:'-';renderRombelTabs(docTabs.includes(id));renderAll();genPrompts();if(id==='admin')loadAdmin();if(id==='absen')rAbsen();if(id==='nilai')rNilai();if(id==='jurnal')rJurnal();if(id==='jadwal')rJadwal();if(window.innerWidth<768)$('sidebar').classList.add('hidden')}
 
-// ===== RENDER TABLES =====
+// RENDER TABLES
 function rt(){rKalT();rCP();rSwT();rJadwal()}
+function rKalT(){const ie=AL==='approved'||AL==='admin';$('tbKal').innerHTML=D.kal.map((k,i)=>`<tr class="border-b"><td class="p-0.5"><input value="${k.S||''}" onchange="D.kal[${i}].S=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.T||''}" onchange="D.kal[${i}].T=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.A||''}" onchange="D.kal[${i}].A=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.K||''}" onchange="D.kal[${i}].K=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5">${ie?`<button onclick="D.kal.splice(${i},1);rt()" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button>`:''}</td></tr>`).join('')}
 
-function rKalT(){const ie=AL==='approved'||AL==='admin';$('tbKal').innerHTML=D.kal.map((k,i)=>`<tr class="border-b"><td class="p-0.5"><input value="${k.S||''}" onchange="D.kal[${i}].S=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.T||''}" onchange="D.kal[${i}].T=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.A||''}" onchange="D.kal[${i}].A=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${k.K||''}" onchange="D.kal[${i}].K=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5">${ie?`<button onclick="D.kal.splice(${i},1);rt()" class="text-red-500"><i class="fa-solid fa-trash text-[8px]"></i></button>`:''}</td></tr>`).join('')}
-
-function rCP(){const ie=AL==='approved'||AL==='admin';const fk=$('fK').value,fs=$('fSm').value,fe=$('fEl').value;let fd=D.cp.filter(c=>(!fk||c.K===fk)&&(!fs||c.S===fs)&&(!fe||c.E===fe));$('tbCP').innerHTML=fd.map((c,fi)=>{const i=D.cp.indexOf(c);return`<tr class="border-b ${fi%2?'bg-slate-50/40':''}"><td class="p-0.5"><select onchange="D.cp[${i}].K=this.value" class="w-full border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}>${kelasRange(v('fJn')).map(k=>`<option value="Kelas ${k}" ${c.K==='Kelas '+k?'selected':''}>Kls${k}</option>`).join('')}</select></td><td class="p-0.5"><select onchange="D.cp[${i}].S=this.value" class="w-full border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}><option ${c.S==='Semester 1'?'selected':''}>Semester 1</option><option ${c.S==='Semester 2'?'selected':''}>Semester 2</option></select></td><td class="p-0.5"><input value="${c.E||''}" onchange="D.cp[${i}].E=this.value;updElFlt()" class="w-full border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><textarea onchange="D.cp[${i}].C=this.value" class="w-full border rounded p-0.5 text-[9px] ef" rows="2" ${ie?'':'disabled'}>${c.C||''}</textarea></td><td class="p-0.5"><textarea onchange="D.cp[${i}].T=this.value" class="w-full border rounded p-0.5 text-[9px] ef" rows="2" ${ie?'':'disabled'}>${c.T||''}</textarea></td><td class="p-0.5"><input value="${c.Di||''}" onchange="D.cp[${i}].Di=this.value" class="w-full border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><select onchange="D.cp[${i}].M=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}>${METODE_LIST.map(m=>`<option ${c.M===m?'selected':''}>${m}</option>`).join('')}</select></td><td class="p-0.5"><input type="number" value="${c.P||1}" onchange="D.cp[${i}].P=+this.value" class="w-12 border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}></td><td class="p-0.5">${ie?`<button onclick="D.cp.splice(${i},1);rCP();updElFlt()" class="text-red-500"><i class="fa-solid fa-trash text-[8px]"></i></button>`:''}</td></tr>`}).join('');$('cpI').textContent=`${fd.length}/${D.cp.length} TP`}
+function rCP(){const ie=AL==='approved'||AL==='admin';const fk=$('fK').value,fs=$('fSm').value,fe=$('fEl').value;let fd=D.cp.filter(c=>(!fk||c.K===fk)&&(!fs||c.S===fs)&&(!fe||c.E===fe));$('tbCP').innerHTML=fd.map((c,fi)=>{const i=D.cp.indexOf(c);return`<tr class="border-b ${fi%2?'bg-slate-50/40':''}"><td class="p-0.5"><select onchange="D.cp[${i}].K=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}>${kelasRange(v('fJn')).map(k=>`<option value="Kelas ${k}" ${c.K==='Kelas '+k?'selected':''}>Kls${k}</option>`).join('')}</select></td><td class="p-0.5"><select onchange="D.cp[${i}].S=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}><option ${c.S==='Semester 1'?'selected':''}>Semester 1</option><option ${c.S==='Semester 2'?'selected':''}>Semester 2</option></select></td><td class="p-0.5"><input value="${c.E||''}" onchange="D.cp[${i}].E=this.value;updElFlt()" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><textarea onchange="D.cp[${i}].C=this.value" class="w-full border rounded p-0.5 text-[8px] ef" rows="2" ${ie?'':'disabled'}>${c.C||''}</textarea></td><td class="p-0.5"><textarea onchange="D.cp[${i}].T=this.value" class="w-full border rounded p-0.5 text-[8px] ef" rows="2" ${ie?'':'disabled'}>${c.T||''}</textarea></td><td class="p-0.5"><input value="${c.Di||''}" onchange="D.cp[${i}].Di=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><select onchange="D.cp[${i}].M=this.value" class="w-full border rounded p-0.5 text-[7px] ef" ${ie?'':'disabled'}>${METODE.map(m=>`<option ${c.M===m?'selected':''}>${m}</option>`).join('')}</select></td><td class="p-0.5"><input type="number" value="${c.P||1}" onchange="D.cp[${i}].P=+this.value" class="w-10 border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td><td class="p-0.5">${ie?`<button onclick="D.cp.splice(${i},1);rCP()" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button>`:''}</td></tr>`}).join('');$('cpI').textContent=`${fd.length}/${D.cp.length} TP`}
 function updElFlt(){const els=[...new Set(D.cp.map(c=>c.E).filter(Boolean))];const s=$('fEl'),cv=s.value;s.innerHTML='<option value="">Elemen</option>'+els.map(e=>`<option ${e===cv?'selected':''}>${e}</option>`).join('')}
 
-function rSwT(){const ie=AL==='approved'||AL==='admin';const list=D.siswa[ST.rombel]||[];$('swR').textContent=ST.rombel;$('tbSw').innerHTML=list.map((s,i)=>`<tr class="border-b"><td class="p-0.5 text-center text-[10px]">${i+1}</td><td class="p-0.5"><input value="${s.nis||''}" onchange="D.siswa['${ST.rombel}'][${i}].nis=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${s.nama||''}" onchange="D.siswa['${ST.rombel}'][${i}].nama=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><select onchange="D.siswa['${ST.rombel}'][${i}].jk=this.value" class="border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}><option ${s.jk==='L'?'selected':''}>L</option><option ${s.jk==='P'?'selected':''}>P</option></select></td><td class="p-0.5">${ie?`<button onclick="D.siswa['${ST.rombel}'].splice(${i},1);rSwT()" class="text-red-500"><i class="fa-solid fa-trash text-[8px]"></i></button>`:''}</td></tr>`).join('');$('swI').textContent=`${list.length} siswa • L:${list.filter(s=>s.jk==='L').length} P:${list.filter(s=>s.jk==='P').length}`}
+function rSwT(){const ie=AL==='approved'||AL==='admin';const list=D.siswa[ST.rombel]||[];$('swR').textContent=ST.rombel;$('tbSw').innerHTML=list.map((s,i)=>`<tr class="border-b"><td class="p-0.5 text-center text-[10px]">${i+1}</td><td class="p-0.5"><input value="${s.nis||''}" onchange="D.siswa['${ST.rombel}'][${i}].nis=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><input value="${s.nama||''}" onchange="D.siswa['${ST.rombel}'][${i}].nama=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td><td class="p-0.5"><select onchange="D.siswa['${ST.rombel}'][${i}].jk=this.value" class="border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}><option ${s.jk==='L'?'selected':''}>L</option><option ${s.jk==='P'?'selected':''}>P</option></select></td><td class="p-0.5">${ie?`<button onclick="D.siswa['${ST.rombel}'].splice(${i},1);rSwT()" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button>`:''}</td></tr>`).join('');$('swI').textContent=`${list.length} siswa • L:${list.filter(s=>s.jk==='L').length} P:${list.filter(s=>s.jk==='P').length}`}
 function addSiswa(){if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];D.siswa[ST.rombel].push({nis:'',nama:'',jk:'L'});rSwT()}
 
-// ===== JADWAL (Rekap semua rombel/kelas) =====
+// JADWAL - format seperti gambar: JP | WAKTU | SENIN | SELASA | ... each cell = "MAPEL\nROMBEL"
 function rJadwal(){
   const ie=AL==='approved'||AL==='admin';
-  const isGuruKelas=v('fTG')==='kelas';
-  $('jdLabel').textContent=isGuruKelas?`Guru Kelas — ${ST.rombel} (Semua Mapel)`:`Guru Mapel — ${ST.mapel} (Semua Rombel)`;
-  if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();
-  const jd=D.jadwal;
+  const days=getDays();
   const mapelLC=ST.mapel.toLowerCase();
+  const isGK=v('fTG')==='kelas';
+  $('jdGuruInfo').textContent=isGK?`Guru Kelas — ${ST.rombel}`:`${ST.mapel} — Semua Rombel`;
+  if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();
 
-  // Build conflict map for guru mapel: same time slot across rombel
-  let conflictMap={};
+  let html=`<table class="w-full" style="border-collapse:collapse"><thead><tr><td class="jd-header" style="width:40px">JP</td><td class="jd-header" style="width:90px">WAKTU</td>`;
+  days.forEach(d=>html+=`<td class="jd-header">${d.toUpperCase()}</td>`);
+  html+=`</tr></thead><tbody>`;
 
-  let colHeaders='';
-  if(isGuruKelas){
-    // Guru kelas: columns = days, cells = mapel for that rombel
-    colHeaders=DAYS.slice(0,6).map(d=>`<th class="border p-1">${d}</th>`).join('');
-  } else {
-    // Guru mapel: columns = rombel x day
-    if(ST.rombelList.length===0){colHeaders=`<th class="border p-1" colspan="5">Tambahkan rombel dulu</th>`}
-    else{
-      colHeaders=ST.rombelList.map(r=>`<th class="border p-1 bg-blue-50" colspan="${DAYS.slice(0,5).length}">${r}</th>`).join('');
+  D.jadwal.forEach((r,ri)=>{
+    if(r.j==='ist'){
+      html+=`<tr><td class="jd-ist" style="font-size:12px;font-weight:700;padding:8px"><b>IST</b></td><td class="jd-ist" style="font-size:11px;color:#b45309">${r.w||''}</td><td class="jd-ist" colspan="${days.length}" style="font-size:13px;letter-spacing:2px"><b>ISTIRAHAT</b></td></tr>`;
+      return;
     }
-  }
+    html+=`<tr>`;
+    html+=`<td class="jd-cell" style="font-weight:700;color:#2563eb;font-size:13px">JP${r.j}</td>`;
+    html+=`<td class="jd-cell" style="color:#6b7280;font-size:11px"><input value="${r.w||''}" onchange="D.jadwal[${ri}].w=this.value" class="w-20 text-center text-[10px] border rounded p-0.5 ef" ${ie?'':'disabled'}></td>`;
+    
+    days.forEach(d=>{
+      if(!r.h)r.h={};
+      // Each cell stores: "MAPEL\nROMBEL" format
+      const cellKey=`${d}`;
+      const val=r.h[cellKey]||'';
+      // Parse mapel and rombel from cell
+      const parts=val.split('\n');
+      const cellMapel=parts[0]||'';
+      const cellRombel=parts[1]||'';
+      const isSelf=cellMapel.toLowerCase().includes(mapelLC);
 
-  let html=`<table class="w-full text-[9px] border-collapse border text-center"><thead class="bg-slate-100">`;
-  if(isGuruKelas){
-    html+=`<tr><th class="border p-1 w-6">Jam</th><th class="border p-1 w-16">Waktu</th>${colHeaders}<th class="border p-1 w-6 no-print"></th></tr>`;
-  } else {
-    html+=`<tr><th class="border p-1 w-6" rowspan="2">Jam</th><th class="border p-1 w-16" rowspan="2">Waktu</th>${colHeaders}<th class="border p-1 w-6 no-print" rowspan="2"></th></tr>`;
-    html+=`<tr>${ST.rombelList.map(r=>DAYS.slice(0,5).map(d=>`<th class="border p-0.5 text-[7px]">${d.substring(0,3)}</th>`).join('')).join('')}</tr>`;
-  }
-  html+=`</thead><tbody>`;
-
-  jd.forEach((r,ri)=>{
-    if(r.j==='ist'){html+=`<tr><td class="border p-1 bg-amber-50 font-semibold text-amber-700 text-[9px]" colspan="${isGuruKelas?8:2+ST.rombelList.length*5+1}">ISTIRAHAT (${r.w})</td></tr>`;return}
-    html+=`<tr><td class="border p-1 font-bold">${r.j}</td>`;
-    html+=`<td class="border p-0.5"><input value="${r.w}" onchange="D.jadwal[${ri}].w=this.value" class="w-16 text-center text-[8px] border rounded p-0.5 ef" ${ie?'':'disabled'}></td>`;
-
-    if(isGuruKelas){
-      DAYS.slice(0,6).forEach(d=>{
-        const key=`${ST.rombel}_${d}`;
-        if(!r.h)r.h={};
-        const val=r.h[key]||'';
-        const isSelf=val.toLowerCase().includes(mapelLC);
-        html+=`<td class="border p-0.5 ${isSelf?'jd-self':''}"><input value="${val}" onchange="D.jadwal[${ri}].h['${key}']=this.value;rJadwal()" class="w-full text-center text-[8px] p-0.5 rounded ef" ${ie?'':'disabled'}></td>`;
-      });
-    } else {
-      // Guru mapel: for each rombel x day
-      ST.rombelList.forEach(rom=>{
-        DAYS.slice(0,5).forEach(d=>{
-          const key=`${rom}_${d}`;
-          if(!r.h)r.h={};
-          const val=r.h[key]||'';
-          const isSelf=val.toLowerCase().includes(mapelLC);
-          // Check conflict: same day+jam, different rombel, same value (guru mengajar 2 rombel bersamaan)
-          let isConflict=false;
-          if(val&&isSelf){
-            ST.rombelList.forEach(otherRom=>{
-              if(otherRom!==rom){
-                const otherKey=`${otherRom}_${d}`;
-                const otherVal=r.h[otherKey]||'';
-                if(otherVal.toLowerCase().includes(mapelLC))isConflict=true;
-              }
-            });
-          }
-          html+=`<td class="border p-0.5 ${isSelf?'jd-self':''} ${isConflict?'jd-conflict':''}"><input value="${val}" onchange="D.jadwal[${ri}].h['${key}']=this.value;rJadwal()" class="w-full text-center text-[7px] p-0.5 rounded ef" style="min-width:40px" ${ie?'':'disabled'}></td>`;
-        });
-      });
-    }
-    html+=`<td class="border p-0.5 no-print">${ie?`<button onclick="D.jadwal.splice(${ri},1);rJadwal()" class="text-red-400"><i class="fa-solid fa-trash text-[7px]"></i></button>`:''}</td></tr>`;
+      if(isGK){
+        // Guru kelas: just mapel name
+        html+=`<td class="jd-cell ${isSelf?'jd-mapel':'jd-empty'}">
+          <input value="${val}" onchange="D.jadwal[${ri}].h['${cellKey}']=this.value;rJadwal()" 
+          class="w-full text-center text-[10px] p-0.5 rounded ef border-0 bg-transparent" 
+          placeholder="-" ${ie?'':'disabled'}>
+        </td>`;
+      } else {
+        // Guru mapel: show MAPEL + ROMBEL (two-line input)
+        html+=`<td class="jd-cell ${isSelf?'':''}">
+          <div class="flex flex-col items-center">
+            <input value="${cellMapel}" onchange="updateJdCell(${ri},'${d}',0,this.value)" 
+              class="w-full text-center text-[11px] font-bold p-0 rounded ef border-0 bg-transparent ${isSelf?'text-blue-600':'text-slate-400'}" 
+              placeholder="-" ${ie?'':'disabled'}>
+            <input value="${cellRombel}" onchange="updateJdCell(${ri},'${d}',1,this.value)" 
+              class="w-full text-center text-[9px] p-0 rounded ef border-0 bg-transparent text-slate-400" 
+              placeholder="" ${ie?'':'disabled'}>
+          </div>
+        </td>`;
+      }
+    });
+    html+=`</tr>`;
   });
   html+=`</tbody></table>`;
 
   // Count JP
   let jpCount=0;
-  jd.forEach(r=>{if(r.j!=='ist'&&r.h){Object.values(r.h).forEach(val=>{if(val&&val.toLowerCase().includes(mapelLC))jpCount++})}});
-  html+=`<p class="text-[9px] mt-1 text-slate-500">Total JP <b>${ST.mapel}</b>/minggu: <b class="text-blue-600">${jpCount}</b></p>`;
-
+  D.jadwal.forEach(r=>{if(r.j!=='ist')getDays().forEach(d=>{const val=r.h?.[d]||'';const mp=(val.split('\n')[0]||'').toLowerCase();if(mp.includes(mapelLC))jpCount++})});
+  html+=`<p class="text-[9px] mt-1 text-slate-500 no-print">Total JP <b>${ST.mapel}</b>/minggu: <b class="text-blue-600">${jpCount}</b> (${jpCount*getJPDur(v('fJn'))} menit)</p>`;
   $('jdArea').innerHTML=html;
 }
 
-function addJRow(){const n=D.jadwal.filter(r=>r.j!=='ist').length+1;D.jadwal.push({j:n,w:'00.00-00.00',h:{}});rJadwal()}
-function addIst(){D.jadwal.push({j:'ist',w:'00.00-00.00',h:{}});rJadwal()}
-
-async function shareJadwal(){const np=v('fNP');if(!np)return toast('warning','','Isi NPSN');try{await db.collection('sharedJadwal').doc(np).set({npsn:np,jadwal:D.jadwal,by:CU.uid,guru:v('fG'),mapel:ST.mapel,rombelList:ST.rombelList,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});toast('success','','Jadwal dibagikan via NPSN')}catch(e){toast('error','',e.message)}}
-
-async function pullJadwal(){const np=v('fNP');if(!np)return toast('warning','','Isi NPSN');try{const d=await db.collection('sharedJadwal').doc(np).get();if(!d.exists)return toast('info','','Belum ada jadwal shared');const data=d.data();D.jadwal=data.jadwal;if(data.rombelList){data.rombelList.forEach(r=>{if(!ST.rombelList.includes(r))ST.rombelList.push(r)});if(CU)await db.collection('users').doc(CU.uid).update({rombelList:ST.rombelList});renderSel()}rJadwal();toast('success','','Jadwal diambil dari NPSN')}catch(e){toast('error','',e.message)}}
-
-// ===== ABSEN (per rombel, default hadir) =====
-function rAbsen(){
-  const bln=$('abBln').value;const list=D.siswa[ST.rombel]||[];$('abR').textContent=ST.rombel;
-  if(!D.absen[ST.rombel])D.absen[ST.rombel]={};
-  if(!D.absen[ST.rombel][bln]){
-    // Default all hadir
-    D.absen[ST.rombel][bln]={};
-    list.forEach((s,si)=>{for(let di=0;di<20;di++)D.absen[ST.rombel][bln][`${si}_${di}`]='H'});
-  }
-  const ie=AL==='approved'||AL==='admin';
-  const pertemuan=getJPPerWeek()*4;
-  let html=`<table class="w-full text-[9px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1 text-left min-w-[100px]">Nama</th>`;
-  for(let i=1;i<=pertemuan;i++)html+=`<th class="border p-0.5 w-5">${i}</th>`;
-  html+=`<th class="border p-1">H</th><th class="border p-1">S</th><th class="border p-1">I</th><th class="border p-1">A</th></tr></thead><tbody>`;
-  list.forEach((s,si)=>{
-    html+=`<tr><td class="border p-1 text-center">${si+1}</td><td class="border p-1">${s.nama||'-'}</td>`;
-    let h=0,sk=0,iz=0,a=0;
-    for(let di=0;di<pertemuan;di++){
-      const key=`${si}_${di}`;const val=D.absen[ST.rombel][bln][key]||'H';
-      if(val==='H')h++;else if(val==='S')sk++;else if(val==='I')iz++;else if(val==='A')a++;
-      const colors={H:'bg-emerald-50',S:'bg-amber-100',I:'bg-blue-100',A:'bg-red-100'};
-      html+=`<td class="border p-0 ${colors[val]||''}"><select onchange="D.absen['${ST.rombel}']['${bln}']['${key}']=this.value;rAbsen()" class="w-full text-[7px] p-0 bg-transparent outline-none text-center" ${ie?'':'disabled'}><option ${val==='H'?'selected':''}>H</option><option ${val==='S'?'selected':''}>S</option><option ${val==='I'?'selected':''}>I</option><option ${val==='A'?'selected':''}>A</option></select></td>`;
-    }
-    html+=`<td class="border p-1 text-center font-bold text-emerald-600">${h}</td><td class="border p-1 text-center text-amber-600">${sk}</td><td class="border p-1 text-center text-blue-600">${iz}</td><td class="border p-1 text-center text-red-600">${a}</td></tr>`;
-  });
-  html+=`</tbody></table>`;$('abArea').innerHTML=html;
+function updateJdCell(ri,day,part,val){
+  if(!D.jadwal[ri].h)D.jadwal[ri].h={};
+  const cur=D.jadwal[ri].h[day]||'';
+  const parts=cur.split('\n');
+  parts[part]=val;
+  D.jadwal[ri].h[day]=parts.join('\n');
+  rJadwal();
 }
 
-function getJPPerWeek(){let c=0;const ml=ST.mapel.toLowerCase();D.jadwal.forEach(r=>{if(r.j!=='ist'&&r.h)Object.values(r.h).forEach(v=>{if(v&&v.toLowerCase().includes(ml))c++})});return c||2}
+function addJP(){const n=D.jadwal.filter(r=>r.j!=='ist').length+1;const dur=getJPDur(v('fJn'));const lastRow=D.jadwal.filter(r=>r.j!=='ist').pop();let t=7*60;if(lastRow){const end=lastRow.w.split('-')[1];const p=end.split('.');t=parseInt(p[0])*60+parseInt(p[1])}const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=dur;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;D.jadwal.push({j:n,w:`${s}-${e}`,h:{}});rJadwal()}
+function addIstirahat(){const lastRow=D.jadwal[D.jadwal.length-1];let t=7*60;if(lastRow){const end=(lastRow.w||'07.00').split('-').pop();const p=end.split('.');t=parseInt(p[0])*60+parseInt(p[1])}const s=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;t+=30;const e=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;D.jadwal.push({j:'ist',w:`${s}-${e}`,h:{}});rJadwal()}
 
-// ===== NILAI (per rombel) =====
+async function shareJd(){const np=v('fNP');if(!np)return toast('warning','Isi NPSN');try{await db.collection('sharedJadwal').doc(np).set({npsn:np,jadwal:D.jadwal,by:CU.uid,guru:v('fG'),mapel:ST.mapel,rombelList:ST.rombelList,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});toast('success','Jadwal dibagikan!')}catch(e){toast('error','',e.message)}}
+async function pullJd(){const np=v('fNP');if(!np)return toast('warning','Isi NPSN');try{const d=await db.collection('sharedJadwal').doc(np).get();if(!d.exists)return toast('info','Belum ada jadwal');D.jadwal=d.data().jadwal;rJadwal();toast('success','Jadwal diambil!')}catch(e){toast('error','',e.message)}}
+
+// ABSEN (per rombel, default hadir)
+function rAbsen(){const bln=$('abBln').value;const rom=ST.activeDocRombel||ST.rombel;const list=D.siswa[rom]||[];$('abR').textContent=rom;if(!D.absen[rom])D.absen[rom]={};if(!D.absen[rom][bln]){D.absen[rom][bln]={};list.forEach((s,si)=>{for(let di=0;di<20;di++)D.absen[rom][bln][`${si}_${di}`]='H'})}const ie=AL==='approved'||AL==='admin';const prt=getJPPerWeekForRombel(rom)*4;let html=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1 text-left min-w-[80px]">Nama</th>`;for(let i=1;i<=Math.min(prt,20);i++)html+=`<th class="border p-0.5 w-4">${i}</th>`;html+=`<th class="border p-1">H</th><th class="border p-1">S</th><th class="border p-1">I</th><th class="border p-1">A</th></tr></thead><tbody>`;list.forEach((s,si)=>{html+=`<tr><td class="border p-0.5 text-center">${si+1}</td><td class="border p-0.5">${s.nama||'-'}</td>`;let h=0,sk=0,iz=0,a=0;for(let di=0;di<Math.min(prt,20);di++){const key=`${si}_${di}`;const val=D.absen[rom][bln][key]||'H';if(val==='H')h++;else if(val==='S')sk++;else if(val==='I')iz++;else if(val==='A')a++;const clr={H:'bg-emerald-50',S:'bg-amber-100',I:'bg-blue-100',A:'bg-red-100'};html+=`<td class="border p-0 ${clr[val]||''}"><select onchange="D.absen['${rom}']['${bln}']['${key}']=this.value;rAbsen()" class="w-full text-[7px] p-0 bg-transparent outline-none text-center" ${ie?'':'disabled'}><option ${val==='H'?'selected':''}>H</option><option ${val==='S'?'selected':''}>S</option><option ${val==='I'?'selected':''}>I</option><option ${val==='A'?'selected':''}>A</option></select></td>`}html+=`<td class="border p-0.5 text-center font-bold text-emerald-600">${h}</td><td class="border p-0.5 text-center text-amber-600">${sk}</td><td class="border p-0.5 text-center text-blue-600">${iz}</td><td class="border p-0.5 text-center text-red-600">${a}</td></tr>`});html+=`</tbody></table>`;$('abArea').innerHTML=html;$('abTTD').innerHTML=makeTTD(getTTDPelaporan(bln))}
+
+function getJPPerWeekForRombel(rom){let c=0;const ml=ST.mapel.toLowerCase();D.jadwal.forEach(r=>{if(r.j!=='ist')getDays().forEach(d=>{const val=r.h?.[d]||'';const parts=val.split('\n');const mp=(parts[0]||'').toLowerCase();const rb=(parts[1]||'').trim();if(mp.includes(ml)&&(!rb||rb===rom))c++})});return c||2}
+
+// NILAI (per rombel)
 function addKrit(){D.kriteria.push({n:'Kriteria Baru',b:100});rNilai()}
-function rNilai(){
-  const ie=AL==='approved'||AL==='admin';const list=D.siswa[ST.rombel]||[];$('nlR').textContent=ST.rombel;
-  if(!D.nilai[ST.rombel])D.nilai[ST.rombel]={};
-  $('krArea').innerHTML=D.kriteria.map((k,i)=>`<div class="flex items-center space-x-1 text-[10px]"><input value="${k.n}" onchange="D.kriteria[${i}].n=this.value;rNilai()" class="border rounded p-1 flex-1 ef" ${ie?'':'disabled'}><span class="text-slate-500">Bobot:</span><input type="number" value="${k.b}" onchange="D.kriteria[${i}].b=+this.value;rNilai()" class="border rounded p-1 w-14 ef" ${ie?'':'disabled'}>%${ie?`<button onclick="D.kriteria.splice(${i},1);rNilai()" class="text-red-500"><i class="fa-solid fa-trash text-[8px]"></i></button>`:''}</div>`).join('');
-  let html=`<table class="w-full text-[9px] border-collapse border"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1 text-left">Nama</th>`;
-  D.kriteria.forEach(k=>html+=`<th class="border p-1">${k.n}<br><span class="text-[7px]">(${k.b}%)</span></th>`);
-  html+=`<th class="border p-1 bg-blue-50">Rata</th><th class="border p-1 bg-emerald-50">Predikat</th></tr></thead><tbody>`;
-  list.forEach((s,si)=>{
-    html+=`<tr><td class="border p-1 text-center">${si+1}</td><td class="border p-1">${s.nama||'-'}</td>`;
-    let tw=0,tb=0;
-    D.kriteria.forEach((k,ki)=>{const key=`${si}_${ki}`;const val=D.nilai[ST.rombel][key]||'';const nv=parseFloat(val)||0;tw+=nv*(k.b/100);tb+=k.b;
-    html+=`<td class="border p-0.5"><input type="number" value="${val}" onchange="D.nilai['${ST.rombel}']['${key}']=this.value;rNilai()" class="w-full text-center text-[9px] p-0.5 border rounded ef" min="0" max="100" ${ie?'':'disabled'}></td>`});
-    const avg=tb>0?Math.round(tw):0;const pred=avg>=89?'Sangat Baik':avg>=76?'Baik':avg>=61?'Cukup':'Perlu Bimbingan';const pc=avg>=89?'text-emerald-600':avg>=76?'text-blue-600':avg>=61?'text-amber-600':'text-red-600';
-    html+=`<td class="border p-1 text-center font-bold">${avg}</td><td class="border p-1 text-center font-bold ${pc} text-[8px]">${pred}</td></tr>`});
-  html+=`</tbody></table>`;$('nlArea').innerHTML=html}
+function rNilai(){const ie=AL==='approved'||AL==='admin';const rom=ST.activeDocRombel||ST.rombel;const list=D.siswa[rom]||[];$('nlR').textContent=rom;if(!D.nilai[rom])D.nilai[rom]={};$('krArea').innerHTML=D.kriteria.map((k,i)=>`<div class="flex items-center space-x-1 text-[10px]"><input value="${k.n}" onchange="D.kriteria[${i}].n=this.value;rNilai()" class="border rounded p-0.5 flex-1 ef" ${ie?'':'disabled'}><span class="text-slate-500">Bobot:</span><input type="number" value="${k.b}" onchange="D.kriteria[${i}].b=+this.value;rNilai()" class="border rounded p-0.5 w-12 ef" ${ie?'':'disabled'}>%${ie?`<button onclick="D.kriteria.splice(${i},1);rNilai()" class="text-red-500"><i class="fa-solid fa-trash text-[8px]"></i></button>`:''}</div>`).join('');let html=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1 text-left">Nama</th>`;D.kriteria.forEach(k=>html+=`<th class="border p-1">${k.n}<br><span class="text-[7px]">(${k.b}%)</span></th>`);html+=`<th class="border p-1 bg-blue-50">Rata</th><th class="border p-1 bg-emerald-50">Predikat</th></tr></thead><tbody>`;list.forEach((s,si)=>{html+=`<tr><td class="border p-0.5 text-center">${si+1}</td><td class="border p-0.5">${s.nama||'-'}</td>`;let tw=0;D.kriteria.forEach((k,ki)=>{const key=`${si}_${ki}`;const val=D.nilai[rom][key]||'';const nv=parseFloat(val)||0;tw+=nv*(k.b/100);html+=`<td class="border p-0"><input type="number" value="${val}" onchange="D.nilai['${rom}']['${key}']=this.value;rNilai()" class="w-full text-center text-[9px] p-0.5 ef border-0" min="0" max="100" ${ie?'':'disabled'}></td>`});const avg=Math.round(tw);const pred=avg>=89?'Sangat Baik':avg>=76?'Baik':avg>=61?'Cukup':'Bimbingan';const pc=avg>=89?'text-emerald-600':avg>=76?'text-blue-600':avg>=61?'text-amber-600':'text-red-600';html+=`<td class="border p-0.5 text-center font-bold">${avg}</td><td class="border p-0.5 text-center font-bold ${pc} text-[8px]">${pred}</td></tr>`});html+=`</tbody></table>`;$('nlArea').innerHTML=html;$('nlTTD').innerHTML=makeTTD(getTTDPelaporan($('abBln').value||'Juli'))}
 
-// ===== JURNAL (per bulan, semua rombel, tanggal pengesahan akhir bulan) =====
-function rJurnal(){
-  const bln=$('jrBln').value;
-  const ie=AL==='approved'||AL==='admin';
-  const isGuruKelas=v('fTG')==='kelas';
-  const mapelLC=ST.mapel.toLowerCase();
-  const cpK=D.cp.filter(c=>c.K===v('fKl'));
+// JURNAL (per bulan, semua rombel, ttd tanggal akhir bulan)
+function rJurnal(){const bln=$('jrBln').value;const ie=AL==='approved'||AL==='admin';const mapelLC=ST.mapel.toLowerCase();const kelas=getRombelKelas();const cpK=D.cp.filter(c=>c.K===kelas);const days=getDays();
+  // Build entries from jadwal
+  let entries=[];for(let w=0;w<4;w++){days.forEach(day=>{D.jadwal.forEach(r=>{if(r.j==='ist'||!r.h)return;const val=r.h[day]||'';const parts=val.split('\n');const mp=(parts[0]||'').toLowerCase();const rb=(parts[1]||'').trim();if(mp.includes(mapelLC))entries.push({day,jam:r.j,waktu:r.w,rombel:rb||ST.rombel,week:w+1})})})}
+  if(!D.jurnal[bln])D.jurnal[bln]=[];const jd=D.jurnal[bln];while(jd.length<entries.length)jd.push({tgl:'',tp:'',keg:'',cat:''});
+  const sub=`${v('fS')} • ${ST.mapel} • Bulan ${bln} TA ${v('fTA')}`;const tpOpts=cpK.map((c,ci)=>`<option value="${ci}">${(c.T||'').substring(0,35)}</option>`).join('');
+  let html=`<h2 class="text-sm font-bold text-center uppercase">JURNAL PEMBELAJARAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Hari/Tgl</th><th class="border p-1">Rombel</th><th class="border p-1">JP</th><th class="border p-1">TP</th><th class="border p-1">Kegiatan</th><th class="border p-1">H</th><th class="border p-1">S</th><th class="border p-1">I</th><th class="border p-1">A</th><th class="border p-1">Catatan</th></tr></thead><tbody>`;
+  entries.forEach((e,i)=>{const j=jd[i]||{};const abBln=D.absen[e.rombel]?.[bln]||{};const swList=D.siswa[e.rombel]||[];let h=0,s=0,iz=0,a=0;swList.forEach((sw,si)=>{const av=abBln[`${si}_${i}`]||'H';if(av==='H')h++;else if(av==='S')s++;else if(av==='I')iz++;else if(av==='A')a++});
+  html+=`<tr class="border ${i%2?'bg-slate-50/30':''}"><td class="border p-0.5 text-center">${i+1}</td><td class="border p-0.5"><input value="${j.tgl||`${e.day} M${e.week}`}" onchange="D.jurnal['${bln}'][${i}].tgl=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td><td class="border p-0.5 text-center font-bold text-blue-600">${e.rombel}</td><td class="border p-0.5 text-center text-[8px]">JP${e.jam}</td><td class="border p-0.5"><select onchange="D.jurnal['${bln}'][${i}].tp=this.value" class="w-full text-[7px] ef" ${ie?'':'disabled'}><option>-</option>${tpOpts}</select></td><td class="border p-0.5"><input value="${j.keg||''}" onchange="D.jurnal['${bln}'][${i}].keg=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td><td class="border p-0.5 text-center text-emerald-600 font-bold">${h}</td><td class="border p-0.5 text-center text-amber-600">${s}</td><td class="border p-0.5 text-center text-blue-600">${iz}</td><td class="border p-0.5 text-center text-red-600">${a}</td><td class="border p-0.5"><input value="${j.cat||''}" onchange="D.jurnal['${bln}'][${i}].cat=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td></tr>`});
+  html+=`</tbody></table>`;html+=makeTTD(getTTDPelaporan(bln));$('jrContent').innerHTML=html}
 
-  // Build journal entries from jadwal: each day+rombel that has this mapel
-  let entries=[];
-  const weekDates=4; // 4 minggu
-  const dayNames=['Senin','Selasa','Rabu','Kamis','Jumat'];
+// CSV
+function procCSV(type){const raw=$(type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw').value.trim();if(!raw)return toast('warning','Paste CSV');const lines=raw.split('\n').filter(l=>l.trim());if(type==='kal'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{S:r[0]||'',T:r[1]||'',A:r[2]||'',K:r[3]||''}}).filter(k=>k.A);D.kal=D.kal.concat(nd);toast('success','',`${nd.length} agenda`)}else if(type==='cp'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{K:r[0]||'',S:r[1]||'',E:r[2]||'',C:r[3]||'',T:r[4]||'',Di:r[5]||'',M:r[6]||METODE[0],P:parseInt(r[7])||2}}).filter(c=>c.T);D.cp=D.cp.concat(nd);toast('success','',`${nd.length} TP`)}else{if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{nis:r[0]||'',nama:r[1]||'',jk:r[2]||'L'}}).filter(s=>s.nama);D.siswa[ST.rombel]=D.siswa[ST.rombel].concat(nd);toast('success','',`${nd.length} siswa`);$('csvSwA').classList.add('hidden')}rt();renderAll();updElFlt()}
 
-  for(let w=0;w<weekDates;w++){
-    dayNames.forEach((day,di)=>{
-      D.jadwal.forEach(r=>{
-        if(r.j==='ist')return;
-        if(!r.h)return;
-        // Find matching cells
-        if(isGuruKelas){
-          const key=`${ST.rombel}_${day}`;
-          const val=r.h[key]||'';
-          if(val){entries.push({day,jam:r.j,waktu:r.w,rombel:ST.rombel,mapelVal:val,week:w+1})}
-        } else {
-          ST.rombelList.forEach(rom=>{
-            const key=`${rom}_${day}`;
-            const val=r.h[key]||'';
-            if(val&&val.toLowerCase().includes(mapelLC)){entries.push({day,jam:r.j,waktu:r.w,rombel:rom,mapelVal:val,week:w+1})}
-          });
-        }
-      });
-    });
-  }
+// IMPORT
+async function openImport(){$('mImport').classList.remove('hidden');$('mImport').innerHTML=`<div class="bg-white rounded-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-hidden flex flex-col"><div class="bg-teal-700 text-white p-3 flex justify-between"><div><b>Ambil CP/TP</b><p class="text-[10px] text-teal-200">Guru se-NPSN / sesama mapel</p></div><button onclick="closeM('mImport')" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button></div><div class="p-3 flex-1 overflow-y-auto" id="impL"><div class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div>`;try{const myNP=v('fNP'),myM=ST.mapel.toLowerCase();const snap=await db.collection('users').get();const mt=[];for(const ud of snap.docs){if(ud.id===CU?.uid)continue;const u=ud.data();const sameNP=myNP&&u.npsn&&u.npsn===myNP;const sameM=(u.mapelList||[]).some(m=>m.toLowerCase()===myM);if(!sameNP&&!sameM)continue;const mks=[...new Set((u.mapelList||[]).concat(u.mapel?[u.mapel]:[]))];for(const mk of mks){if(!mk)continue;try{const cd=await db.doc(`u/${ud.id}/m/${mk.replace(/[^a-zA-Z0-9]/g,'_')}/d/cp`).get();if(cd.exists&&cd.data().i?.length)mt.push({name:u.name,school:u.school,npsn:u.npsn,mapel:mk,count:cd.data().i.length,sameNP,sameM:mk.toLowerCase()===myM,items:cd.data().i})}catch(ee){}}}if(!mt.length){$('impL').innerHTML='<p class="text-center py-4 text-slate-400 text-xs">Tidak ada</p>';return}window._imp=mt;$('impL').innerHTML=mt.map((m,i)=>`<div class="border rounded p-2 mb-1 hover:bg-slate-50 flex justify-between items-center"><div><b class="text-xs">${m.name}</b> <span class="text-[9px] text-slate-400">${m.school} NPSN:${m.npsn||'-'} • ${m.mapel} • ${m.count} TP</span></div><button onclick="doImp(${i})" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded">Ambil</button></div>`).join('')}catch(e){$('impL').innerHTML=`<p class="text-red-500 text-xs">${e.message}</p>`}}
+function doImp(i){const m=window._imp[i];if(!m)return;D.cp=D.cp.concat(m.items);rt();renderAll();updElFlt();closeM('mImport');toast('success','',`${m.items.length} TP`)}
 
-  if(!D.jurnal[bln])D.jurnal[bln]=[];
-  const jd=D.jurnal[bln];
-  // Ensure enough rows
-  while(jd.length<entries.length)jd.push({tgl:'',tp:'',keg:'',cat:'',h:0,s:0,i:0,a:0});
-
-  const sub=`${v('fS')} • ${ST.mapel} • ${v('fKl')} • Bulan ${bln} TA ${v('fTA')}`;
-  $('jrSub').textContent=sub;
-
-  // TTD with end-of-month date
-  const months=['Juli','Agustus','September','Oktober','November','Desember','Januari','Februari','Maret','April','Mei','Juni'];
-  const monthDays=[31,31,30,31,30,31,31,28,31,30,31,30];
-  const mi=months.indexOf(bln);
-  const yr=mi<6?(v('fTA').split('/')[0]||'2026'):(v('fTA').split('/')[1]||'2027');
-  const lastDay=monthDays[mi]||30;
-  const ttdDate=`${v('fTD').split(',')[0]||'Nagreg'}, ${lastDay} ${bln} ${yr}`;
-
-  const tpOpts=cpK.map((c,ci)=>`<option value="${ci}">${(c.T||'').substring(0,40)}</option>`).join('');
-
-  $('jrB').innerHTML=entries.map((e,i)=>{
-    const j=jd[i]||{};
-    // Get absen data for this rombel
-    const abBln=D.absen[e.rombel]?.[bln]||{};
-    const swList=D.siswa[e.rombel]||[];
-    let h=0,s=0,iz=0,a=0;
-    swList.forEach((sw,si)=>{const av=abBln[`${si}_${i}`]||'H';if(av==='H')h++;else if(av==='S')s++;else if(av==='I')iz++;else if(av==='A')a++});
-
-    return`<tr class="border ${i%2?'bg-slate-50/30':''}">
-      <td class="border p-1 text-center">${i+1}</td>
-      <td class="border p-0.5"><input value="${j.tgl||`${e.day} M${e.week}`}" onchange="D.jurnal['${bln}'][${i}].tgl=this.value" class="w-full border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}></td>
-      <td class="border p-1 text-center font-bold text-blue-600">${e.rombel}</td>
-      <td class="border p-1 text-center">${e.jam} (${e.waktu})</td>
-      <td class="border p-0.5"><select onchange="D.jurnal['${bln}'][${i}].tp=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}><option value="">-TP-</option>${tpOpts}</select></td>
-      <td class="border p-0.5"><input value="${j.keg||''}" onchange="D.jurnal['${bln}'][${i}].keg=this.value" class="w-full border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}></td>
-      <td class="border p-1 text-center text-emerald-600 font-bold">${h}</td>
-      <td class="border p-1 text-center text-amber-600">${s}</td>
-      <td class="border p-1 text-center text-blue-600">${iz}</td>
-      <td class="border p-1 text-center text-red-600">${a}</td>
-      <td class="border p-0.5"><input value="${j.cat||''}" onchange="D.jurnal['${bln}'][${i}].cat=this.value" class="w-full border rounded p-0.5 text-[9px] ef" ${ie?'':'disabled'}></td>
-    </tr>`}).join('');
-
-  // TTD with end-of-month date
-  $('jrTTD').innerHTML=`<div class="flex justify-between pt-4 text-[10px] text-center">
-    <div><p>Mengetahui,</p><p class="font-semibold">Kepala ${v('fS')}</p><div class="h-14"></div><p class="font-bold underline">${v('fKS')}</p><p>NIP. ${v('fNK')}</p></div>
-    <div><p>${ttdDate}</p><p class="font-semibold">Guru ${ST.mapel}</p><div class="h-14"></div><p class="font-bold underline">${v('fG')}</p><p>NIP. ${v('fNI')}</p></div>
-  </div>`;
-}
-
-// ===== CSV PROCESSOR =====
-function procCSV(type){
-  const raw=$(type==='kal'?'csvKal':type==='cp'?'csvCP':'csvSw').value.trim();
-  if(!raw)return toast('warning','','Paste CSV dulu');
-  const lines=raw.split('\n').filter(l=>l.trim());
-  if(type==='kal'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{S:r[0]||'',T:r[1]||'',A:r[2]||'',K:r[3]||''}}).filter(k=>k.A);D.kal=D.kal.concat(nd);toast('success','',`${nd.length} agenda`)}
-  else if(type==='cp'){const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{K:r[0]||'',S:r[1]||'',E:r[2]||'',C:r[3]||'',T:r[4]||'',Di:r[5]||'',M:r[6]||'PBL (Problem Based Learning)',P:parseInt(r[7])||2}}).filter(c=>c.T);D.cp=D.cp.concat(nd);toast('success','',`${nd.length} TP`)}
-  else if(type==='siswa'){if(!D.siswa[ST.rombel])D.siswa[ST.rombel]=[];const nd=lines.slice(1).map(l=>{const r=pcsv(l);return{nis:r[0]||'',nama:r[1]||'',jk:r[2]||'L'}}).filter(s=>s.nama);D.siswa[ST.rombel]=D.siswa[ST.rombel].concat(nd);toast('success','',`${nd.length} siswa`);$('csvSwA').classList.add('hidden')}
-  rt();renderAll();updElFlt()
-}
-
-// ===== IMPORT CP =====
-async function openImport(){
-  $('mImport').classList.remove('hidden');
-  $('mImport').innerHTML=`<div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-hidden flex flex-col"><div class="bg-teal-700 text-white p-3 flex justify-between"><div><h3 class="font-bold text-sm"><i class="fa-solid fa-download mr-1"></i>Ambil CP/TP</h3><p class="text-teal-200 text-[10px]">Guru se-NPSN / sesama mapel</p></div><button onclick="closeM('mImport')" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button></div><div class="p-3 flex-1 overflow-y-auto" id="impL"><div class="text-center py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div>`;
-  try{const myNP=v('fNP'),myM=ST.mapel.toLowerCase();const snap=await db.collection('users').get();const mt=[];for(const ud of snap.docs){if(ud.id===CU?.uid)continue;const u=ud.data();const sameNP=myNP&&u.npsn&&u.npsn===myNP;const sameM=(u.mapelList||[]).some(m=>m.toLowerCase()===myM);if(!sameNP&&!sameM)continue;const mks=[...new Set((u.mapelList||[]).concat(u.mapel?[u.mapel]:[]))];for(const mk of mks){if(!mk)continue;try{const cd=await db.doc(`u/${ud.id}/m/${mk.replace(/[^a-zA-Z0-9]/g,'_')}/d/cp`).get();if(cd.exists&&cd.data().i?.length)mt.push({uid:ud.id,name:u.name,school:u.school,npsn:u.npsn,mapel:mk,count:cd.data().i.length,sameNP,sameM:mk.toLowerCase()===myM,items:cd.data().i})}catch(ee){}}}
-  if(!mt.length){$('impL').innerHTML='<p class="text-center py-4 text-slate-400 text-xs">Tidak ada data cocok</p>';return}
-  window._imp=mt;$('impL').innerHTML=mt.map((m,i)=>`<div class="border rounded-lg p-2 mb-1 hover:bg-slate-50 flex justify-between items-center"><div><b class="text-xs">${m.name}</b><span class="text-[9px] text-slate-400 ml-1">${m.school||'-'} NPSN:${m.npsn||'-'}</span><br><span class="text-[9px]">${m.mapel} • ${m.count} TP</span><span class="ml-1">${m.sameNP?'<span class="text-[8px] bg-blue-100 text-blue-600 px-1 rounded-full">NPSN</span>':''}${m.sameM?'<span class="text-[8px] bg-emerald-100 text-emerald-600 px-1 rounded-full">Mapel</span>':''}</span></div><button onclick="doImp(${i})" class="bg-emerald-600 text-white text-[10px] px-2 py-1 rounded">Ambil</button></div>`).join('')}catch(e){$('impL').innerHTML=`<p class="text-red-500 text-xs">${e.message}</p>`}
-}
-function doImp(i){const m=window._imp[i];if(!m)return;if(confirm(`Ambil ${m.items.length} TP?`)){D.cp=D.cp.concat(m.items);rt();renderAll();updElFlt();closeM('mImport');toast('success','',`${m.items.length} TP diambil`)}}
-
-// ===== RENDER ALL DOCS =====
+// RENDER ALL DOCS (per rombel via ST.activeDocRombel)
 function renderAll(){
-  const kl=v('fKl'),fase=getFase(kl),mp=ST.mapel;
-  const sub=`${v('fS')} (NPSN:${v('fNP')}) • ${mp} • ${kl} (Fase ${fase}) • TA ${v('fTA')}`;
-  const ttd=`<div class="flex justify-between pt-4 text-[10px] text-center"><div><p>Mengetahui,</p><p class="font-semibold">Kepala ${v('fS')}</p><div class="h-14"></div><p class="font-bold underline">${v('fKS')}</p><p>NIP. ${v('fNK')}</p></div><div><p>${v('fTD')}</p><p class="font-semibold">Guru ${mp}</p><div class="h-14"></div><p class="font-bold underline">${v('fG')}</p><p>NIP. ${v('fNI')}</p></div></div>`;
-  document.querySelectorAll('.ttd').forEach(e=>e.innerHTML=ttd);
-  const cpK=D.cp.filter(c=>c.K===kl);
+  const rom=ST.activeDocRombel||ST.rombel;
+  const kelas=getRombelKelas();
+  const fase=getFase(kelas);
+  const mp=ST.mapel;
+  const sub=`${v('fS')} (NPSN:${v('fNP')}) • ${mp} • Rombel ${rom} (${kelas} Fase ${fase}) • TA ${v('fTA')}`;
+  const ttdPlan=makeTTD(getTTDPerencanaan());
+  const cpK=D.cp.filter(c=>c.K===kelas);
   const cp1=cpK.filter(c=>c.S==='Semester 1'),cp2=cpK.filter(c=>c.S==='Semester 2');
   const JP=2;
 
   // Kalender
-  $('oKJ').textContent=`KALENDER PENDIDIKAN TA ${v('fTA')}`;$('oKS').textContent=v('fS');
-  $('oKB').innerHTML=D.kal.map((k,i)=>{const cc={'Libur Nasional':'bg-red-50','Asesmen':'bg-blue-50','Kegiatan Sekolah':'bg-emerald-50','Libur Semester':'bg-amber-50'};return`<tr class="border ${cc[k.K]||''}"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${k.S}</td><td class="border p-1">${k.T}</td><td class="border p-1">${k.A}</td><td class="border p-1 text-[9px] font-semibold">${k.K}</td></tr>`}).join('');
+  $('dKalContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">KALENDER PENDIDIKAN TA ${v('fTA')}</h2><p class="text-[10px] text-center font-semibold text-slate-600 mb-2">${v('fS')} — Rombel ${rom}</p><table class="w-full text-[10px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Smt</th><th class="border p-1">Tanggal</th><th class="border p-1">Agenda</th><th class="border p-1">Kategori</th></tr></thead><tbody>${D.kal.map((k,i)=>`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${k.S}</td><td class="border p-1">${k.T}</td><td class="border p-1">${k.A}</td><td class="border p-1 text-[9px]">${k.K}</td></tr>`).join('')}</tbody></table>${ttdPlan}`;
 
   // ACP
-  $('oAS').textContent=sub;const eg={};cpK.forEach(c=>{if(!eg[c.E])eg[c.E]={cp:'',s1:[],s2:[],di:new Set()};if(c.C)eg[c.E].cp=c.C;if(c.S==='Semester 1')eg[c.E].s1.push(c.T);else eg[c.E].s2.push(c.T);if(c.Di)c.Di.split(';').forEach(d=>eg[c.E].di.add(d.trim()))});let an=0;
-  $('oAB').innerHTML=Object.entries(eg).map(([e,d])=>{an++;return`<tr class="border"><td class="border p-1 text-center">${an}</td><td class="border p-1 font-semibold">${e}</td><td class="border p-1 text-[8px]">${d.cp}</td><td class="border p-1 text-[8px]">${d.s1.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${d.s2.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${[...d.di].join('; ')}</td></tr>`}).join('');
+  const eg={};cpK.forEach(c=>{if(!eg[c.E])eg[c.E]={cp:'',s1:[],s2:[],di:new Set()};if(c.C)eg[c.E].cp=c.C;if(c.S==='Semester 1')eg[c.E].s1.push(c.T);else eg[c.E].s2.push(c.T);if(c.Di)c.Di.split(';').forEach(d=>eg[c.E].di.add(d.trim()))});let an=0;
+  $('dAcpContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">ANALISIS CAPAIAN PEMBELAJARAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">CP</th><th class="border p-1">TP Smt 1</th><th class="border p-1">TP Smt 2</th><th class="border p-1">Dimensi PL</th></tr></thead><tbody>${Object.entries(eg).map(([e,d])=>{an++;return`<tr class="border"><td class="border p-1 text-center">${an}</td><td class="border p-1 font-semibold">${e}</td><td class="border p-1 text-[8px]">${d.cp}</td><td class="border p-1 text-[8px]">${d.s1.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${d.s2.map((t,i)=>`${i+1}. ${t}`).join('<br>')||'-'}</td><td class="border p-1 text-[8px]">${[...d.di].join('; ')}</td></tr>`}).join('')}</tbody></table>${ttdPlan}`;
 
-  // ATP (with Metode)
-  $('oTS').textContent=sub;$('oTB').innerHTML=cpK.map((c,i)=>`<tr class="border ${i%2?'bg-slate-50/30':''}"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${c.S==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P||'-'}</td><td class="border p-1 text-[8px]">${c.M||'-'}</td><td class="border p-1 text-[8px]">${c.Di}</td></tr>`).join('');
+  // ATP
+  $('dAtpContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">ALUR TUJUAN PEMBELAJARAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">TP</th><th class="border p-1">Smt</th><th class="border p-1">Prt</th><th class="border p-1">Metode</th><th class="border p-1">Dimensi PL</th></tr></thead><tbody>${cpK.map((c,i)=>`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${c.S==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-[8px]">${c.M}</td><td class="border p-1 text-[8px]">${c.Di}</td></tr>`).join('')}</tbody></table>${ttdPlan}`;
 
   // Prota
-  $('oPtS').textContent=sub;let ph='';
-  [['Semester 1','bg-blue-50',cp1],['Semester 2','bg-emerald-50',cp2]].forEach(([lb,bg,data])=>{if(!data.length)return;ph+=`<tr class="${bg} font-bold"><td colspan="6" class="border p-1">${lb.toUpperCase()}</td></tr>`;let tot=0;data.forEach((c,i)=>{const jp=(c.P||1)*JP;tot+=jp;ph+=`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${lb==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P||'-'}</td><td class="border p-1 text-center">${jp} JP</td></tr>`});ph+=`<tr class="${bg} font-bold"><td colspan="5" class="border p-1 text-right">Total:</td><td class="border p-1 text-center">${tot} JP</td></tr>`});
-  $('oPtB').innerHTML=ph;
+  let ph='';[['Semester 1','bg-blue-50',cp1],['Semester 2','bg-emerald-50',cp2]].forEach(([lb,bg,data])=>{if(!data.length)return;ph+=`<tr class="${bg} font-bold"><td colspan="6" class="border p-1">${lb}</td></tr>`;let tot=0;data.forEach((c,i)=>{const jp=(c.P||1)*JP;tot+=jp;ph+=`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${lb==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-center">${jp}</td></tr>`});ph+=`<tr class="${bg} font-bold"><td colspan="5" class="border p-1 text-right">Total:</td><td class="border p-1 text-center">${tot} JP</td></tr>`});
+  $('dProtaContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">PROGRAM TAHUNAN</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">Elemen</th><th class="border p-1">TP</th><th class="border p-1">Smt</th><th class="border p-1">Prt</th><th class="border p-1">JP</th></tr></thead><tbody>${ph}</tbody></table>${ttdPlan}`;
 
   // Promes
-  $('oPsS').textContent=sub;$('bS1').className=`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ST.ps===1?'bg-blue-100 text-blue-700':'bg-slate-100'}`;$('bS2').className=`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ST.ps===2?'bg-blue-100 text-blue-700':'bg-slate-100'}`;
-  const smD=ST.ps===1?cp1:cp2;const mons=ST.ps===1?['Jul','Ags','Sep','Okt','Nov','Des']:['Jan','Feb','Mar','Apr','Mei','Jun'];const wpm=[3,4,4,4,5,4];const tw=wpm.reduce((a,b)=>a+b,0);
-  let mh=mons.map((m,i)=>`<th class="border p-0.5 text-[7px]" colspan="${wpm[i]}">${m}</th>`).join('');let wh=wpm.map(w=>Array.from({length:w},(_,i)=>`<th class="border p-0.5 text-[6px]">M${i+1}</th>`).join('')).join('');
-  let wc=0;let pr=smD.map((c,idx)=>{const p=c.P||1;let cells='';for(let w=0;w<tw;w++){if(w>=wc&&w<wc+p)cells+=`<td class="border p-0.5 bg-emerald-100 text-emerald-700 font-bold text-[7px]">${JP}</td>`;else cells+=`<td class="border p-0.5"></td>`}wc+=p;if(wc>=tw)wc=0;return`<tr class="border"><td class="border p-0.5 text-center font-bold">${idx+1}</td><td class="border p-0.5 text-left text-[7px]">${c.T}</td><td class="border p-0.5 text-center font-bold">${p*JP}</td>${cells}</tr>`}).join('');
-  $('oPsA').innerHTML=`<table class="w-full text-[8px] border-collapse border text-center"><thead class="bg-slate-100"><tr><th class="border p-0.5" rowspan="2">No</th><th class="border p-0.5 text-left" rowspan="2" style="min-width:120px">TP</th><th class="border p-0.5" rowspan="2">JP</th>${mh}</tr><tr class="bg-slate-50">${wh}</tr></thead><tbody>${pr}</tbody></table>`;
+  $('bS1').className=`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ST.ps===1?'bg-blue-100 text-blue-700':'bg-slate-100'}`;$('bS2').className=`text-[10px] px-2 py-0.5 rounded-full border font-bold ${ST.ps===2?'bg-blue-100 text-blue-700':'bg-slate-100'}`;
+  const smD=ST.ps===1?cp1:cp2;const mons=ST.ps===1?['Jul','Ags','Sep','Okt','Nov','Des']:['Jan','Feb','Mar','Apr','Mei','Jun'];const wpm=[3,4,4,4,5,4];const tw=wpm.reduce((a,b)=>a+b,0);let mh=mons.map((m,i)=>`<th class="border p-0.5 text-[7px]" colspan="${wpm[i]}">${m}</th>`).join('');let wh=wpm.map(w=>Array.from({length:w},(_,i)=>`<th class="border p-0.5 text-[6px]">M${i+1}</th>`).join('')).join('');let wc=0;let pr=smD.map((c,idx)=>{const p=c.P||1;let cells='';for(let w=0;w<tw;w++){if(w>=wc&&w<wc+p)cells+=`<td class="border p-0.5 bg-emerald-100 text-emerald-700 font-bold text-[7px]">${JP}</td>`;else cells+=`<td class="border p-0.5"></td>`}wc+=p;if(wc>=tw)wc=0;return`<tr class="border"><td class="border p-0.5 text-center">${idx+1}</td><td class="border p-0.5 text-left text-[7px]">${c.T}</td><td class="border p-0.5 text-center">${p*JP}</td>${cells}</tr>`}).join('');
+  $('dPromesContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER</h2><p class="text-[10px] text-center font-semibold mb-1">${sub}</p><div class="overflow-x-auto"><table class="w-full text-[8px] text-center"><thead class="bg-slate-100"><tr><th class="border p-0.5" rowspan="2">No</th><th class="border p-0.5 text-left" rowspan="2" style="min-width:100px">TP</th><th class="border p-0.5" rowspan="2">JP</th>${mh}</tr><tr class="bg-slate-50">${wh}</tr></thead><tbody>${pr}</tbody></table></div>${ttdPlan}`;
 
   // Modul
-  $('mS').textContent=v('fS');$('mM').textContent=mp;$('mG').textContent=v('fG');$('mK').textContent=`${kl} (Fase ${fase})`;
-  $('mTP').textContent=cpK[0]?.T||'-';$('mDi').textContent=cpK[0]?.Di||'-';
-  const met=cpK[0]?.M||'PBL';$('mMet').textContent=met;
-  const metDetails={'PBL (Problem Based Learning)':'Siswa mengidentifikasi masalah nyata → menganalisis → mencari solusi → mempresentasikan','PjBL (Project Based Learning)':'Siswa merancang proyek → melaksanakan → mengevaluasi → mempresentasikan produk','Inquiry Based Learning':'Siswa merumuskan pertanyaan → menyelidiki → menemukan jawaban → menyimpulkan','Cooperative Learning':'Siswa bekerja dalam kelompok → berdiskusi → saling mengajar → berbagi hasil','Discovery Learning':'Siswa mengeksplorasi → menemukan pola → membangun konsep → mengaplikasikan'};
-  $('mMetDetail').textContent=`Implementasi ${met}: ${metDetails[met]||'Pendekatan pembelajaran aktif sesuai karakteristik materi.'}`;
+  const met=cpK[0]?.M||METODE[0];const metInfo={'PBL (Problem Based Learning)':'Siswa mengidentifikasi masalah→analisis→solusi→presentasi','PjBL (Project Based Learning)':'Siswa merancang proyek→melaksanakan→evaluasi→produk','Inquiry Based Learning':'Siswa merumuskan pertanyaan→investigasi→penemuan→simpulan','Cooperative Learning':'Kelompok→diskusi→saling ajar→berbagi','Discovery Learning':'Eksplorasi→pola→konsep→aplikasi'};
+  $('dModulContent').innerHTML=`<h2 class="text-base font-bold text-center border-b pb-1">MODUL AJAR DEEP LEARNING</h2><div class="bg-slate-50 p-2 rounded border grid grid-cols-2 gap-1 text-[10px] mt-2"><div><b>Sekolah:</b> ${v('fS')}</div><div><b>Mapel:</b> ${mp}</div><div><b>Guru:</b> ${v('fG')}</div><div><b>Rombel:</b> ${rom} (${kelas} Fase ${fase})</div></div><div class="space-y-2 mt-2 text-[10px]"><div><h4 class="font-bold bg-slate-200 p-1 rounded">A. TUJUAN PEMBELAJARAN</h4><p class="p-1.5 border rounded mt-0.5">${cpK[0]?.T||'-'}</p></div><div><h4 class="font-bold bg-blue-100 p-1 rounded">B. METODE / MODEL</h4><p class="p-1.5 border rounded mt-0.5"><b>${met}</b><br>${metInfo[met]||''}</p></div><div><h4 class="font-bold bg-amber-100 p-1 rounded">C. PERTANYAAN PEMANTIK</h4><p class="p-1.5 border rounded mt-0.5">1. Mengapa penting? 2. Bagaimana penerapan? 3. Apa dampaknya?</p></div><div><h4 class="font-bold bg-slate-200 p-1 rounded">D. DIMENSI PROFIL LULUSAN</h4><p class="p-1.5 border rounded mt-0.5">${cpK[0]?.Di||'-'}</p></div><div><h4 class="font-bold bg-emerald-100 p-1 rounded">E. KEGIATAN DEEP LEARNING</h4><div class="mt-0.5 space-y-1"><div class="border rounded p-1.5"><b>🟢 Pendahuluan (15'):</b> Salam, doa, apersepsi, motivasi</div><div class="border rounded p-1.5"><b>🔵 Inti (${getJPDur(v('fJn'))*2-30}'):</b><br>• <b>Experiencing:</b> Mengamati fenomena<br>• <b>Reflecting:</b> Diskusi reflektif<br>• <b>Conceptualizing:</b> Membangun konsep<br>• <b>Applying:</b> Menerapkan konteks baru<br><i class="text-blue-600">${metInfo[met]||''}</i></div><div class="border rounded p-1.5"><b>🟡 Penutup (15'):</b> Simpulan, asesmen, refleksi, doa</div></div></div><div><h4 class="font-bold bg-red-100 p-1 rounded">F. ASESMEN</h4><p class="p-1.5 border rounded mt-0.5">Diagnostik • Formatif • Sumatif</p></div></div>${ttdPlan}`;
 
   // KKTP
-  $('oKkS').textContent=sub;$('oKkB').innerHTML=cpK.map((c,i)=>{const tl=(c.T||'').toLowerCase().substring(0,45);return`<tr class="border ${i%2?'bg-slate-50/30':''}"><td class="border p-1 text-center font-bold">${i+1}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-red-600 text-[8px]">Belum mampu ${tl}... meskipun dibimbing.</td><td class="border p-1 text-amber-600 text-[8px]">Mampu ${tl}... dengan bimbingan.</td><td class="border p-1 text-blue-600 text-[8px]">Mampu ${tl}... secara mandiri.</td><td class="border p-1 text-emerald-600 text-[8px] font-semibold">Mampu ${tl}... dan membantu teman.</td></tr>`}).join('');
+  $('dKktpContent').innerHTML=`<h2 class="text-sm font-bold text-center uppercase">KKTP</h2><p class="text-[10px] text-center font-semibold mb-2">${sub}</p><table class="w-full text-[9px]"><thead class="bg-slate-100"><tr><th class="border p-1">No</th><th class="border p-1">TP</th><th class="border p-1 bg-red-50">Bimbingan (0-60)</th><th class="border p-1 bg-amber-50">Cukup (61-75)</th><th class="border p-1 bg-blue-50">Baik (76-88)</th><th class="border p-1 bg-emerald-50">Sangat Baik (89-100)</th></tr></thead><tbody>${cpK.map((c,i)=>{const t=(c.T||'').toLowerCase().substring(0,40);return`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-[8px] text-red-600">Belum mampu ${t}...</td><td class="border p-1 text-[8px] text-amber-600">Mampu ${t}... dengan bimbingan</td><td class="border p-1 text-[8px] text-blue-600">Mampu ${t}... mandiri</td><td class="border p-1 text-[8px] text-emerald-600 font-semibold">Mampu ${t}... dan bantu teman</td></tr>`}).join('')}</tbody></table>${ttdPlan}`;
+
+  $('pgS').textContent=docTabs.includes(getCurrentTab())?`Rombel: ${rom}`:'-';
 }
 
-// ===== PROMPTS =====
-function genPrompts(){
-  const mp=ST.mapel,kl=v('fKl'),fase=getFase(kl),jn=v('fJn'),ta=v('fTA');
-  const metodeStr=METODE_LIST.join(', ');
+function getCurrentTab(){const vis=document.querySelector('.tab-c:not(.hidden)');return vis?vis.id.replace('tab-',''):'profil'}
 
-  $('prCP').textContent=`Saya guru ${mp} jenjang ${jn}.
-Buatkan CSV LENGKAP CP & TP Kurikulum Merdeka.
+// PROMPTS
+function genPrompts(){const mp=ST.mapel,kl=getRombelKelas(),fase=getFase(kl),jn=v('fJn'),ta=v('fTA');$('prCP').textContent=`Saya guru ${mp} jenjang ${jn}.\nBuatkan CSV CP & TP Kurikulum Merdeka.\n\nFORMAT (header persis):\nKelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan\n\n- Kelas: "${kl}"\n- Dimensi PL: ${DIMEN}\n- Metode (pilih): ${METODE.join(', ')}\n- Min 10 TP/semester, total ~16-18 pertemuan/semester\n- JANGAN koma dalam isi (ganti titik koma)\n\nBuatkan untuk ${mp} ${kl} Fase ${fase}.`;$('prKl').textContent=`CSV Kalender Pendidikan TA ${ta} ${jn}.\nFORMAT: Semester,Tanggal,Agenda,Kategori\nMin 15 agenda/semester. JANGAN koma.`;const tp1=D.cp.filter(c=>c.K===kl)[0];$('prLK').textContent=`Guru ${mp} ${jn}, ${kl} Fase ${fase}.\nBuatkan LKPD VISUAL terintegrasi Modul Ajar Deep Learning.\n\nTP: ${tp1?.T||'[sesuaikan]'}\nMetode: ${tp1?.M||METODE[0]}\nDimensi PL: ${tp1?.Di||DIMEN}\n\nBuat:\n1. Identitas LKPD\n2. Petunjuk\n3. Aktivitas Deep Learning:\n   - Experiencing (mengamati+ilustrasi)\n   - Reflecting (mind map+pertanyaan HOTS)\n   - Conceptualizing (tabel data+diagram)\n   - Applying (proyek mini)\n   - Evaluasi (PG bergambar+uraian)\n4. Rubrik penilaian\n5. Deskripsi visual DETAIL tiap ilustrasi\n6. Format A4, 6-10 halaman\n\nSertakan deskripsi gambar untuk AI image generator.`}
 
-FORMAT CSV (header persis):
-Kelas,Semester,Elemen,CP,TP,Dimensi Profil Lulusan,Metode,Pertemuan
+// PROFILE
+function openProfile(){if(!CU||!UD)return;$('mProfile').classList.remove('hidden');$('mProfile').innerHTML=`<div class="bg-white rounded-2xl w-full max-w-sm mx-4 overflow-hidden"><div class="bg-blue-700 text-white p-4 text-center"><b>${UD.name||'-'}</b><p class="text-blue-200 text-[10px]">${CU.email}</p></div><div class="p-3 space-y-1 text-xs"><div class="flex justify-between"><span>Sekolah:</span><b>${UD.school||'-'} (${UD.npsn||'-'})</b></div><div class="flex justify-between"><span>Tipe:</span><b>${UD.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}</b></div><div class="flex justify-between"><span>Mapel:</span><b>${(UD.mapelList||[]).join(', ')}</b></div><div class="pt-2 space-y-1"><button onclick="doLogout()" class="w-full bg-red-500 text-white py-1.5 rounded-lg font-bold text-xs">Keluar</button><button onclick="closeM('mProfile')" class="w-full bg-slate-100 py-1.5 rounded-lg font-bold text-xs">Tutup</button></div></div></div>`}
 
-KETERANGAN:
-- Kelas: "${kl}"
-- Semester: "Semester 1" atau "Semester 2"
-- Elemen: Elemen CP mapel ${mp}
-- CP: Capaian Pembelajaran Fase ${fase} sesuai Permendikbudristek
-- TP: Tujuan Pembelajaran spesifik terukur
-- Dimensi Profil Lulusan (pisahkan titik koma):
-  ${DIMEN}
-- Metode: pilih salah satu model Deep Learning yang cocok:
-  ${metodeStr}
-- Pertemuan: 1-3
-
-KETENTUAN:
-1. Min 10 TP per semester
-2. CP sesuai Fase ${fase}
-3. Setiap elemen di 2 semester
-4. TP bertahap mudah→kompleks
-5. Total pertemuan/semester ≈ 16-18
-6. JANGAN koma dalam isi kolom (ganti titik koma)
-7. Pilih metode yang paling cocok untuk tiap TP
-8. Header ada di baris pertama
-
-Buatkan untuk ${mp} ${kl} Fase ${fase} ${jn}.`;
-
-  $('prKl').textContent=`Buatkan CSV Kalender Pendidikan TA ${ta} jenjang ${jn}.
-FORMAT: Semester,Tanggal,Agenda,Kategori
-Kategori: Kegiatan Sekolah / Libur Nasional / Asesmen / Libur Semester / Hari Besar
-Smt 1: Jul-Des. Smt 2: Jan-Jun. Min 15 agenda/smt. JANGAN koma dalam isi.`;
-
-  const tp1=D.cp.filter(c=>c.K===kl)[0];
-  $('prLK').textContent=`Saya guru ${mp} ${jn}, ${kl} (Fase ${fase}).
-Buatkan LKPD VISUAL terintegrasi Modul Ajar Deep Learning.
-
-KONTEKS MODUL AJAR:
-- Sekolah: ${v('fS')} (NPSN: ${v('fNP')})
-- Guru: ${v('fG')}
-- TP: ${tp1?.T||'[sesuaikan]'}
-- CP: ${tp1?.C||'[sesuaikan]'}
-- Metode/Model: ${tp1?.M||'PBL (Problem Based Learning)'}
-- Dimensi Profil Lulusan: ${tp1?.Di||DIMEN}
-- Alokasi: ${tp1?.P||2} pertemuan
-
-INSTRUKSI LKPD (buat LENGKAP & DETAIL):
-
-1. IDENTITAS: Judul menarik, mapel, kelas, semester, nama siswa, alokasi waktu
-
-2. PETUNJUK: Umum & khusus, langkah kerja terstruktur
-
-3. KOMPETENSI: CP, TP, indikator ketercapaian
-
-4. MATERI VISUAL:
-   - Ringkasan + ilustrasi (deskripsikan detail setiap gambar/ilustrasi untuk AI image generator)
-   - Infografis, diagram, tabel berwarna
-   - Box tips/info menarik
-
-5. KEGIATAN DEEP LEARNING (sesuai model ${tp1?.M||'PBL'}):
-
-   Aktivitas 1: EXPERIENCING (Mengalami)
-   - Gambar/ilustrasi terkait (deskripsi detail)
-   - Tabel pengamatan, pertanyaan observasi
-
-   Aktivitas 2: REFLECTING (Merefleksikan)
-   - Mind mapping / concept mapping
-   - Pertanyaan LOTS→HOTS bertingkat
-   - Ruang menulis refleksi
-
-   Aktivitas 3: CONCEPTUALIZING (Membangun Konsep)
-   - Tabel data untuk dilengkapi
-   - Studi kasus bergambar
-   - Diagram Venn / tabel perbandingan
-
-   Aktivitas 4: APPLYING (Menerapkan)
-   - Proyek mini terkait kehidupan nyata
-   - Checklist pengerjaan
-   - Template presentasi mini
-   - Rubrik penilaian diri
-
-   Aktivitas 5: EVALUASI
-   - 5-10 soal PG bergambar
-   - 3-5 soal uraian bertingkat
-   - Kolom refleksi + emoticon self-assessment
-
-6. ELEMEN VISUAL WAJIB:
-   - Header/banner tema materi (deskripsikan desain)
-   - Ikon ilustratif tiap bagian
-   - Border dekoratif
-   - Tabel berwarna kontras
-   - Karakter maskot (opsional)
-   - QR Code placeholder
-
-7. RUBRIK PENILAIAN: Skor + deskriptor per aktivitas
-
-8. FORMAT: A4, 6-10 halaman, font mudah dibaca
-
-Sertakan deskripsi visual DETAIL untuk setiap ilustrasi.
-Buat sekarang.`;
-}
-
-// ===== PROFILE =====
-function openProfile(){if(!CU||!UD)return;const sm={approved:'<span class="sb bg-emerald-100 text-emerald-700">OK</span>',pending:'<span class="sb bg-amber-100 text-amber-700">Tunggu</span>',rejected:'<span class="sb bg-red-100 text-red-700">Ditolak</span>'};$('mProfile').classList.remove('hidden');$('mProfile').innerHTML=`<div class="bg-white rounded-2xl w-full max-w-sm mx-4 overflow-hidden"><div class="bg-blue-700 text-white p-4 text-center"><div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-1"><i class="fa-solid fa-user text-xl"></i></div><b>${UD.name||'-'}</b><p class="text-blue-200 text-[10px]">${CU.email}</p></div><div class="p-3 space-y-1.5 text-xs"><div class="flex justify-between"><span class="text-slate-500">Status:</span>${sm[UD.status]||sm.pending}</div><div class="flex justify-between"><span class="text-slate-500">Sekolah:</span><b>${UD.school||'-'}</b></div><div class="flex justify-between"><span class="text-slate-500">NPSN:</span><b>${UD.npsn||'-'}</b></div><div class="flex justify-between"><span class="text-slate-500">Tipe:</span><b>${(UD.guruType||'mapel')==='kelas'?'Guru Kelas':'Guru Mapel'}</b></div><div class="flex justify-between"><span class="text-slate-500">Mapel:</span><b>${(UD.mapelList||[]).join(', ')||'-'}</b></div><div class="pt-2 space-y-1"><button onclick="doLogout()" class="w-full bg-red-500 text-white py-1.5 rounded-lg font-bold text-xs">Keluar</button><button onclick="closeM('mProfile')" class="w-full bg-slate-100 py-1.5 rounded-lg font-bold text-xs">Tutup</button></div></div></div>`}
-
-// ===== ADMIN =====
-async function loadAdmin(){if(AL!=='admin')return;$('aLoad').classList.remove('hidden');$('aBody').innerHTML='';try{const snap=await db.collection('users').orderBy('createdAt','desc').get();const users=[];snap.forEach(d=>users.push({id:d.id,...d.data()}));$('aLoad').classList.add('hidden');const t=users.length,p=users.filter(u=>u.status==='pending').length,a=users.filter(u=>u.status==='approved').length,r=users.filter(u=>u.status==='rejected').length;$('aSt').innerHTML=`<div class="bg-blue-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${t}</div><div class="text-[8px]">Total</div></div><div class="bg-amber-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${p}</div><div class="text-[8px]">Pending</div></div><div class="bg-emerald-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${a}</div><div class="text-[8px]">OK</div></div><div class="bg-red-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${r}</div><div class="text-[8px]">Tolak</div></div>`;$('aBody').innerHTML=users.map(u=>{const me=u.email===ADMIN;const sc={pending:'bg-amber-100 text-amber-700',approved:'bg-emerald-100 text-emerald-700',rejected:'bg-red-100 text-red-700'};const sl={pending:'⏳',approved:'✅',rejected:'❌'};let act='';if(!me){if(u.status!=='approved')act+=`<button onclick="setSt('${u.id}','approved')" class="bg-emerald-500 text-white px-1 py-0.5 rounded text-[8px]">✓</button> `;if(u.status!=='rejected')act+=`<button onclick="setSt('${u.id}','rejected')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[8px]">✗</button> `;act+=`<button onclick="if(confirm('Hapus?'))delU('${u.id}')" class="bg-slate-200 text-red-500 px-1 py-0.5 rounded text-[8px]"><i class="fa-solid fa-trash"></i></button>`}else act='<span class="text-[8px] text-red-500">ADMIN</span>';return`<tr class="${u.status==='pending'?'bg-amber-50/50':''}"><td class="p-2"><b class="text-[10px]">${u.name||'-'}</b><br><span class="text-[8px] text-slate-400">${u.email}</span></td><td class="p-2 text-[10px]">${u.school||'-'}<br><span class="text-[8px]">NPSN:${u.npsn||'-'}</span></td><td class="p-2 text-[10px]">${u.guruType==='kelas'?'Guru Kelas':'Guru Mapel'}<br><span class="text-[8px]">${(u.mapelList||[]).join(',')}</span></td><td class="p-2 text-center"><span class="sb ${sc[u.status]||sc.pending}">${sl[u.status]||'?'}</span></td><td class="p-2 text-center">${act}</td></tr>`}).join('')}catch(e){$('aLoad').classList.add('hidden');toast('error','',e.message)}}
+// ADMIN
+async function loadAdmin(){if(AL!=='admin')return;$('aLoad').classList.remove('hidden');$('aBody').innerHTML='';try{const snap=await db.collection('users').orderBy('createdAt','desc').get();const users=[];snap.forEach(d=>users.push({id:d.id,...d.data()}));$('aLoad').classList.add('hidden');const t=users.length,p=users.filter(u=>u.status==='pending').length,a=users.filter(u=>u.status==='approved').length,r=users.filter(u=>u.status==='rejected').length;$('aSt').innerHTML=`<div class="bg-blue-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${t}</div><div class="text-[8px]">Total</div></div><div class="bg-amber-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${p}</div><div class="text-[8px]">Pending</div></div><div class="bg-emerald-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${a}</div><div class="text-[8px]">OK</div></div><div class="bg-red-500 rounded-lg p-2 text-white text-center"><div class="text-lg font-bold">${r}</div><div class="text-[8px]">Tolak</div></div>`;$('aBody').innerHTML=users.map(u=>{const me=u.email===ADMIN_EMAIL;const sc={pending:'bg-amber-100 text-amber-700',approved:'bg-emerald-100 text-emerald-700',rejected:'bg-red-100 text-red-700'};let act='';if(!me){if(u.status!=='approved')act+=`<button onclick="setSt('${u.id}','approved')" class="bg-emerald-500 text-white px-1 py-0.5 rounded text-[8px]">✓</button> `;if(u.status!=='rejected')act+=`<button onclick="setSt('${u.id}','rejected')" class="bg-red-500 text-white px-1 py-0.5 rounded text-[8px]">✗</button> `;act+=`<button onclick="if(confirm('Hapus?'))delU('${u.id}')" class="bg-slate-200 text-red-500 px-1 py-0.5 rounded text-[8px]"><i class="fa-solid fa-trash"></i></button>`}else act='<span class="text-[8px] text-red-500">ADMIN</span>';return`<tr><td class="p-2"><b class="text-[10px]">${u.name||'-'}</b><br><span class="text-[8px] text-slate-400">${u.email}</span></td><td class="p-2 text-[10px]">${u.school||'-'}<br>NPSN:${u.npsn||'-'}</td><td class="p-2 text-[10px]">${u.guruType==='kelas'?'Kelas':'Mapel'}</td><td class="p-2 text-center"><span class="sb ${sc[u.status]||sc.pending}">${u.status}</span></td><td class="p-2 text-center">${act}</td></tr>`}).join('')}catch(e){$('aLoad').classList.add('hidden');toast('error','',e.message)}}
 async function setSt(uid,st){try{await db.collection('users').doc(uid).update({status:st});toast('success','',st);loadAdmin()}catch(e){toast('error','',e.message)}}
-async function delU(uid){try{await db.collection('users').doc(uid).delete();toast('success','Hapus','');loadAdmin()}catch(e){toast('error','',e.message)}}
+async function delU(uid){try{await db.collection('users').doc(uid).delete();toast('success','Hapus');loadAdmin()}catch(e){toast('error','',e.message)}}
 
-// ===== EVENTS =====
+// EVENTS
 document.querySelectorAll('#fProfil input,#fProfil select').forEach(el=>el.addEventListener('input',()=>{renderAll();genPrompts()}));
 $('lP').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin()});
-$('lE').addEventListener('keyup',e=>{if(e.key==='Enter')doLogin()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM('mProfile');closeM('mLock');closeM('mImport')}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeM('mProfile');closeM('mLock');closeM('mImport');closeM('mAdminWA')}});
 
-// ===== INIT =====
-updKelas();rt();renderAll();genPrompts();
+updKelas();updJPDuration();rt();renderAll();genPrompts();
 </script>
 </body>
 </html>
