@@ -1079,15 +1079,38 @@ function rt(){rKalT();rCP();rSwT();rJadwal()}
 function addKalRow(){D.kal.push({S:'Semester 1',T:'',A:'',K:''});rKalT()}
 function rKalT(){
   const ie=isEdit();
+  const mulai=getTanggalMulaiEfektif();
+  const bulanNames=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  
+  // Tampilkan info tanggal mulai efektif di atas tabel
+  const infoDiv=document.getElementById('kalInfoStart');
+  if(!infoDiv && $('tbKal')){
+    const info=document.createElement('div');
+    info.id='kalInfoStart';
+    info.className='mb-2 bg-emerald-50 border border-emerald-200 rounded p-2 text-[10px] text-emerald-700';
+    $('tbKal').parentElement.parentElement.insertBefore(info,$('tbKal').parentElement);
+  }
+  const infoEl=document.getElementById('kalInfoStart');
+  if(infoEl){
+    infoEl.innerHTML=`<b><i class="fa-solid fa-calendar-check mr-1"></i>Tanggal Mulai Efektif Terdeteksi:</b><br>
+      📗 <b>Semester 1:</b> ${mulai.smt1.d} ${bulanNames[mulai.smt1.m]} ${mulai.smt1.y} 
+      &nbsp;•&nbsp; 
+      📘 <b>Semester 2:</b> ${mulai.smt2.d} ${bulanNames[mulai.smt2.m]} ${mulai.smt2.y}
+      <br><span class="text-[9px] italic">
+      💡 Tanggal SEBELUM tanggal ini otomatis dianggap "Belum Masuk Sekolah" di Promes & Jurnal. 
+      Sistem mendeteksi dari agenda yang mengandung kata: MPLS, Masuk Sekolah, Hari Pertama, Awal Semester, dll.
+      </span>`;
+  }
+  
   $('tbKal').innerHTML=D.kal.map((k,i)=>`<tr class="border-b">
-    <td class="p-0.5"><input value="${k.S||''}" onchange="D.kal[${i}].S=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
-    <td class="p-0.5"><input value="${k.T||''}" onchange="D.kal[${i}].T=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
-    <td class="p-0.5"><input value="${k.A||''}" onchange="D.kal[${i}].A=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
-    <td class="p-0.5"><input value="${k.K||''}" onchange="D.kal[${i}].K=this.value" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
-    <td class="p-0.5">${ie?`<button onclick="D.kal.splice(${i},1);rKalT()" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button>`:''}</td>
+    <td class="p-0.5"><input value="${k.S||''}" onchange="D.kal[${i}].S=this.value;renderAll();rKalT()" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
+    <td class="p-0.5"><input value="${k.T||''}" onchange="D.kal[${i}].T=this.value;renderAll();rKalT()" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
+    <td class="p-0.5"><input value="${k.A||''}" onchange="D.kal[${i}].A=this.value;renderAll();rKalT()" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
+    <td class="p-0.5"><input value="${k.K||''}" onchange="D.kal[${i}].K=this.value;renderAll();rKalT()" class="w-full border rounded p-0.5 text-[10px] ef" ${ie?'':'disabled'}></td>
+    <td class="p-0.5">${ie?`<button onclick="D.kal.splice(${i},1);rKalT();renderAll()" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button>`:''}</td>
   </tr>`).join('');
 }
-
+  
 function addCPRow(){D.cp.push({K:getRombelKelas(),S:'Semester 1',E:'',C:'',T:'',Di:'',M:METODE[0],P:2});rCP();updElFlt()}
 function rCP(){
   const ie=isEdit();
@@ -1511,6 +1534,9 @@ function rJurnal(){
     const dayName=ALLDAYS[dow-1];
     if(!dayName||!days.includes(dayName))continue;
     
+    // ⭐ Cek apakah tanggal ini SEBELUM mulai efektif semester
+    const belumMulai=isSebelumMulaiEfektif(dt);
+    
     D.jadwal.forEach(r=>{
       if(r.j==='ist'||!r.h)return;
       const val=r.h[dayName]||'';
@@ -1521,10 +1547,11 @@ function rJurnal(){
         const agendaInfo=getAgendaOnDate(dt,kalMap);
         rawEntries.push({
           day:dayName,date:d,jam:r.j,waktu:r.w,rombel:rb||ST.rombel,
-          libur:agendaInfo?agendaInfo.libur:false,
-          agendaFull:agendaInfo?agendaInfo.agenda:null,
-          agendaShort:agendaInfo?agendaInfo.shortLabel:null,
-          kategori:agendaInfo?agendaInfo.kategori:null
+          libur:agendaInfo?agendaInfo.libur:belumMulai,
+          agendaFull:agendaInfo?agendaInfo.agenda:(belumMulai?'Belum Masuk Sekolah (Libur Awal Semester)':null),
+          agendaShort:agendaInfo?agendaInfo.shortLabel:(belumMulai?'BLM':null),
+          kategori:agendaInfo?agendaInfo.kategori:(belumMulai?'Libur Semester':null),
+          belumMulai:belumMulai
         });
       }
     });
@@ -1905,23 +1932,26 @@ function getMengajarDates(bulanIdx,tahun,rombel){
   
   for(let d=1;d<=daysInMonth;d++){
     const dt=new Date(tahun,bulanIdx,d);
-    // Hanya masukkan hari yang guru mengajar
     if(!mengajarHari.has(dt.getDay()))continue;
     
     const key=`${tahun}-${bulanIdx}-${d}`;
     const agendaInfo=kalMap[key];
     
-    // Tanggal MASUK meski libur — akan diberi label agenda / libur
+    // ⭐ Cek apakah tanggal ini SEBELUM mulai efektif semester
+    const belumMulai=isSebelumMulaiEfektif(dt);
+    
     dates.push({
       d:d,
-      libur:agendaInfo?agendaInfo.libur:false,
-      agenda:agendaInfo?agendaInfo.shortLabel:null,
-      agendaFull:agendaInfo?agendaInfo.agenda:null,
-      kategori:agendaInfo?agendaInfo.kategori:null
+      libur:agendaInfo?agendaInfo.libur:belumMulai, // belumMulai dianggap libur
+      agenda:agendaInfo?agendaInfo.shortLabel:(belumMulai?'BLM':null),
+      agendaFull:agendaInfo?agendaInfo.agenda:(belumMulai?'Belum Masuk Sekolah':null),
+      kategori:agendaInfo?agendaInfo.kategori:(belumMulai?'Libur Semester':null),
+      belumMulai:belumMulai
     });
   }
   return dates;
 }
+  
   // ============ ⭐ HELPER: PARSE KALENDER ============
 
 // Parse tanggal Indonesia (13 Juli 2026, 21-25 Sept 2026, 17/8/2026, dll)
@@ -2016,11 +2046,71 @@ function buildKalenderMap(){
   
   return map;
 }
+// ⭐ HELPER: Deteksi tanggal MULAI EFEKTIF per semester dari kalender
+// Kembalikan: { smt1: {y:2026, m:6, d:13}, smt2: {y:2027, m:0, d:5} }
+function getTanggalMulaiEfektif(){
+  const ta=v('fTA');
+  const yr1=parseInt(ta.split('/')[0])||2026;
+  const yr2=parseInt(ta.split('/')[1])||2027;
+  
+  // Keyword untuk deteksi hari pertama masuk sekolah
+  const KEYWORDS_MULAI=[
+    'mpls','masa pengenalan','hari pertama','masuk sekolah','awal semester',
+    'awal tahun','permulaan','pembukaan','pertama masuk','mulai sekolah',
+    'kembali masuk','kbm efektif','pembelajaran efektif','masuk semester'
+  ];
+  
+  let smt1Start=null;
+  let smt2Start=null;
+  
+  // Cari di kalender berdasarkan keyword
+  D.kal.forEach(k=>{
+    if(!k.T||!k.A)return;
+    const agendaLC=k.A.toLowerCase();
+    const isMulai=KEYWORDS_MULAI.some(kw=>agendaLC.includes(kw));
+    if(!isMulai)return;
+    
+    const dates=parseTanggalKalender(k.T);
+    if(!dates.length)return;
+    const firstDate=dates[0]; // tanggal awal jika range
+    
+    // Tentukan semester berdasarkan bulan
+    // Bulan 6-11 (Jul-Des) = Smt 1, Bulan 0-5 (Jan-Jun) = Smt 2
+    if(firstDate.m>=6){
+      // Semester 1
+      if(!smt1Start||new Date(firstDate.y,firstDate.m,firstDate.d)<new Date(smt1Start.y,smt1Start.m,smt1Start.d)){
+        smt1Start=firstDate;
+      }
+    } else {
+      // Semester 2
+      if(!smt2Start||new Date(firstDate.y,firstDate.m,firstDate.d)<new Date(smt2Start.y,smt2Start.m,smt2Start.d)){
+        smt2Start=firstDate;
+      }
+    }
+  });
+  
+  // Default fallback jika tidak ada MPLS di kalender
+  if(!smt1Start)smt1Start={y:yr1,m:6,d:15}; // Default 15 Juli
+  if(!smt2Start)smt2Start={y:yr2,m:0,d:5};  // Default 5 Januari
+  
+  return {smt1:smt1Start,smt2:smt2Start};
+}
 
+// Cek apakah tanggal berada SEBELUM tanggal mulai efektif semester
+function isSebelumMulaiEfektif(dateObj){
+  const mulai=getTanggalMulaiEfektif();
+  const month=dateObj.getMonth();
+  const isSmt1=month>=6; // Juli-Des = Smt 1
+  const target=isSmt1?mulai.smt1:mulai.smt2;
+  const targetDate=new Date(target.y,target.m,target.d);
+  return dateObj<targetDate;
+}
+  
 // Label pendek untuk ditampilkan di sel Promes/Jurnal
 function getShortLabel(agenda,kategori){
   const a=agenda.toUpperCase();
   if(a.includes('MPLS'))return 'MPLS';
+  if(a.includes('BELUM MASUK'))return 'BLM'; // ⭐ TAMBAH INI
   if(a.includes('PTS')||a.includes('STS'))return 'PTS';
   if(a.includes('PAS')||a.includes('SAS')||a.includes('ASAT'))return 'PAS';
   if(a.includes('RAPOR'))return 'RPT';
