@@ -1501,14 +1501,16 @@ function rJurnal(){
   const yr=BULAN_IDX_JS[bln]>=6?parseInt(v('fTA').split('/')[0])||2026:parseInt(v('fTA').split('/')[1])||2027;
   const monthIdx=BULAN_IDX_JS[bln];
   const lastDay=new Date(yr,monthIdx+1,0).getDate();
+  const kalMap=buildKalenderMap();
   
-  // Kumpulkan semua pertemuan raw
+  // Kumpulkan semua pertemuan raw (skip Minggu, tapi masukkan hari yang libur agar tampil label)
   let rawEntries=[];
   for(let d=1;d<=lastDay;d++){
     const dt=new Date(yr,monthIdx,d);
     const dow=dt.getDay();
     const dayName=ALLDAYS[dow-1];
     if(!dayName||!days.includes(dayName))continue;
+    
     D.jadwal.forEach(r=>{
       if(r.j==='ist'||!r.h)return;
       const val=r.h[dayName]||'';
@@ -1516,7 +1518,14 @@ function rJurnal(){
       const mp=(parts[0]||'').toLowerCase();
       const rb=(parts[1]||'').trim();
       if(mp.includes(mapelLC)){
-        rawEntries.push({day:dayName,date:d,jam:r.j,waktu:r.w,rombel:rb||ST.rombel});
+        const agendaInfo=getAgendaOnDate(dt,kalMap);
+        rawEntries.push({
+          day:dayName,date:d,jam:r.j,waktu:r.w,rombel:rb||ST.rombel,
+          libur:agendaInfo?agendaInfo.libur:false,
+          agendaFull:agendaInfo?agendaInfo.agenda:null,
+          agendaShort:agendaInfo?agendaInfo.shortLabel:null,
+          kategori:agendaInfo?agendaInfo.kategori:null
+        });
       }
     });
   }
@@ -1539,21 +1548,28 @@ function rJurnal(){
     return;
   }
   
-  // ⭐ GROUPING: Ringkas berdasarkan (tanggal + rombel + TP sama + JP berurutan)
+  // ⭐ GROUPING: Ringkas berdasarkan (tanggal + rombel + TP/agenda sama + JP berurutan)
+  // Baris libur/agenda dikelompokkan berdasarkan kategori yang sama
   let grouped=[];
   let processed=new Set();
   
   rawEntries.forEach((e,i)=>{
     if(processed.has(i))return;
     const j=jd[i]||{};
+    // Kunci untuk grouping: libur → pakai kategori, agenda → pakai agenda, normal → pakai tp
+    const groupKey=e.libur?`libur_${e.agendaFull||'libur'}`:(e.agendaShort?`agenda_${e.agendaShort}`:`tp_${j.tp||''}`);
+    
     let jamList=[e.jam];
     let jamIndices=[i];
     let lastJam=e.jam;
+    
     for(let k=i+1;k<rawEntries.length;k++){
       if(processed.has(k))continue;
       const e2=rawEntries[k];
       const j2=jd[k]||{};
-      if(e2.date===e.date && e2.rombel===e.rombel && (j2.tp||'')===(j.tp||'')){
+      const groupKey2=e2.libur?`libur_${e2.agendaFull||'libur'}`:(e2.agendaShort?`agenda_${e2.agendaShort}`:`tp_${j2.tp||''}`);
+      
+      if(e2.date===e.date && e2.rombel===e.rombel && groupKey2===groupKey){
         if(typeof e2.jam==='number' && typeof lastJam==='number' && e2.jam===lastJam+1){
           jamList.push(e2.jam);
           jamIndices.push(k);
@@ -1564,12 +1580,7 @@ function rJurnal(){
     }
     processed.add(i);
     
-    let jamText='';
-    if(jamList.length===1){
-      jamText=`JP${jamList[0]}`;
-    } else {
-      jamText=`JP${jamList[0]} - JP${jamList[jamList.length-1]}`;
-    }
+    let jamText=jamList.length===1?`JP${jamList[0]}`:`JP${jamList[0]} - JP${jamList[jamList.length-1]}`;
     const firstWaktu=rawEntries[jamIndices[0]].waktu||'';
     const lastWaktu=rawEntries[jamIndices[jamIndices.length-1]].waktu||'';
     const startTime=firstWaktu.split('-')[0]||'';
@@ -1579,7 +1590,8 @@ function rJurnal(){
     grouped.push({
       day:e.day,date:e.date,bulan:bln,rombel:e.rombel,
       jamList:jamList,jamText:jamText,waktuText:waktuText,
-      jpCount:jamList.length,firstIdx:jamIndices[0],j:j
+      jpCount:jamList.length,firstIdx:jamIndices[0],j:j,
+      libur:e.libur,agendaFull:e.agendaFull,agendaShort:e.agendaShort,kategori:e.kategori
     });
   });
   
@@ -1608,40 +1620,64 @@ function rJurnal(){
       const av=abBln[`${si}_${i}`]||'H';
       if(av==='H')h++;else if(av==='S')s++;else if(av==='I')iz++;else if(av==='A')a++;
     });
+    
+    let rowClass='',tpCell='',kegCell='';
     const kelasRom='Kelas '+(parseInt(g.rombel.replace(/\D/g,''))||1);
     const cpForRombel=cpAll.filter(c=>c.K===kelasRom);
-    const tpOpts=cpForRombel.map((c,ci)=>`<option value="${ci}" ${j.tp==ci?'selected':''}>${(c.T||'').substring(0,40)}</option>`).join('');
     
-    html+=`<tr class="border ${gi%2?'bg-slate-50/30':''}">
+    if(g.libur){
+      // BARIS LIBUR
+      rowClass='bg-red-50';
+      tpCell=`<td class="border p-1 text-center text-red-700 font-bold" colspan="2">🔴 LIBUR: ${g.agendaFull||'Hari Libur'} <span class="text-[8px]">(${g.kategori||'Libur'})</span></td>`;
+    } else if(g.agendaShort){
+      // BARIS AGENDA (MPLS/PTS/PAS/dll)
+      rowClass='bg-blue-50';
+      tpCell=`<td class="border p-0.5 text-blue-700 font-bold text-center">📌 ${g.agendaFull}</td>`;
+      kegCell=`<td class="border p-0.5"><input value="${j.keg||''}" onchange="D.jurnal['${bln}'][${i}].keg=this.value" class="w-full border rounded p-0.5 text-[8px] ef" placeholder="Kegiatan ${g.agendaShort}..." ${ie?'':'disabled'}></td>`;
+    } else {
+      // BARIS TP NORMAL
+      const tpOpts=cpForRombel.map((c,ci)=>`<option value="${ci}" ${j.tp==ci?'selected':''}>${(c.T||'').substring(0,40)}</option>`).join('');
+      tpCell=`<td class="border p-0.5">
+        <select onchange="D.jurnal['${bln}'][${i}].tp=this.value;rJurnal()" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}>
+          <option value="">-Pilih TP-</option>${tpOpts}
+        </select>
+      </td>`;
+      kegCell=`<td class="border p-0.5"><input value="${j.keg||''}" onchange="D.jurnal['${bln}'][${i}].keg=this.value" class="w-full border rounded p-0.5 text-[8px] ef" placeholder="Kegiatan..." ${ie?'':'disabled'}></td>`;
+    }
+    
+    html+=`<tr class="border ${rowClass||(gi%2?'bg-slate-50/30':'')}">
       <td class="border p-0.5 text-center">${gi+1}</td>
       <td class="border p-0.5 text-center text-[9px]"><b>${g.day}</b><br>${g.date} ${g.bulan.substring(0,3)}</td>
       <td class="border p-0.5 text-center font-bold text-blue-600">${g.rombel}</td>
       <td class="border p-0.5 text-center text-[9px]"><b>${g.jamText}</b><br><span class="text-[8px] text-slate-500">${g.waktuText}</span></td>
       <td class="border p-0.5 text-center font-bold text-emerald-700">${g.jpCount}</td>
-      <td class="border p-0.5">
-        <select onchange="D.jurnal['${bln}'][${i}].tp=this.value;rJurnal()" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}>
-          <option value="">-Pilih TP-</option>${tpOpts}
-        </select>
-      </td>
-      <td class="border p-0.5"><input value="${j.keg||''}" onchange="D.jurnal['${bln}'][${i}].keg=this.value" class="w-full border rounded p-0.5 text-[8px] ef" placeholder="Kegiatan..." ${ie?'':'disabled'}></td>
-      <td class="border p-0.5 text-center text-emerald-600 font-bold">${h}</td>
-      <td class="border p-0.5 text-center text-amber-600">${s}</td>
-      <td class="border p-0.5 text-center text-blue-600">${iz}</td>
-      <td class="border p-0.5 text-center text-red-600">${a}</td>
+      ${tpCell}
+      ${g.libur?'':kegCell}
+      <td class="border p-0.5 text-center text-emerald-600 font-bold">${g.libur?'-':h}</td>
+      <td class="border p-0.5 text-center text-amber-600">${g.libur?'-':s}</td>
+      <td class="border p-0.5 text-center text-blue-600">${g.libur?'-':iz}</td>
+      <td class="border p-0.5 text-center text-red-600">${g.libur?'-':a}</td>
       <td class="border p-0.5"><input value="${j.cat||''}" onchange="D.jurnal['${bln}'][${i}].cat=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td>
     </tr>`;
   });
-  html+=`</tbody></table>
-    <div class="mt-2 bg-blue-50 border border-blue-200 rounded p-2 text-[9px] text-blue-700 no-print">
-      <b><i class="fa-solid fa-info-circle mr-1"></i>Info Ringkasan Jurnal:</b> 
-      Baris jurnal <b>otomatis diringkas</b> jika tanggal, rombel, dan TP sama serta JP berurutan. 
-      Contoh: JP1-JP4 tanggal & TP sama → 1 baris "JP1 - JP4".
-      <br>Total baris ringkas: <b>${grouped.length}</b> dari <b>${rawEntries.length}</b> pertemuan total.
-    </div>`;
+  html+=`</tbody></table>`;
+  
+  // Statistik
+  const efektif=grouped.filter(g=>!g.libur&&!g.agendaShort).length;
+  const agenda=grouped.filter(g=>!g.libur&&g.agendaShort).length;
+  const libur=grouped.filter(g=>g.libur).length;
+  
+  html+=`<div class="mt-2 bg-blue-50 border border-blue-200 rounded p-2 text-[9px] text-blue-700 no-print">
+    <b><i class="fa-solid fa-info-circle mr-1"></i>Jurnal Sinkron Kalender & Diringkas:</b> 
+    JP berurutan + tanggal & TP/agenda sama → 1 baris. Tanggal libur/agenda dari Kalender Pendidikan otomatis dikenali.
+    <br>Total: <b>${grouped.length}</b> baris • 
+    <span class="text-emerald-700"><b>${efektif}</b> pertemuan efektif</span> • 
+    <span class="text-blue-700"><b>${agenda}</b> agenda khusus</span> • 
+    <span class="text-red-700"><b>${libur}</b> libur</span>
+  </div>`;
   html+=makeTTD(getTTDPelaporan(bln));
   $('jrContent').innerHTML=html;
 }
-
 // ============ PROFILE MODAL ============
 function openProfile(){
   if(!CU||!UD)return;
@@ -1862,15 +1898,156 @@ function getMengajarDates(bulanIdx,tahun,rombel){
       if(mp.includes(mapelLC)&&(!rombel||rb===rombel))mengajarHari.add(DAY_MAP[d]);
     });
   });
+  
+  const kalMap=buildKalenderMap();
   const dates=[];
   const daysInMonth=new Date(tahun,bulanIdx+1,0).getDate();
+  
   for(let d=1;d<=daysInMonth;d++){
     const dt=new Date(tahun,bulanIdx,d);
-    if(mengajarHari.has(dt.getDay()))dates.push(d);
+    // Hanya masukkan hari yang guru mengajar
+    if(!mengajarHari.has(dt.getDay()))continue;
+    
+    const key=`${tahun}-${bulanIdx}-${d}`;
+    const agendaInfo=kalMap[key];
+    
+    // Tanggal MASUK meski libur — akan diberi label agenda / libur
+    dates.push({
+      d:d,
+      libur:agendaInfo?agendaInfo.libur:false,
+      agenda:agendaInfo?agendaInfo.shortLabel:null,
+      agendaFull:agendaInfo?agendaInfo.agenda:null,
+      kategori:agendaInfo?agendaInfo.kategori:null
+    });
   }
   return dates;
 }
+  // ============ ⭐ HELPER: PARSE KALENDER ============
 
+// Parse tanggal Indonesia (13 Juli 2026, 21-25 Sept 2026, 17/8/2026, dll)
+function parseTanggalKalender(str){
+  if(!str)return [];
+  const dates=[];
+  const bulanMap={
+    'jan':0,'januari':0,'feb':1,'februari':1,'mar':2,'maret':2,'apr':3,'april':3,
+    'mei':4,'jun':5,'juni':5,'jul':6,'juli':6,'ags':7,'agu':7,'agustus':7,
+    'sep':8,'sept':8,'september':8,'okt':9,'oktober':9,'nov':10,'november':10,'des':11,'desember':11
+  };
+  const s=str.toLowerCase().trim();
+  
+  // Pattern 1: "13 Juli 2026" atau "13-25 Juli 2026" atau "21-25 Sept 2026"
+  const m1=s.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s+([a-z]+)\s+(\d{4})/);
+  if(m1){
+    const startDay=parseInt(m1[1]);
+    const endDay=m1[2]?parseInt(m1[2]):startDay;
+    const bulanName=m1[3];
+    const yr=parseInt(m1[4]);
+    const bulanIdx=bulanMap[bulanName];
+    if(bulanIdx!==undefined){
+      for(let d=startDay;d<=endDay;d++){
+        dates.push({d:d,m:bulanIdx,y:yr});
+      }
+      return dates;
+    }
+  }
+  
+  // Pattern 2: "13-25 Juli 2026" tanpa spasi
+  const m2=s.match(/(\d+)-(\d+)\s+([a-z]+)\s+(\d{4})/);
+  if(m2){
+    const startDay=parseInt(m2[1]);
+    const endDay=parseInt(m2[2]);
+    const bulanIdx=bulanMap[m2[3]];
+    const yr=parseInt(m2[4]);
+    if(bulanIdx!==undefined){
+      for(let d=startDay;d<=endDay;d++)dates.push({d:d,m:bulanIdx,y:yr});
+      return dates;
+    }
+  }
+  
+  // Pattern 3: rentang lintas bulan "28 Des 2026 - 3 Jan 2027"
+  const m3=s.match(/(\d+)\s+([a-z]+)\s+(\d{4})\s*[-–]\s*(\d+)\s+([a-z]+)\s+(\d{4})/);
+  if(m3){
+    const d1=parseInt(m3[1]),b1=bulanMap[m3[2]],y1=parseInt(m3[3]);
+    const d2=parseInt(m3[4]),b2=bulanMap[m3[5]],y2=parseInt(m3[6]);
+    if(b1!==undefined&&b2!==undefined){
+      let cur=new Date(y1,b1,d1);
+      const end=new Date(y2,b2,d2);
+      while(cur<=end){
+        dates.push({d:cur.getDate(),m:cur.getMonth(),y:cur.getFullYear()});
+        cur.setDate(cur.getDate()+1);
+      }
+      return dates;
+    }
+  }
+  
+  // Pattern 4: "17/8/2026" atau "17-08-2026"
+  const m4=s.match(/(\d+)[\/\-](\d+)[\/\-](\d{4})/);
+  if(m4){
+    dates.push({d:parseInt(m4[1]),m:parseInt(m4[2])-1,y:parseInt(m4[3])});
+    return dates;
+  }
+  
+  return dates;
+}
+
+// Bangun map: {'2026-6-13': {libur:false, agenda:'MPLS', kategori:'Kegiatan Sekolah'}}
+function buildKalenderMap(){
+  const map={};
+  const LIBUR_KATEGORI=['Libur Nasional','Libur Semester','Hari Besar'];
+  const AGENDA_KATEGORI=['Kegiatan Sekolah','Asesmen'];
+  
+  D.kal.forEach(k=>{
+    if(!k.T||!k.A)return;
+    const dates=parseTanggalKalender(k.T);
+    dates.forEach(dt=>{
+      const key=`${dt.y}-${dt.m}-${dt.d}`;
+      const isLibur=LIBUR_KATEGORI.includes(k.K);
+      // Prioritaskan libur (jika sudah libur, jangan overwrite)
+      if(!map[key] || (isLibur && !map[key].libur)){
+        map[key]={
+          libur:isLibur,
+          agenda:k.A,
+          kategori:k.K,
+          shortLabel:getShortLabel(k.A,k.K)
+        };
+      }
+    });
+  });
+  
+  return map;
+}
+
+// Label pendek untuk ditampilkan di sel Promes/Jurnal
+function getShortLabel(agenda,kategori){
+  const a=agenda.toUpperCase();
+  if(a.includes('MPLS'))return 'MPLS';
+  if(a.includes('PTS')||a.includes('STS'))return 'PTS';
+  if(a.includes('PAS')||a.includes('SAS')||a.includes('ASAT'))return 'PAS';
+  if(a.includes('RAPOR'))return 'RPT';
+  if(a.includes('CLASS MEETING'))return 'CM';
+  if(a.includes('LIBUR'))return 'LIB';
+  if(kategori==='Libur Nasional')return 'LN';
+  if(kategori==='Libur Semester')return 'LS';
+  if(kategori==='Hari Besar')return 'HB';
+  if(kategori==='Asesmen')return 'ASM';
+  return agenda.substring(0,4).toUpperCase();
+}
+
+// Cek apakah tanggal libur (weekend + kalender libur)
+function isTanggalLibur(dateObj,kalMap){
+  const dow=dateObj.getDay();
+  const maxDay=parseInt(v('fHari'))===6?6:5;
+  if(dow===0||dow>maxDay)return true; // Minggu / Sabtu (jika 5-hari)
+  const key=`${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  if(kalMap[key]&&kalMap[key].libur)return true;
+  return false;
+}
+
+// Cek info agenda pada tanggal tsb
+function getAgendaOnDate(dateObj,kalMap){
+  const key=`${dateObj.getFullYear()}-${dateObj.getMonth()}-${dateObj.getDate()}`;
+  return kalMap[key]||null;
+}
 function renderPromes(sub,ttdPlan,cp1,cp2,JP,rom){
   $('bS1').className=`text-[10px] px-3 py-1 rounded-full border font-bold ${ST.ps===1?'bg-blue-100 text-blue-700':'bg-slate-100'}`;
   $('bS2').className=`text-[10px] px-3 py-1 rounded-full border font-bold ${ST.ps===2?'bg-blue-100 text-blue-700':'bg-slate-100'}`;
@@ -1884,8 +2061,9 @@ function renderPromes(sub,ttdPlan,cp1,cp2,JP,rom){
   const allDates=[];
   monConfig.forEach(m=>{
     const dates=getMengajarDates(m.idx,m.yr,rom);
-    dates.forEach(d=>allDates.push({bulan:m.n,bulanIdx:m.idx,yr:m.yr,tgl:d}));
+    dates.forEach(d=>allDates.push({bulan:m.n,bulanIdx:m.idx,yr:m.yr,tgl:d.d,libur:d.libur,agenda:d.agenda,agendaFull:d.agendaFull,kategori:d.kategori}));
   });
+  
   if(!allDates.length){
     $('dPromesContent').innerHTML=`
       <h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER (PROMES)</h2>
@@ -1896,32 +2074,93 @@ function renderPromes(sub,ttdPlan,cp1,cp2,JP,rom){
       </div>${ttdPlan}`;
     return;
   }
+  
   const monthGroups={};
-  allDates.forEach(d=>{if(!monthGroups[d.bulan])monthGroups[d.bulan]=[];monthGroups[d.bulan].push(d.tgl)});
+  allDates.forEach(d=>{if(!monthGroups[d.bulan])monthGroups[d.bulan]=[];monthGroups[d.bulan].push(d)});
   let monHeader='',tglHeader='';
   Object.entries(monthGroups).forEach(([m,tgls])=>{
     monHeader+=`<th class="border p-0.5 text-[8px] bg-blue-50" colspan="${tgls.length}">${m.toUpperCase()}</th>`;
   });
-  allDates.forEach(d=>{tglHeader+=`<th class="border p-0.5 text-[7px]">${d.tgl}</th>`});
+  
+  // Header tanggal + warna berdasarkan status
+  allDates.forEach(d=>{
+    let cellClass='border p-0.5 text-[7px]';
+    let cellTitle=d.agendaFull||'';
+    if(d.libur){
+      cellClass+=' bg-red-100 text-red-700 font-bold';
+    } else if(d.agenda){
+      cellClass+=' bg-blue-100 text-blue-700 font-bold';
+    }
+    tglHeader+=`<th class="${cellClass}" title="${cellTitle}">${d.tgl}</th>`;
+  });
+  
+  // ⭐ Assign TP hanya ke tanggal EFEKTIF (bukan libur, bukan agenda khusus)
+  // Tanggal dengan agenda (MPLS/PTS/PAS) akan diberi label agenda, bukan TP
   const totalDates=allDates.length;
   let dateIdx=0;
+  const cellAssignments=new Array(totalDates).fill(null); // null=kosong, {tp:idx} atau {agenda:'MPLS'}
+  
+  // Pertama, isi cell dengan agenda dulu (prioritas)
+  allDates.forEach((d,di)=>{
+    if(d.libur||d.agenda){
+      cellAssignments[di]={type:'agenda',label:d.agenda||'LIB',isLibur:d.libur};
+    }
+  });
+  
+  // Kedua, distribusikan TP ke tanggal efektif (tanpa agenda)
+  smD.forEach((c,tpIdx)=>{
+    const prt=c.P||1;
+    let assigned=0;
+    while(dateIdx<totalDates && assigned<prt){
+      if(!cellAssignments[dateIdx]){
+        // Slot kosong — assign TP ini
+        cellAssignments[dateIdx]={type:'tp',tpIdx:tpIdx};
+        assigned++;
+      }
+      dateIdx++;
+    }
+  });
+  
+  // Build rows
   const rows=smD.map((c,idx)=>{
     const prt=c.P||1;
     let cells='';
     for(let di=0;di<totalDates;di++){
-      if(di>=dateIdx&&di<dateIdx+prt){
+      const assign=cellAssignments[di];
+      if(assign && assign.type==='tp' && assign.tpIdx===idx){
         cells+=`<td class="border p-0.5 bg-emerald-100 text-emerald-700 font-bold text-[7px]">✓</td>`;
-      }else{
+      } else {
         cells+=`<td class="border p-0.5"></td>`;
       }
     }
-    dateIdx+=prt;
     return `<tr class="border"><td class="border p-0.5 text-center font-bold">${idx+1}</td><td class="border p-0.5 text-left text-[8px]">${c.T}</td><td class="border p-0.5 text-center font-bold">${prt*JP}</td>${cells}</tr>`;
   }).join('');
+  
+  // Baris tambahan: agenda/libur di bawah
+  let agendaRow=`<tr class="border bg-slate-50">
+    <td class="border p-0.5 text-center font-bold" colspan="3">Agenda / Libur →</td>`;
+  allDates.forEach(d=>{
+    if(d.libur){
+      agendaRow+=`<td class="border p-0 bg-red-100 text-red-700 font-bold text-[7px] text-center" title="${d.agendaFull||'Libur'}">${d.agenda||'L'}</td>`;
+    } else if(d.agenda){
+      agendaRow+=`<td class="border p-0 bg-blue-100 text-blue-700 font-bold text-[7px] text-center" title="${d.agendaFull||''}">${d.agenda}</td>`;
+    } else {
+      agendaRow+=`<td class="border p-0.5"></td>`;
+    }
+  });
+  agendaRow+=`</tr>`;
+  
+  // Hitung statistik
+  const tanggalEfektif=allDates.filter(d=>!d.libur&&!d.agenda).length;
+  const tanggalAgenda=allDates.filter(d=>d.agenda&&!d.libur).length;
+  const tanggalLibur=allDates.filter(d=>d.libur).length;
+  
   $('dPromesContent').innerHTML=`
     <h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER (PROMES)</h2>
     <p class="text-[10px] text-center font-semibold mb-1">${sub}</p>
-    <p class="text-[9px] text-center text-slate-500 mb-2 italic">Tanggal pertemuan berdasarkan jadwal mengajar ${ST.mapel} di rombel ${rom} • 1 Pertemuan = ${JP} JP</p>
+    <p class="text-[9px] text-center text-slate-500 mb-2 italic">
+      Tanggal pertemuan sinkron dengan Kalender Pendidikan & Jadwal ${ST.mapel} rombel ${rom} • 1 Pertemuan = ${JP} JP
+    </p>
     <div class="overflow-x-auto">
       <table class="w-full text-[8px] text-center">
         <thead class="bg-slate-100">
@@ -1933,15 +2172,25 @@ function renderPromes(sub,ttdPlan,cp1,cp2,JP,rom){
           </tr>
           <tr class="bg-slate-50">${tglHeader}</tr>
         </thead>
-        <tbody>${rows}</tbody>
+        <tbody>${rows}${agendaRow}</tbody>
       </table>
     </div>
-    <p class="text-[9px] text-slate-500 mt-2 italic">
-      Total: <b>${totalDates}</b> pertemuan (${totalDates*JP} JP) di semester ${ST.ps} 
-      <br>Ceklis (✓) = tanggal pertemuan pembelajaran TP tersebut
-    </p>${ttdPlan}`;
+    <div class="mt-2 bg-slate-50 border rounded p-2 text-[9px] no-print">
+      <div class="flex flex-wrap gap-3">
+        <span><b>Total hari mengajar:</b> ${totalDates}</span>
+        <span class="text-emerald-700"><b>Efektif (untuk TP):</b> ${tanggalEfektif}</span>
+        <span class="text-blue-700"><b>Agenda khusus:</b> ${tanggalAgenda}</span>
+        <span class="text-red-700"><b>Libur:</b> ${tanggalLibur}</span>
+      </div>
+      <div class="mt-1 text-slate-600">
+        <b>Legenda warna:</b>
+        <span class="inline-block bg-emerald-100 text-emerald-700 px-1.5 rounded ml-1">✓ = TP terjadwal</span>
+        <span class="inline-block bg-blue-100 text-blue-700 px-1.5 rounded ml-1">MPLS/PTS/PAS = Agenda</span>
+        <span class="inline-block bg-red-100 text-red-700 px-1.5 rounded ml-1">LN/LS = Libur</span>
+      </div>
+    </div>
+    ${ttdPlan}`;
 }
-
 // ============ MODUL AJAR DEEP LEARNING (SANGAT LENGKAP + JP SINKRON) ============
 function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase,JP){
   const modulSel=$('modulTPSelect');
