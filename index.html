@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SI-GUMART v7 - Sistem Administrasi Guru Smart</title>
+  <title>SI-GUMART v7.1 - Sistem Administrasi Guru Smart</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -51,7 +51,7 @@
       <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
     </div>
     <h1 class="text-2xl font-extrabold text-white">SI-GUMART</h1>
-    <p class="text-blue-300 text-[11px]">Sistem Administrasi Guru Smart v7</p>
+    <p class="text-blue-300 text-[11px]">Sistem Administrasi Guru Smart v7.1</p>
     <p class="text-blue-400/50 text-[9px] mt-0.5">Semua Mapel • Kelas 1-12 • Kurikulum Merdeka • Deep Learning</p>
   </div>
   <div class="bg-white rounded-2xl shadow-2xl overflow-hidden fade-in">
@@ -59,7 +59,6 @@
       <button onclick="authTab('login')" id="aTabL" class="flex-1 py-2 text-xs font-bold text-blue-600 border-b-2 border-blue-600">Masuk</button>
       <button onclick="authTab('register')" id="aTabR" class="flex-1 py-2 text-xs font-bold text-slate-400 border-b-2 border-transparent">Daftar</button>
     </div>
-    <!-- LOGIN -->
     <div id="loginForm" class="p-4 space-y-2">
       <div><label class="block text-[10px] font-semibold mb-0.5">Email</label>
         <input type="email" id="lE" class="w-full border rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-400" placeholder="email@contoh.com">
@@ -75,7 +74,6 @@
       </button>
       <button onclick="doResetPwd()" class="w-full text-[10px] text-blue-500 hover:text-blue-700">Lupa password?</button>
     </div>
-    <!-- REGISTER -->
     <div id="regForm" class="p-4 space-y-2 hidden">
       <div class="grid grid-cols-2 gap-2">
         <div><label class="block text-[10px] font-semibold mb-0.5">Nama Lengkap</label><input id="rN" class="w-full border rounded-lg p-2 text-sm outline-none"></div>
@@ -166,7 +164,9 @@
       <p id="waLivePreview" class="text-[10px] italic text-slate-500"></p>
     </div>
     <div class="flex space-x-2">
-      <button onclick="saveWAConfig()" class="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-bold text-sm"><i class="fa-solid fa-save mr-1"></i>Simpan</button>
+      <button onclick="saveWAConfig()" id="btnSaveWA" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-bold text-sm">
+        <i class="fa-solid fa-save mr-1"></i>Simpan
+      </button>
       <button onclick="closeM('mWA')" class="flex-1 bg-slate-100 py-2 rounded-lg font-bold text-sm">Batal</button>
     </div>
   </div>
@@ -176,7 +176,7 @@
 <div class="md:hidden bg-slate-900 text-white p-3 flex justify-between items-center no-print">
   <div class="flex items-center space-x-1.5">
     <i class="fa-solid fa-graduation-cap text-blue-400 text-sm"></i>
-    <span class="font-bold text-xs">SI-GUMART v7</span>
+    <span class="font-bold text-xs">SI-GUMART v7.1</span>
   </div>
   <button onclick="$('sidebar').classList.toggle('hidden')"><i class="fa-solid fa-bars"></i></button>
 </div>
@@ -185,10 +185,9 @@
 <aside id="sidebar" class="w-full md:w-56 bg-slate-900 text-slate-200 p-2.5 hidden md:flex md:flex-col no-print shrink-0 overflow-y-auto" style="max-height:100vh">
   <div class="flex items-center space-x-2 pb-2 border-b border-slate-700 mb-2">
     <div class="bg-blue-600 p-1.5 rounded-lg"><i class="fa-solid fa-graduation-cap text-white text-sm"></i></div>
-    <div><h1 class="font-bold text-white text-xs">SI-GUMART v7</h1><p class="text-[8px] text-slate-400">Administrasi Guru Smart</p></div>
+    <div><h1 class="font-bold text-white text-xs">SI-GUMART v7.1</h1><p class="text-[8px] text-slate-400">Administrasi Guru Smart</p></div>
   </div>
 
-  <!-- User Info -->
   <div id="sideUser" class="bg-slate-800 rounded-lg p-2 mb-2 hidden">
     <div class="flex items-center space-x-2">
       <div class="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold" id="sAvatar">?</div>
@@ -203,7 +202,6 @@
     </div>
   </div>
 
-  <!-- Mapel Selector (NO rombel — rombel auto from jadwal) -->
   <div id="selArea" class="mb-2 hidden">
     <label class="text-[8px] text-slate-500 uppercase font-bold">Mata Pelajaran Aktif</label>
     <div class="flex space-x-0.5 mt-0.5">
@@ -213,7 +211,6 @@
     <p class="text-[8px] text-slate-600 mt-1 px-0.5 italic">💡 Rombel otomatis terdeteksi dari jadwal</p>
   </div>
 
-  <!-- Navigation -->
   <nav class="space-y-2 text-[11px] flex-1">
     <div>
       <div class="text-[8px] font-bold text-slate-500 uppercase mb-0.5 px-1">📝 Input Data</div>
@@ -252,7 +249,6 @@
     </div>
   </nav>
 
-  <!-- Footer Sidebar -->
   <div class="mt-2 pt-2 border-t border-slate-700 space-y-1">
     <div id="gBtn" class="hidden">
       <button onclick="showAuth()" class="w-full bg-blue-600 text-white py-1.5 rounded text-[10px] font-bold">
@@ -264,14 +260,12 @@
         <i class="fa-solid fa-right-from-bracket mr-1"></i>Keluar
       </button>
     </div>
-    <p class="text-[8px] text-slate-600 text-center">SI-GUMART v7.0 © 2025</p>
+    <p class="text-[8px] text-slate-600 text-center">SI-GUMART v7.1 © 2025</p>
   </div>
 </aside>
 
-<!-- ========== MAIN CONTENT AREA ========== -->
+<!-- ========== MAIN AREA — TOP BAR ========== -->
 <main class="flex-1 p-3 md:p-4 overflow-y-auto">
-
-  <!-- TOP BAR -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3 no-print bg-white p-3 rounded-xl shadow-sm border">
     <div>
       <h2 id="pgT" class="text-sm font-bold">Profil</h2>
@@ -460,6 +454,7 @@
         <i class="fa-solid fa-lightbulb mr-1"></i>
         <b>Cara isi jadwal:</b> Ketik <b>mapel</b> di baris atas, <b>rombel</b> di baris bawah (contoh: PAI / 1A). 
         Rombel akan otomatis terdaftar untuk Data Siswa, Absen, Nilai, dan Dokumen.
+        Jumlah JP berturut-turut di 1 hari = <b>JP per pertemuan</b> yang akan digunakan otomatis di Prota, Promes, dan Modul Ajar.
       </div>
     </div>
   </div>
@@ -548,7 +543,7 @@
     </div>
   </div>
 
-  <!-- ===== TAB: JURNAL PEMBELAJARAN (per Bulan) ===== -->
+  <!-- ===== TAB: JURNAL PEMBELAJARAN (Ringkas) ===== -->
   <div id="tab-jurnal" class="tab-c hidden fade-in">
     <div class="bg-white p-3 rounded-xl border print-area">
       <div class="flex items-center space-x-2 mb-2 no-print">
@@ -622,7 +617,7 @@ let adminWAConfig={phone:'6281234567890',template:"Assalamu'alaikum saudara Admi
 // ============ HELPERS ============
 const $=id=>document.getElementById(id);
 const v=id=>$(id)?.value||'';
-const toast=(t,ti,m)=>{const i={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};$('tI').textContent=i[t]||'ℹ️';$('tT').textContent=ti;$('tM').textContent=m||'';const e=$('toast');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3e3)};
+const toast=(t,ti,m)=>{const i={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};$('tI').textContent=i[t]||'ℹ️';$('tT').textContent=ti;$('tM').textContent=m||'';const e=$('toast');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3500)};
 const closeM=id=>$(id).classList.add('hidden');
 const showAuth=()=>$('authScreen').classList.remove('hidden');
 const hideAuth=()=>$('authScreen').classList.add('hidden');
@@ -636,6 +631,29 @@ const pcsv=l=>{const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=
 const getDays=()=>ALLDAYS.slice(0,parseInt(v('fHari'))||5);
 const getRombelKelas=()=>{const r=ST.activeDocRombel||ST.rombel;const n=parseInt(r.replace(/\D/g,''));return n?'Kelas '+n:'Kelas 1'};
 const isEdit=()=>AL==='approved'||AL==='admin';
+
+// ⭐ HELPER: Hitung JP per pertemuan otomatis dari jadwal
+function getJPPerPertemuan(){
+  const mapelLC=ST.mapel.toLowerCase();
+  const rom=ST.activeDocRombel||ST.rombel;
+  const jpPerDay={};
+  D.jadwal.forEach(r=>{
+    if(r.j==='ist'||!r.h)return;
+    getDays().forEach(d=>{
+      const val=r.h[d]||'';
+      const parts=val.split('\n');
+      const mp=(parts[0]||'').toLowerCase();
+      const rb=(parts[1]||'').trim();
+      if(mp.includes(mapelLC)&&(!rom||rb===rom)){
+        const key=`${rom}_${d}`;
+        jpPerDay[key]=(jpPerDay[key]||0)+1;
+      }
+    });
+  });
+  const vals=Object.values(jpPerDay);
+  if(!vals.length)return 2;
+  return Math.max(...vals);
+}
 
 function updKelas(){
   const s=$('fK');
@@ -693,7 +711,7 @@ function getLastWorkdayOfMonth(bln){
   const maxDay=parseInt(v('fHari'))===6?6:5;
   for(let d=lastDay;d>=1;d--){
     const dt=new Date(yr,monthNum,d);
-    const dow=dt.getDay(); // 0=Min, 1=Sen, ...
+    const dow=dt.getDay();
     if(dow>=1&&dow<=maxDay)return `${d} ${bln} ${yr}`;
   }
   return `${lastDay} ${bln} ${yr}`;
@@ -765,13 +783,19 @@ async function doLogout(){
 function enterGuest(){AL='guest';CU=null;hideAuth();$('pendingScr').classList.add('hidden');updUI();loadCloud()}
 function enterViewOnly(){$('pendingScr').classList.add('hidden');hideAuth();updUI()}
 
-// ============ WA CONFIG ============
+// ============ ⭐ WA CONFIG (FIXED SAVE) ============
 async function loadWAConfig(){
   try{
     const d=await db.collection('config').doc('waContact').get();
-    if(d.exists)adminWAConfig=d.data();
-  }catch(e){console.error('Load WA:',e)}
+    if(d.exists){
+      const dt=d.data();
+      if(dt.phone)adminWAConfig.phone=dt.phone;
+      if(dt.template)adminWAConfig.template=dt.template;
+      console.log('WA Config loaded:',adminWAConfig);
+    }
+  }catch(e){console.error('Load WA config error:',e)}
 }
+
 function updateWALink(){
   const email=CU?.email||'';
   const msg=(adminWAConfig.template||'').replace('{email}',email);
@@ -780,6 +804,7 @@ function updateWALink(){
   const l=$('waLink');if(l)l.href=`https://wa.me/${phone}?text=${encoded}`;
   const p=$('waPreview');if(p)p.textContent=msg;
 }
+
 function openWASettings(){
   $('mWA').classList.remove('hidden');
   $('waPhoneInput').value=adminWAConfig.phone||'';
@@ -793,20 +818,21 @@ function updateWAPreview(){
   const preview=tmpl.replace('{email}','user@example.com');
   $('waLivePreview').textContent=preview||'(Template kosong)';
 }
+
 async function saveWAConfig(){
   const phone=$('waPhoneInput').value.trim();
   const template=$('waTemplateInput').value.trim();
   if(!phone)return toast('warning','','Nomor WA harus diisi');
   if(!template)return toast('warning','','Template pesan harus diisi');
   
-  // Cek status admin
-  if(!CU){return toast('error','Belum Login','Login sebagai admin dulu')}
-  if(CU.email!==ADMIN_EMAIL){return toast('error','Bukan Admin',`Hanya ${ADMIN_EMAIL} yang bisa menyimpan`)}
+  // Validasi admin
+  if(!CU)return toast('error','Belum Login','Login sebagai admin dulu');
+  if(CU.email!==ADMIN_EMAIL)return toast('error','Bukan Admin',`Hanya ${ADMIN_EMAIL} yang bisa menyimpan konfigurasi WA`);
   
-  const btnList=document.querySelectorAll('#mWA button');
-  const saveBtn=btnList[0];
-  const origHTML=saveBtn?.innerHTML||'Simpan';
-  if(saveBtn){saveBtn.disabled=true;saveBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...'}
+  const btn=$('btnSaveWA');
+  const orig=btn.innerHTML;
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...';
   
   try{
     const newConfig={
@@ -815,17 +841,19 @@ async function saveWAConfig(){
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       updatedBy:CU.email
     };
-    console.log('Saving WA config:',newConfig);
+    console.log('Saving WA config to Firestore:',newConfig);
     await db.collection('config').doc('waContact').set(newConfig,{merge:true});
     adminWAConfig={phone:newConfig.phone,template:newConfig.template};
     toast('success','Tersimpan!','Konfigurasi WA berhasil disimpan');
-    setTimeout(()=>closeM('mWA'),500);
+    setTimeout(()=>closeM('mWA'),600);
   }catch(e){
     console.error('Save WA error:',e);
-    toast('error','Gagal Simpan',`${e.code||''}: ${e.message}`);
+    toast('error','Gagal Simpan',`${e.code||'unknown'}: ${e.message}`);
   }
-  if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML=origHTML}
+  btn.disabled=false;
+  btn.innerHTML=orig;
 }
+
 // ============ AUTH STATE ============
 auth.onAuthStateChanged(async u=>{
   if(u){
@@ -1122,8 +1150,6 @@ function rJadwal(){
   const days=getDays();
   const mapelLC=ST.mapel.toLowerCase();
   const isGK=v('fTG')==='kelas';
-  
-  // AUTO-DETECT rombel dari jadwal
   const detectedRombel=new Set();
   if(D.jadwal)D.jadwal.forEach(r=>{
     if(r.j==='ist'||!r.h)return;
@@ -1134,7 +1160,6 @@ function rJadwal(){
       if(rb)detectedRombel.add(rb);
     });
   });
-  
   const newRombelList=[...detectedRombel].sort();
   if(JSON.stringify(newRombelList)!==JSON.stringify(ST.rombelList)){
     ST.rombelList=newRombelList;
@@ -1144,16 +1169,13 @@ function rJadwal(){
     }
     if(CU&&ie)db.collection('users').doc(CU.uid).update({rombelList:ST.rombelList}).catch(()=>{});
   }
-  
   $('jdGuruInfo').textContent=isGK?`Guru Kelas ${ST.activeDocRombel||''}`:`${ST.mapel} — ${ST.rombelList.length} Rombel Aktif`;
   if(!D.jadwal||!D.jadwal.length)D.jadwal=defJadwal();
-  
   let html=`<table class="w-full" style="border-collapse:collapse"><thead><tr>
     <td class="jd-header" style="width:40px">JP</td>
     <td class="jd-header" style="width:90px">WAKTU</td>`;
   days.forEach(d=>html+=`<td class="jd-header">${d.toUpperCase()}</td>`);
   html+=`</tr></thead><tbody>`;
-  
   D.jadwal.forEach((r,ri)=>{
     if(r.j==='ist'){
       html+=`<tr>
@@ -1197,8 +1219,6 @@ function rJadwal(){
     html+=`</tr>`;
   });
   html+=`</tbody></table>`;
-  
-  // Rekap JP per rombel
   let jpCount=0;
   const rombelJP={};
   D.jadwal.forEach(r=>{
@@ -1211,17 +1231,16 @@ function rJadwal(){
       if(mp.includes(mapelLC)){jpCount++;if(rb)rombelJP[rb]=(rombelJP[rb]||0)+1}
     });
   });
-  
   if(Object.keys(rombelJP).length){
     html+=`<div class="mt-2 no-print bg-blue-50 border border-blue-200 rounded p-2 text-[10px]">
       <b class="text-blue-700"><i class="fa-solid fa-list mr-1"></i>Rekap Rombel yang Diampu:</b>
       <div class="mt-1 flex flex-wrap gap-1">
         ${Object.entries(rombelJP).map(([rb,jp])=>`<span class="bg-white border border-blue-300 rounded-full px-2 py-0.5 text-blue-700"><b>${rb}</b>: ${jp} JP/mgg</span>`).join('')}
       </div>
+      <p class="text-[9px] mt-1 text-blue-600"><i class="fa-solid fa-lightbulb mr-0.5"></i>JP per pertemuan otomatis: <b>${getJPPerPertemuan()} JP</b></p>
     </div>`;
   }
   html+=`<p class="text-[9px] mt-1 text-slate-500 no-print">Total JP <b>${ST.mapel}</b>/minggu: <b class="text-blue-600">${jpCount} JP</b> (${jpCount*getJPDur(v('fJn'))} menit)</p>`;
-  
   $('jdArea').innerHTML=html;
   renderSel();
   renderRombelTabs(docTabs.includes(getCurrentTab()));
@@ -1473,7 +1492,7 @@ function rNilai(){
   $('nlTTD').innerHTML=makeTTD(getTTDPelaporan(bln));
 }
 
-// ============ JURNAL PEMBELAJARAN ============
+// ============ ⭐ JURNAL PEMBELAJARAN RINGKAS ============
 function rJurnal(){
   const bln=$('jrBln').value;
   const ie=isEdit();
@@ -1483,7 +1502,7 @@ function rJurnal(){
   const monthIdx=BULAN_IDX_JS[bln];
   const lastDay=new Date(yr,monthIdx+1,0).getDate();
   
-  // Kumpulkan semua pertemuan raw (per JP)
+  // Kumpulkan semua pertemuan raw
   let rawEntries=[];
   for(let d=1;d<=lastDay;d++){
     const dt=new Date(yr,monthIdx,d);
@@ -1520,27 +1539,21 @@ function rJurnal(){
     return;
   }
   
-  // GROUPING: Ringkas berdasarkan (tanggal + rombel + TP yang sama) → gabungkan JP berurutan
-  // Struktur: entries dengan info jam mulai-selesai
+  // ⭐ GROUPING: Ringkas berdasarkan (tanggal + rombel + TP sama + JP berurutan)
   let grouped=[];
   let processed=new Set();
   
   rawEntries.forEach((e,i)=>{
     if(processed.has(i))return;
     const j=jd[i]||{};
-    const key=`${e.date}_${e.rombel}_${j.tp||''}`;
-    
-    // Cari semua entry berikutnya yang sama tanggal, rombel, TP, dan JP berurutan
     let jamList=[e.jam];
     let jamIndices=[i];
     let lastJam=e.jam;
-    
     for(let k=i+1;k<rawEntries.length;k++){
       if(processed.has(k))continue;
       const e2=rawEntries[k];
       const j2=jd[k]||{};
       if(e2.date===e.date && e2.rombel===e.rombel && (j2.tp||'')===(j.tp||'')){
-        // Cek apakah JP berurutan (contoh: 1,2,3 atau 4,5)
         if(typeof e2.jam==='number' && typeof lastJam==='number' && e2.jam===lastJam+1){
           jamList.push(e2.jam);
           jamIndices.push(k);
@@ -1551,15 +1564,12 @@ function rJurnal(){
     }
     processed.add(i);
     
-    // Ringkas jam: [1,2,3,4] → "JP1 - JP4", [1] → "JP1"
     let jamText='';
     if(jamList.length===1){
       jamText=`JP${jamList[0]}`;
     } else {
       jamText=`JP${jamList[0]} - JP${jamList[jamList.length-1]}`;
     }
-    
-    // Ringkas waktu: ambil waktu awal dari JP pertama dan waktu akhir dari JP terakhir
     const firstWaktu=rawEntries[jamIndices[0]].waktu||'';
     const lastWaktu=rawEntries[jamIndices[jamIndices.length-1]].waktu||'';
     const startTime=firstWaktu.split('-')[0]||'';
@@ -1567,16 +1577,9 @@ function rJurnal(){
     const waktuText=startTime&&endTime?`${startTime}-${endTime}`:firstWaktu;
     
     grouped.push({
-      day:e.day,
-      date:e.date,
-      bulan:bln,
-      rombel:e.rombel,
-      jamList:jamList,
-      jamText:jamText,
-      waktuText:waktuText,
-      jpCount:jamList.length,
-      firstIdx:jamIndices[0],
-      j:j
+      day:e.day,date:e.date,bulan:bln,rombel:e.rombel,
+      jamList:jamList,jamText:jamText,waktuText:waktuText,
+      jpCount:jamList.length,firstIdx:jamIndices[0],j:j
     });
   });
   
@@ -1598,7 +1601,6 @@ function rJurnal(){
   grouped.forEach((g,gi)=>{
     const i=g.firstIdx;
     const j=g.j;
-    // Absen
     const abBln=D.absen[g.rombel]?.[bln]||{};
     const swList=D.siswa[g.rombel]||[];
     let h=0,s=0,iz=0,a=0;
@@ -1606,7 +1608,6 @@ function rJurnal(){
       const av=abBln[`${si}_${i}`]||'H';
       if(av==='H')h++;else if(av==='S')s++;else if(av==='I')iz++;else if(av==='A')a++;
     });
-    // TP options
     const kelasRom='Kelas '+(parseInt(g.rombel.replace(/\D/g,''))||1);
     const cpForRombel=cpAll.filter(c=>c.K===kelasRom);
     const tpOpts=cpForRombel.map((c,ci)=>`<option value="${ci}" ${j.tp==ci?'selected':''}>${(c.T||'').substring(0,40)}</option>`).join('');
@@ -1630,17 +1631,17 @@ function rJurnal(){
       <td class="border p-0.5"><input value="${j.cat||''}" onchange="D.jurnal['${bln}'][${i}].cat=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td>
     </tr>`;
   });
-  
   html+=`</tbody></table>
-    <div class="mt-2 bg-blue-50 border border-blue-200 rounded p-2 text-[9px] text-blue-700">
+    <div class="mt-2 bg-blue-50 border border-blue-200 rounded p-2 text-[9px] text-blue-700 no-print">
       <b><i class="fa-solid fa-info-circle mr-1"></i>Info Ringkasan Jurnal:</b> 
-      Baris jurnal <b>otomatis diringkas</b> jika tanggal, rombel, dan TP sama serta jam pelajaran berurutan. 
-      Contoh: JP1-JP4 pada tanggal & TP sama → tampil 1 baris (bukan 4 baris).
-      <br>Total baris ringkas: <b>${grouped.length}</b> dari <b>${rawEntries.length}</b> pertemuan raw.
+      Baris jurnal <b>otomatis diringkas</b> jika tanggal, rombel, dan TP sama serta JP berurutan. 
+      Contoh: JP1-JP4 tanggal & TP sama → 1 baris "JP1 - JP4".
+      <br>Total baris ringkas: <b>${grouped.length}</b> dari <b>${rawEntries.length}</b> pertemuan total.
     </div>`;
   html+=makeTTD(getTTDPelaporan(bln));
   $('jrContent').innerHTML=html;
 }
+
 // ============ PROFILE MODAL ============
 function openProfile(){
   if(!CU||!UD)return;
@@ -1717,8 +1718,7 @@ async function setSt(uid,st){
 async function delU(uid){
   try{await db.collection('users').doc(uid).delete();toast('success','Terhapus','');loadAdmin()}
   catch(e){toast('error','',e.message)}
-}
-// ============ RENDER ALL DOCUMENT OUTPUTS ============
+} // ============ RENDER ALL DOCUMENT OUTPUTS ============
 function renderAll(){
   const rom=ST.activeDocRombel||ST.rombel;
   const kelas=getRombelKelas();
@@ -1729,7 +1729,9 @@ function renderAll(){
   const cpK=D.cp.filter(c=>c.K===kelas);
   const cp1=cpK.filter(c=>c.S==='Semester 1');
   const cp2=cpK.filter(c=>c.S==='Semester 2');
-  const JP=2;
+  
+  // ⭐ JP SINKRON: 1 Pertemuan = getJPPerPertemuan() JP
+  const JP=getJPPerPertemuan();
 
   // ===== KALENDER PENDIDIKAN =====
   $('dKalContent').innerHTML=`
@@ -1786,14 +1788,15 @@ function renderAll(){
       <tbody>${cpK.map((c,i)=>`<tr class="border ${i%2?'bg-slate-50/30':''}"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${c.S==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-[8px]">${c.M||METODE[0]}</td><td class="border p-1 text-[8px]">${c.Di}</td></tr>`).join('')}</tbody>
     </table>${ttdPlan}`;
 
-  // ===== PROTA =====
+  // ===== PROTA (dengan JP sinkron) =====
   let ph='';
   [['Semester 1','bg-blue-50',cp1],['Semester 2','bg-emerald-50',cp2]].forEach(([lb,bg,data])=>{
     if(!data.length)return;
     ph+=`<tr class="${bg} font-bold"><td colspan="6" class="border p-1 text-center">${lb.toUpperCase()}</td></tr>`;
     let tot=0;
     data.forEach((c,i)=>{
-      const jp=(c.P||1)*JP;tot+=jp;
+      const jp=(c.P||1)*JP;
+      tot+=jp;
       ph+=`<tr class="border"><td class="border p-1 text-center">${i+1}</td><td class="border p-1 font-semibold">${c.E}</td><td class="border p-1">${c.T}</td><td class="border p-1 text-center">${lb==='Semester 1'?'1':'2'}</td><td class="border p-1 text-center">${c.P}</td><td class="border p-1 text-center">${jp} JP</td></tr>`;
     });
     ph+=`<tr class="${bg} font-bold"><td colspan="5" class="border p-1 text-right">Total ${lb}:</td><td class="border p-1 text-center">${tot} JP</td></tr>`;
@@ -1801,6 +1804,7 @@ function renderAll(){
   $('dProtaContent').innerHTML=`
     <h2 class="text-sm font-bold text-center uppercase">PROGRAM TAHUNAN (PROTA)</h2>
     <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>
+    <p class="text-[9px] text-center text-slate-500 mb-2 italic">1 Pertemuan = ${JP} JP (otomatis dari jadwal)</p>
     <table class="w-full text-[9px]">
       <thead class="bg-slate-100"><tr>
         <th class="border p-1">No</th><th class="border p-1">Elemen</th>
@@ -1813,8 +1817,8 @@ function renderAll(){
   // ===== PROMES DENGAN TANGGAL REAL =====
   renderPromes(sub,ttdPlan,cp1,cp2,JP,rom);
 
-  // ===== MODUL AJAR DEEP LEARNING (LENGKAP) =====
-  renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase);
+  // ===== MODUL AJAR DEEP LEARNING LENGKAP =====
+  renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase,JP);
 
   // ===== KKTP =====
   $('dKktpContent').innerHTML=`
@@ -1917,7 +1921,7 @@ function renderPromes(sub,ttdPlan,cp1,cp2,JP,rom){
   $('dPromesContent').innerHTML=`
     <h2 class="text-sm font-bold text-center uppercase">PROGRAM SEMESTER (PROMES)</h2>
     <p class="text-[10px] text-center font-semibold mb-1">${sub}</p>
-    <p class="text-[9px] text-center text-slate-500 mb-2 italic">Tanggal pertemuan berdasarkan jadwal mengajar ${ST.mapel} di rombel ${rom}</p>
+    <p class="text-[9px] text-center text-slate-500 mb-2 italic">Tanggal pertemuan berdasarkan jadwal mengajar ${ST.mapel} di rombel ${rom} • 1 Pertemuan = ${JP} JP</p>
     <div class="overflow-x-auto">
       <table class="w-full text-[8px] text-center">
         <thead class="bg-slate-100">
@@ -1938,9 +1942,8 @@ function renderPromes(sub,ttdPlan,cp1,cp2,JP,rom){
     </p>${ttdPlan}`;
 }
 
-// ============ MODUL AJAR DEEP LEARNING (SANGAT LENGKAP) ============
-function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
-  // Populate TP selector
+// ============ MODUL AJAR DEEP LEARNING (SANGAT LENGKAP + JP SINKRON) ============
+function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase,JP){
   const modulSel=$('modulTPSelect');
   if(cpK.length===0){
     modulSel.innerHTML='<option>-Belum ada TP-</option>';
@@ -1953,80 +1956,87 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
   
   const tp=cpK[ST.modulTPIdx]||cpK[0];
   const met=tp?.M||METODE[0];
-  const totalMenit=(tp?.P||1)*2*getJPDur(v('fJn'));
+  const jpPerPertemuan=JP;
+  const totalJP=(tp?.P||1)*jpPerPertemuan;
+  const totalMenit=totalJP*getJPDur(v('fJn'));
   const introMenit=15,penutupMenit=15;
   const intiMenit=totalMenit-introMenit-penutupMenit;
   
-  // Deep description per metode
   const metodeDetail={
     'PBL (Problem Based Learning)':{
       desc:'Model pembelajaran berbasis masalah nyata (autentik) yang mendorong peserta didik berpikir kritis untuk menganalisis dan mencari solusi secara kolaboratif.',
       sintaks:[
-        {tahap:'Orientasi Peserta Didik pada Masalah',uraian:'Guru menyajikan permasalahan otentik/kontekstual terkait TP. Peserta didik diarahkan untuk mengamati dan memahami masalah.',waktu:'15 menit'},
-        {tahap:'Mengorganisasikan Peserta Didik',uraian:'Guru membagi peserta didik dalam kelompok heterogen 4-5 orang, membantu merumuskan pertanyaan investigasi, dan menyusun rencana kerja.',waktu:'10 menit'},
-        {tahap:'Membimbing Penyelidikan Individual & Kelompok',uraian:'Peserta didik mengumpulkan informasi dari berbagai sumber (buku, internet, wawancara), berdiskusi, dan menganalisis data untuk membangun pemahaman.',waktu:'25 menit'},
-        {tahap:'Mengembangkan & Menyajikan Hasil Karya',uraian:'Kelompok menyusun laporan/produk hasil investigasi dan mempresentasikannya di depan kelas dengan berbagai media (poster, PPT, video).',waktu:'15 menit'},
-        {tahap:'Menganalisis & Mengevaluasi Proses',uraian:'Guru memfasilitasi refleksi bersama tentang proses berpikir, kesulitan yang dihadapi, dan pembelajaran yang diperoleh.',waktu:'10 menit'}
+        {tahap:'Orientasi Peserta Didik pada Masalah',uraian:'Guru menyajikan permasalahan otentik/kontekstual terkait TP. Peserta didik diarahkan untuk mengamati dan memahami masalah secara mendalam.',waktu:'15%'},
+        {tahap:'Mengorganisasikan Peserta Didik',uraian:'Guru membagi peserta didik dalam kelompok heterogen 4-5 orang, membantu merumuskan pertanyaan investigasi, dan menyusun rencana kerja.',waktu:'10%'},
+        {tahap:'Membimbing Penyelidikan Individual & Kelompok',uraian:'Peserta didik mengumpulkan informasi dari berbagai sumber (buku, internet, wawancara), berdiskusi, dan menganalisis data untuk membangun pemahaman.',waktu:'30%'},
+        {tahap:'Mengembangkan & Menyajikan Hasil Karya',uraian:'Kelompok menyusun laporan/produk hasil investigasi dan mempresentasikannya di depan kelas dengan berbagai media (poster, PPT, video).',waktu:'25%'},
+        {tahap:'Menganalisis & Mengevaluasi Proses',uraian:'Guru memfasilitasi refleksi bersama tentang proses berpikir, kesulitan yang dihadapi, dan pembelajaran yang diperoleh.',waktu:'20%'}
       ]
     },
     'PjBL (Project Based Learning)':{
       desc:'Model pembelajaran berbasis proyek nyata yang menghasilkan produk/karya, memberikan otonomi belajar dan mengintegrasikan berbagai kompetensi.',
       sintaks:[
-        {tahap:'Menentukan Pertanyaan Mendasar',uraian:'Guru mengajukan pertanyaan esensial yang menantang dan bermakna, terkait dengan proyek yang akan dikerjakan.',waktu:'10 menit'},
-        {tahap:'Mendesain Perencanaan Proyek',uraian:'Peserta didik dan guru berdiskusi merancang proyek: tujuan, langkah kerja, jadwal, alat/bahan, dan pembagian tugas.',waktu:'15 menit'},
-        {tahap:'Menyusun Jadwal Kegiatan',uraian:'Peserta didik menyusun timeline kegiatan proyek dengan tenggat waktu yang jelas untuk setiap tahapan.',waktu:'10 menit'},
-        {tahap:'Memantau Kemajuan Proyek',uraian:'Peserta didik melaksanakan proyek dengan didampingi guru sebagai fasilitator. Guru mendokumentasikan proses.',waktu:'25 menit'},
-        {tahap:'Menguji Hasil (Assess)',uraian:'Peserta didik mempresentasikan produk/karya. Guru dan siswa lain memberikan umpan balik konstruktif.',waktu:'10 menit'},
-        {tahap:'Evaluasi Pengalaman',uraian:'Refleksi bersama: apa yang berhasil, apa yang perlu diperbaiki, pelajaran hidup yang diperoleh.',waktu:'5 menit'}
+        {tahap:'Menentukan Pertanyaan Mendasar',uraian:'Guru mengajukan pertanyaan esensial yang menantang dan bermakna, terkait dengan proyek yang akan dikerjakan.',waktu:'10%'},
+        {tahap:'Mendesain Perencanaan Proyek',uraian:'Peserta didik dan guru berdiskusi merancang proyek: tujuan, langkah kerja, jadwal, alat/bahan, dan pembagian tugas.',waktu:'15%'},
+        {tahap:'Menyusun Jadwal Kegiatan',uraian:'Peserta didik menyusun timeline kegiatan proyek dengan tenggat waktu yang jelas untuk setiap tahapan.',waktu:'10%'},
+        {tahap:'Memantau Kemajuan Proyek',uraian:'Peserta didik melaksanakan proyek dengan didampingi guru sebagai fasilitator. Guru mendokumentasikan proses.',waktu:'35%'},
+        {tahap:'Menguji Hasil (Assess)',uraian:'Peserta didik mempresentasikan produk/karya. Guru dan siswa lain memberikan umpan balik konstruktif.',waktu:'20%'},
+        {tahap:'Evaluasi Pengalaman',uraian:'Refleksi bersama: apa yang berhasil, apa yang perlu diperbaiki, pelajaran hidup yang diperoleh.',waktu:'10%'}
       ]
     },
     'Inquiry Based Learning':{
       desc:'Model pembelajaran berbasis penyelidikan/inkuiri yang mendorong peserta didik untuk bertanya, menyelidiki, dan menemukan sendiri konsep pembelajaran.',
       sintaks:[
-        {tahap:'Orientasi',uraian:'Guru menciptakan iklim belajar yang responsif, menyampaikan topik, tujuan, dan hasil belajar yang diharapkan.',waktu:'10 menit'},
-        {tahap:'Merumuskan Masalah',uraian:'Peserta didik dibimbing untuk merumuskan masalah/pertanyaan yang menantang dan bermakna terkait TP.',waktu:'10 menit'},
-        {tahap:'Merumuskan Hipotesis',uraian:'Peserta didik menyusun jawaban sementara (hipotesis) berdasarkan pengetahuan awal mereka.',waktu:'10 menit'},
-        {tahap:'Mengumpulkan Data',uraian:'Peserta didik melakukan aktivitas penyelidikan: eksperimen, observasi, membaca literatur, atau wawancara.',waktu:'25 menit'},
-        {tahap:'Menguji Hipotesis',uraian:'Peserta didik menganalisis data dan membandingkannya dengan hipotesis awal untuk membuktikan kebenaran.',waktu:'10 menit'},
-        {tahap:'Merumuskan Kesimpulan',uraian:'Peserta didik menyimpulkan hasil penyelidikan dan mengomunikasikan temuan mereka.',waktu:'10 menit'}
+        {tahap:'Orientasi',uraian:'Guru menciptakan iklim belajar yang responsif, menyampaikan topik, tujuan, dan hasil belajar yang diharapkan.',waktu:'10%'},
+        {tahap:'Merumuskan Masalah',uraian:'Peserta didik dibimbing untuk merumuskan masalah/pertanyaan yang menantang dan bermakna terkait TP.',waktu:'15%'},
+        {tahap:'Merumuskan Hipotesis',uraian:'Peserta didik menyusun jawaban sementara (hipotesis) berdasarkan pengetahuan awal mereka.',waktu:'15%'},
+        {tahap:'Mengumpulkan Data',uraian:'Peserta didik melakukan aktivitas penyelidikan: eksperimen, observasi, membaca literatur, atau wawancara.',waktu:'30%'},
+        {tahap:'Menguji Hipotesis',uraian:'Peserta didik menganalisis data dan membandingkannya dengan hipotesis awal untuk membuktikan kebenaran.',waktu:'15%'},
+        {tahap:'Merumuskan Kesimpulan',uraian:'Peserta didik menyimpulkan hasil penyelidikan dan mengomunikasikan temuan mereka.',waktu:'15%'}
       ]
     },
     'Cooperative Learning':{
       desc:'Model pembelajaran kelompok kecil yang menekankan kerjasama, saling ketergantungan positif, dan tanggung jawab individu dalam mencapai tujuan bersama.',
       sintaks:[
-        {tahap:'Menyampaikan Tujuan & Motivasi',uraian:'Guru menyampaikan tujuan pembelajaran, memotivasi, dan menjelaskan sistem kerja kelompok.',waktu:'10 menit'},
-        {tahap:'Menyajikan Informasi',uraian:'Guru memberikan informasi/materi awal melalui presentasi, demonstrasi, atau bahan bacaan.',waktu:'15 menit'},
-        {tahap:'Mengorganisasi Peserta Didik dalam Kelompok',uraian:'Guru membagi kelompok heterogen 4-5 siswa dan menjelaskan peran masing-masing anggota.',waktu:'10 menit'},
-        {tahap:'Membimbing Kelompok Bekerja & Belajar',uraian:'Peserta didik berdiskusi, saling mengajar, dan menyelesaikan tugas kelompok. Guru sebagai fasilitator.',waktu:'25 menit'},
-        {tahap:'Evaluasi',uraian:'Setiap kelompok mempresentasikan hasil kerja. Guru mengevaluasi baik proses maupun hasil.',waktu:'15 menit'},
-        {tahap:'Memberikan Penghargaan',uraian:'Guru memberikan apresiasi/penghargaan pada kelompok/individu yang menunjukkan prestasi.',waktu:'5 menit'}
+        {tahap:'Menyampaikan Tujuan & Motivasi',uraian:'Guru menyampaikan tujuan pembelajaran, memotivasi, dan menjelaskan sistem kerja kelompok.',waktu:'10%'},
+        {tahap:'Menyajikan Informasi',uraian:'Guru memberikan informasi/materi awal melalui presentasi, demonstrasi, atau bahan bacaan.',waktu:'20%'},
+        {tahap:'Mengorganisasi Peserta Didik dalam Kelompok',uraian:'Guru membagi kelompok heterogen 4-5 siswa dan menjelaskan peran masing-masing anggota.',waktu:'10%'},
+        {tahap:'Membimbing Kelompok Bekerja & Belajar',uraian:'Peserta didik berdiskusi, saling mengajar, dan menyelesaikan tugas kelompok. Guru sebagai fasilitator.',waktu:'30%'},
+        {tahap:'Evaluasi',uraian:'Setiap kelompok mempresentasikan hasil kerja. Guru mengevaluasi baik proses maupun hasil.',waktu:'20%'},
+        {tahap:'Memberikan Penghargaan',uraian:'Guru memberikan apresiasi/penghargaan pada kelompok/individu yang menunjukkan prestasi.',waktu:'10%'}
       ]
     },
     'Discovery Learning':{
       desc:'Model pembelajaran penemuan di mana peserta didik menemukan sendiri konsep, prinsip, atau prosedur melalui eksplorasi terbimbing.',
       sintaks:[
-        {tahap:'Stimulation (Pemberian Rangsangan)',uraian:'Guru menyajikan stimulus (video, gambar, cerita, fenomena) untuk memancing rasa ingin tahu peserta didik.',waktu:'10 menit'},
-        {tahap:'Problem Statement (Identifikasi Masalah)',uraian:'Peserta didik mengidentifikasi masalah/pertanyaan dari stimulus dan merumuskannya dalam bentuk hipotesis.',waktu:'10 menit'},
-        {tahap:'Data Collection (Pengumpulan Data)',uraian:'Peserta didik mengumpulkan informasi/data dari berbagai sumber untuk membuktikan hipotesis.',waktu:'20 menit'},
-        {tahap:'Data Processing (Pengolahan Data)',uraian:'Peserta didik mengolah data dengan cara mengklasifikasi, membandingkan, dan menganalisis.',waktu:'15 menit'},
-        {tahap:'Verification (Pembuktian)',uraian:'Peserta didik memverifikasi kebenaran hipotesis dengan data yang telah diolah.',waktu:'10 menit'},
-        {tahap:'Generalization (Menarik Kesimpulan)',uraian:'Peserta didik menyimpulkan pola/prinsip umum yang berlaku dari hasil penemuan.',waktu:'10 menit'}
+        {tahap:'Stimulation (Pemberian Rangsangan)',uraian:'Guru menyajikan stimulus (video, gambar, cerita, fenomena) untuk memancing rasa ingin tahu peserta didik.',waktu:'10%'},
+        {tahap:'Problem Statement (Identifikasi Masalah)',uraian:'Peserta didik mengidentifikasi masalah/pertanyaan dari stimulus dan merumuskannya dalam bentuk hipotesis.',waktu:'15%'},
+        {tahap:'Data Collection (Pengumpulan Data)',uraian:'Peserta didik mengumpulkan informasi/data dari berbagai sumber untuk membuktikan hipotesis.',waktu:'25%'},
+        {tahap:'Data Processing (Pengolahan Data)',uraian:'Peserta didik mengolah data dengan cara mengklasifikasi, membandingkan, dan menganalisis.',waktu:'20%'},
+        {tahap:'Verification (Pembuktian)',uraian:'Peserta didik memverifikasi kebenaran hipotesis dengan data yang telah diolah.',waktu:'15%'},
+        {tahap:'Generalization (Menarik Kesimpulan)',uraian:'Peserta didik menyimpulkan pola/prinsip umum yang berlaku dari hasil penemuan.',waktu:'15%'}
       ]
     }
   };
   const md=metodeDetail[met]||metodeDetail['PBL (Problem Based Learning)'];
   
-  // Dimensi Profil Lulusan breakdown
+  // Konversi persentase ke menit
+  const sintaksTable=md.sintaks.map((s,i)=>{
+    const persen=parseInt(s.waktu.replace('%',''))||10;
+    const menit=Math.round(intiMenit*persen/100);
+    return {...s,menitReal:menit};
+  });
+  
   const dimList=(tp?.Di||DIMEN).split(';').map(d=>d.trim()).filter(Boolean);
   const dimBreakdown={
-    'keimanan dan ketakwaan':'Peserta didik menunjukkan sikap religius dengan berdoa sebelum & sesudah pembelajaran, menghormati nilai-nilai keimanan.',
-    'kewargaan':'Peserta didik menunjukkan sikap sebagai warga negara yang baik: menghargai perbedaan, taat aturan, cinta tanah air.',
-    'penalaran kritis':'Peserta didik menganalisis informasi, mengevaluasi argumen, dan mengambil kesimpulan berdasarkan bukti.',
-    'kreativitas':'Peserta didik menghasilkan ide/karya orisinal, memodifikasi, dan mengombinasikan gagasan dengan cara baru.',
-    'kolaborasi':'Peserta didik bekerja sama dalam kelompok, saling menghargai, dan berkontribusi mencapai tujuan bersama.',
-    'kemandirian':'Peserta didik mengelola diri, mengambil inisiatif, dan bertanggung jawab atas pembelajarannya sendiri.',
-    'kesehatan':'Peserta didik menjaga kesehatan fisik, mental, dan emosional selama proses pembelajaran.',
-    'komunikasi':'Peserta didik menyampaikan gagasan dengan jelas baik lisan maupun tulisan, dan mendengarkan aktif.'
+    'keimanan dan ketakwaan':'Peserta didik menunjukkan sikap religius dengan berdoa sebelum & sesudah pembelajaran, menghormati nilai-nilai keimanan, dan mengaitkan materi dengan nilai-nilai spiritual.',
+    'kewargaan':'Peserta didik menunjukkan sikap sebagai warga negara yang baik: menghargai perbedaan, taat aturan, cinta tanah air, dan berkontribusi pada lingkungan sekolah/masyarakat.',
+    'penalaran kritis':'Peserta didik menganalisis informasi secara mendalam, mengevaluasi argumen dengan bukti, dan mengambil kesimpulan berdasarkan data yang valid.',
+    'kreativitas':'Peserta didik menghasilkan ide/karya orisinal, memodifikasi konsep, dan mengombinasikan gagasan dengan cara baru yang bermakna.',
+    'kolaborasi':'Peserta didik bekerja sama dalam kelompok, saling menghargai peran, berkontribusi aktif, dan menyelesaikan konflik secara konstruktif untuk mencapai tujuan bersama.',
+    'kemandirian':'Peserta didik mengelola diri, mengambil inisiatif dalam belajar, mengatur waktu, dan bertanggung jawab penuh atas proses pembelajaran mereka sendiri.',
+    'kesehatan':'Peserta didik menjaga kesehatan fisik (postur, jarak baca), mental (mengelola emosi), dan emosional (empati) selama proses pembelajaran.',
+    'komunikasi':'Peserta didik menyampaikan gagasan dengan jelas dan santun baik secara lisan maupun tulisan, mendengarkan aktif, dan memberi umpan balik konstruktif.'
   };
   
   $('dModulContent').innerHTML=`
@@ -2035,7 +2045,7 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
       <p class="text-[10px] text-slate-600 mt-0.5">Kurikulum Merdeka • Pendekatan Deep Learning</p>
     </div>
 
-    <!-- IDENTITAS -->
+    <!-- ===== I. INFORMASI UMUM ===== -->
     <div class="mb-3">
       <div class="section-title bg-slate-700 text-white">I. INFORMASI UMUM</div>
       <table class="w-full text-[10px] border">
@@ -2045,15 +2055,15 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
         <tr><td class="border p-1.5 bg-slate-50 font-semibold">Fase / Kelas / Rombel</td><td class="border p-1.5">Fase ${fase} / ${kelas} / Rombel ${rom||'-'}</td></tr>
         <tr><td class="border p-1.5 bg-slate-50 font-semibold">Semester</td><td class="border p-1.5">${tp?.S||'Semester 1'} — TA ${v('fTA')}</td></tr>
         <tr><td class="border p-1.5 bg-slate-50 font-semibold">Elemen</td><td class="border p-1.5">${tp?.E||'-'}</td></tr>
-        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Alokasi Waktu</td><td class="border p-1.5"><b>${tp?.P||1} Pertemuan</b> × ${getJPDur(v('fJn'))} menit × 2 JP = <b>${totalMenit} menit</b></td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Alokasi Waktu</td><td class="border p-1.5"><b>${tp?.P||1} Pertemuan</b> × <b>${jpPerPertemuan} JP</b> = <b class="text-blue-700">${totalJP} JP</b> (${totalMenit} menit) <span class="text-[9px] text-slate-500">— 1 JP = ${getJPDur(v('fJn'))} menit</span></td></tr>
         <tr><td class="border p-1.5 bg-slate-50 font-semibold">Model/Metode Pembelajaran</td><td class="border p-1.5 text-blue-700 font-semibold">${met}</td></tr>
         <tr><td class="border p-1.5 bg-slate-50 font-semibold">Moda Pembelajaran</td><td class="border p-1.5">Tatap Muka (Luring)</td></tr>
-        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Sarana & Prasarana</td><td class="border p-1.5">Buku teks, LCD Proyektor, Laptop, LKPD, Alat tulis, Media pendukung sesuai materi</td></tr>
+        <tr><td class="border p-1.5 bg-slate-50 font-semibold">Sarana & Prasarana</td><td class="border p-1.5">Buku teks, LCD Proyektor, Laptop, LKPD, Alat tulis, Media pendukung sesuai materi (video, gambar, alat peraga)</td></tr>
         <tr><td class="border p-1.5 bg-slate-50 font-semibold">Target Peserta Didik</td><td class="border p-1.5">Peserta didik reguler (heterogen — mampu mengikuti pembelajaran secara umum)</td></tr>
       </table>
     </div>
 
-    <!-- KOMPETENSI INTI / CAPAIAN PEMBELAJARAN -->
+    <!-- ===== II. KOMPETENSI INTI ===== -->
     <div class="mb-3">
       <div class="section-title bg-blue-600 text-white">II. KOMPETENSI INTI</div>
       
@@ -2070,10 +2080,11 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
       <div class="mb-2">
         <b class="text-[10px] block bg-blue-50 p-1 rounded">C. Indikator Ketercapaian Tujuan Pembelajaran (IKTP):</b>
         <ol class="text-[10px] p-2 border rounded mt-1 list-decimal pl-5 space-y-0.5">
-          <li>Peserta didik mampu menjelaskan konsep/materi terkait TP dengan bahasa sendiri.</li>
-          <li>Peserta didik mampu mengidentifikasi contoh penerapan TP dalam kehidupan sehari-hari.</li>
-          <li>Peserta didik mampu menerapkan konsep TP dalam menyelesaikan permasalahan kontekstual.</li>
-          <li>Peserta didik menunjukkan sikap yang mencerminkan Profil Lulusan sesuai dimensi yang dituju.</li>
+          <li>Peserta didik mampu <b>menjelaskan</b> konsep terkait TP dengan bahasa sendiri.</li>
+          <li>Peserta didik mampu <b>mengidentifikasi</b> contoh penerapan TP dalam kehidupan sehari-hari.</li>
+          <li>Peserta didik mampu <b>menerapkan</b> konsep TP dalam menyelesaikan permasalahan kontekstual.</li>
+          <li>Peserta didik mampu <b>menganalisis</b> keterkaitan TP dengan konsep lain yang telah dipelajari.</li>
+          <li>Peserta didik menunjukkan <b>sikap</b> yang mencerminkan Profil Lulusan sesuai dimensi yang dituju.</li>
         </ol>
       </div>
 
@@ -2082,23 +2093,23 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
         <p class="text-[10px] p-2 border rounded mt-1 leading-relaxed italic">
           Peserta didik memahami bahwa materi <b>"${tp?.T||''}"</b> memiliki relevansi langsung dengan kehidupan sehari-hari mereka. 
           Pemahaman ini menjadi bekal untuk membentuk karakter, mengembangkan potensi diri, dan berkontribusi positif bagi masyarakat 
-          sesuai nilai-nilai Profil Lulusan Kurikulum Merdeka.
+          sesuai nilai-nilai Profil Lulusan Kurikulum Merdeka. Materi ini juga menjadi fondasi untuk pembelajaran lanjutan pada tingkat berikutnya.
         </p>
       </div>
 
       <div class="mb-2">
         <b class="text-[10px] block bg-blue-50 p-1 rounded">E. Pertanyaan Pemantik:</b>
         <ol class="text-[10px] p-2 border rounded mt-1 list-decimal pl-5 space-y-1">
-          <li>Apakah kalian pernah mengalami/melihat hal yang berkaitan dengan materi ini dalam kehidupan sehari-hari? Ceritakan!</li>
-          <li>Mengapa materi <b>"${tp?.E||'ini'}"</b> penting untuk kita pelajari?</li>
-          <li>Bagaimana jika kita tidak memahami/menerapkan hal ini? Apa dampaknya?</li>
-          <li>Apa yang ingin kalian ketahui lebih dalam tentang materi ini?</li>
+          <li>Apakah kalian pernah mengalami/melihat hal yang berkaitan dengan materi ini dalam kehidupan sehari-hari? Ceritakan pengalaman kalian!</li>
+          <li>Mengapa materi <b>"${tp?.E||'ini'}"</b> penting untuk kita pelajari? Apa manfaatnya bagi masa depan kalian?</li>
+          <li>Bagaimana jika kita tidak memahami/menerapkan hal ini? Apa dampaknya bagi diri sendiri, keluarga, dan masyarakat?</li>
+          <li>Apa yang ingin kalian ketahui lebih dalam tentang materi ini? Sebutkan minimal 2 pertanyaan!</li>
           <li>Bagaimana kalian akan menggunakan pengetahuan ini setelah pembelajaran hari ini?</li>
         </ol>
       </div>
     </div>
 
-    <!-- DIMENSI PROFIL LULUSAN -->
+    <!-- ===== III. DIMENSI PROFIL LULUSAN ===== -->
     <div class="mb-3">
       <div class="section-title bg-emerald-600 text-white">III. DIMENSI PROFIL LULUSAN YANG DIKEMBANGKAN</div>
       <table class="w-full text-[10px] border">
@@ -2112,13 +2123,23 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
       </table>
     </div>
 
-    <!-- KEGIATAN PEMBELAJARAN DEEP LEARNING -->
+    <!-- ===== IV. KEGIATAN PEMBELAJARAN DEEP LEARNING ===== -->
     <div class="mb-3">
       <div class="section-title bg-purple-600 text-white">IV. KEGIATAN PEMBELAJARAN DEEP LEARNING</div>
       
       <div class="bg-purple-50 border border-purple-200 rounded p-2 mb-2 text-[10px]">
         <b class="text-purple-700">📘 Model Pembelajaran: ${met}</b>
         <p class="mt-0.5 italic">${md.desc}</p>
+      </div>
+
+      <div class="mb-2 bg-slate-50 border rounded p-2">
+        <p class="text-[10px] font-semibold mb-1">📌 Empat Fase Deep Learning yang Terintegrasi:</p>
+        <div class="grid grid-cols-2 gap-1 text-[9px]">
+          <div class="border rounded p-1.5 bg-white"><b class="text-blue-600">1. Experiencing (Mengalami):</b> Peserta didik mengamati fenomena/data/pengalaman langsung terkait materi.</div>
+          <div class="border rounded p-1.5 bg-white"><b class="text-purple-600">2. Reflecting (Merefleksikan):</b> Peserta didik memaknai pengalaman melalui refleksi mendalam dan diskusi.</div>
+          <div class="border rounded p-1.5 bg-white"><b class="text-emerald-600">3. Conceptualizing (Membangun Konsep):</b> Peserta didik menyusun konsep berdasarkan hasil refleksi menjadi pemahaman utuh.</div>
+          <div class="border rounded p-1.5 bg-white"><b class="text-amber-600">4. Applying (Menerapkan):</b> Peserta didik menerapkan konsep dalam konteks baru/kehidupan nyata.</div>
+        </div>
       </div>
 
       <!-- PENDAHULUAN -->
@@ -2133,43 +2154,33 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
             <th class="border p-1 w-16">Waktu</th>
           </tr></thead>
           <tbody>
-            <tr><td class="border p-1 text-center">1</td><td class="border p-1.5"><b>Pembukaan:</b> Guru mengucap salam, memimpin doa, dan menanyakan kabar peserta didik. Guru mengecek kehadiran dan kesiapan belajar.</td><td class="border p-1 text-center">3'</td></tr>
-            <tr><td class="border p-1 text-center">2</td><td class="border p-1.5"><b>Apersepsi:</b> Guru mengaitkan materi sebelumnya dengan materi yang akan dipelajari. Mengajak siswa mengingat pengalaman terkait.</td><td class="border p-1 text-center">3'</td></tr>
-            <tr><td class="border p-1 text-center">3</td><td class="border p-1.5"><b>Motivasi:</b> Guru menyampaikan pentingnya materi hari ini serta manfaatnya dalam kehidupan. Menampilkan gambar/video pemantik.</td><td class="border p-1 text-center">3'</td></tr>
-            <tr><td class="border p-1 text-center">4</td><td class="border p-1.5"><b>Pertanyaan Pemantik:</b> Guru mengajukan 1-2 pertanyaan pemantik untuk memancing rasa ingin tahu peserta didik.</td><td class="border p-1 text-center">3'</td></tr>
-            <tr><td class="border p-1 text-center">5</td><td class="border p-1.5"><b>Penyampaian Tujuan:</b> Guru menyampaikan tujuan pembelajaran, cakupan materi, dan alur kegiatan yang akan dilakukan hari ini.</td><td class="border p-1 text-center">3'</td></tr>
+            <tr><td class="border p-1 text-center">1</td><td class="border p-1.5"><b>Pembukaan:</b> Guru mengucap salam, memimpin doa bersama, dan menanyakan kabar peserta didik. Guru mengecek kehadiran dan kesiapan belajar (buku, alat tulis).</td><td class="border p-1 text-center">3 mnt</td></tr>
+            <tr><td class="border p-1 text-center">2</td><td class="border p-1.5"><b>Apersepsi:</b> Guru mengaitkan materi sebelumnya dengan materi yang akan dipelajari. Mengajak siswa mengingat pengalaman terkait melalui pertanyaan bermakna.</td><td class="border p-1 text-center">3 mnt</td></tr>
+            <tr><td class="border p-1 text-center">3</td><td class="border p-1.5"><b>Motivasi:</b> Guru menyampaikan pentingnya materi hari ini serta manfaatnya dalam kehidupan. Menampilkan gambar/video/cerita pemantik untuk membangkitkan minat.</td><td class="border p-1 text-center">3 mnt</td></tr>
+            <tr><td class="border p-1 text-center">4</td><td class="border p-1.5"><b>Pertanyaan Pemantik:</b> Guru mengajukan 1-2 pertanyaan pemantik untuk memancing rasa ingin tahu dan berpikir kritis peserta didik.</td><td class="border p-1 text-center">3 mnt</td></tr>
+            <tr><td class="border p-1 text-center">5</td><td class="border p-1.5"><b>Penyampaian Tujuan & Asesmen:</b> Guru menyampaikan tujuan pembelajaran, cakupan materi, alur kegiatan, dan bentuk asesmen yang akan digunakan.</td><td class="border p-1 text-center">3 mnt</td></tr>
           </tbody>
         </table>
       </div>
 
-      <!-- KEGIATAN INTI - Deep Learning + Sintaks Metode -->
+      <!-- KEGIATAN INTI -->
       <div class="mb-3">
         <div class="bg-blue-100 border-l-4 border-blue-500 p-2 mb-1">
-          <b class="text-[11px] text-blue-700">🔵 B. KEGIATAN INTI (${intiMenit} menit) — Deep Learning: 4 Fase + Sintaks ${met.split('(')[0].trim()}</b>
+          <b class="text-[11px] text-blue-700">🔵 B. KEGIATAN INTI (${intiMenit} menit) — Sintaks ${met.split('(')[0].trim()} + Deep Learning</b>
         </div>
         
-        <div class="mb-2 bg-slate-50 border rounded p-2">
-          <p class="text-[10px] font-semibold mb-1">📌 Empat Fase Deep Learning:</p>
-          <div class="grid grid-cols-2 gap-1 text-[9px]">
-            <div class="border rounded p-1.5 bg-white"><b class="text-blue-600">1. Experiencing (Mengalami):</b> Peserta didik mengamati fenomena/data/pengalaman langsung.</div>
-            <div class="border rounded p-1.5 bg-white"><b class="text-purple-600">2. Reflecting (Merefleksikan):</b> Peserta didik memaknai pengalaman melalui refleksi mendalam.</div>
-            <div class="border rounded p-1.5 bg-white"><b class="text-emerald-600">3. Conceptualizing (Membangun Konsep):</b> Peserta didik menyusun konsep berdasarkan hasil refleksi.</div>
-            <div class="border rounded p-1.5 bg-white"><b class="text-amber-600">4. Applying (Menerapkan):</b> Peserta didik menerapkan konsep dalam konteks baru/kehidupan nyata.</div>
-          </div>
-        </div>
-
-        <p class="text-[10px] font-semibold mb-1 mt-2">🎯 Sintaks Pembelajaran (${met}) — Integrasi 4 Fase Deep Learning:</p>
+        <p class="text-[10px] font-semibold mb-1 mt-2">🎯 Sintaks Pembelajaran Terintegrasi 4 Fase Deep Learning:</p>
         <table class="w-full text-[10px] border">
           <thead class="bg-slate-50"><tr>
             <th class="border p-1 w-8">Tahap</th>
-            <th class="border p-1 w-1/4">Sintaks</th>
-            <th class="border p-1">Aktivitas Pembelajaran (Deep Learning)</th>
+            <th class="border p-1 w-1/4">Sintaks Metode</th>
+            <th class="border p-1">Aktivitas Pembelajaran Deep Learning</th>
             <th class="border p-1 w-16">Waktu</th>
           </tr></thead>
           <tbody>
-            ${md.sintaks.map((s,i)=>{
-              const fase=['🔵 Experiencing','🟣 Reflecting','🟢 Conceptualizing','🟡 Applying','🔵 Experiencing','🟣 Reflecting'][i]||'🔵 Experiencing';
-              return `<tr><td class="border p-1 text-center font-bold">${i+1}</td><td class="border p-1.5"><b>${s.tahap}</b><br><span class="text-[8px] text-slate-500">${fase}</span></td><td class="border p-1.5">${s.uraian}</td><td class="border p-1 text-center">${s.waktu}</td></tr>`;
+            ${sintaksTable.map((s,i)=>{
+              const faseDL=['🔵 Experiencing','🟣 Reflecting','🟢 Conceptualizing','🟡 Applying','🔵 Experiencing','🟣 Reflecting'][i]||'🔵 Experiencing';
+              return `<tr><td class="border p-1 text-center font-bold">${i+1}</td><td class="border p-1.5"><b>${s.tahap}</b><br><span class="text-[8px] text-slate-500">${faseDL}</span></td><td class="border p-1.5">${s.uraian}</td><td class="border p-1 text-center">${s.menitReal} mnt</td></tr>`;
             }).join('')}
           </tbody>
         </table>
@@ -2187,17 +2198,17 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
             <th class="border p-1 w-16">Waktu</th>
           </tr></thead>
           <tbody>
-            <tr><td class="border p-1 text-center">1</td><td class="border p-1.5"><b>Kesimpulan:</b> Guru bersama peserta didik menyimpulkan pembelajaran hari ini. Peserta didik diminta menyampaikan poin-poin penting yang telah dipelajari.</td><td class="border p-1 text-center">4'</td></tr>
-            <tr><td class="border p-1 text-center">2</td><td class="border p-1.5"><b>Asesmen Formatif:</b> Guru memberikan 3-5 pertanyaan lisan/kuis singkat untuk mengecek pemahaman peserta didik.</td><td class="border p-1 text-center">4'</td></tr>
-            <tr><td class="border p-1 text-center">3</td><td class="border p-1.5"><b>Refleksi:</b> Peserta didik merefleksikan pembelajaran: apa yang sudah dipahami, apa yang masih membingungkan, bagaimana perasaan mereka.</td><td class="border p-1 text-center">4'</td></tr>
-            <tr><td class="border p-1 text-center">4</td><td class="border p-1.5"><b>Tindak Lanjut:</b> Guru memberi tugas rumah/proyek lanjutan dan menyampaikan materi pertemuan berikutnya.</td><td class="border p-1 text-center">2'</td></tr>
-            <tr><td class="border p-1 text-center">5</td><td class="border p-1.5"><b>Penutup:</b> Guru mengajak siswa berdoa dan mengucap salam penutup.</td><td class="border p-1 text-center">1'</td></tr>
+            <tr><td class="border p-1 text-center">1</td><td class="border p-1.5"><b>Kesimpulan Bersama:</b> Guru bersama peserta didik menyimpulkan pembelajaran hari ini. Peserta didik diminta menyampaikan poin-poin penting yang telah dipelajari dengan bahasa sendiri.</td><td class="border p-1 text-center">4 mnt</td></tr>
+            <tr><td class="border p-1 text-center">2</td><td class="border p-1.5"><b>Asesmen Formatif:</b> Guru memberikan 3-5 pertanyaan lisan/kuis singkat untuk mengecek pemahaman peserta didik terhadap materi.</td><td class="border p-1 text-center">4 mnt</td></tr>
+            <tr><td class="border p-1 text-center">3</td><td class="border p-1.5"><b>Refleksi:</b> Peserta didik merefleksikan pembelajaran: apa yang sudah dipahami, apa yang masih membingungkan, bagaimana perasaan mereka, dan apa yang bisa diperbaiki.</td><td class="border p-1 text-center">4 mnt</td></tr>
+            <tr><td class="border p-1 text-center">4</td><td class="border p-1.5"><b>Tindak Lanjut:</b> Guru memberi tugas rumah/proyek lanjutan dan menyampaikan materi pertemuan berikutnya agar siswa siap belajar.</td><td class="border p-1 text-center">2 mnt</td></tr>
+            <tr><td class="border p-1 text-center">5</td><td class="border p-1.5"><b>Penutup:</b> Guru mengajak siswa berdoa bersama dan mengucap salam penutup.</td><td class="border p-1 text-center">1 mnt</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- ASESMEN -->
+    <!-- ===== V. ASESMEN ===== -->
     <div class="mb-3">
       <div class="section-title bg-red-600 text-white">V. ASESMEN PEMBELAJARAN</div>
       <table class="w-full text-[10px] border">
@@ -2210,17 +2221,17 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
           <tr>
             <td class="border p-1.5 font-semibold bg-blue-50">Asesmen Diagnostik</td>
             <td class="border p-1.5">Pertanyaan Lisan / Kuis Pemantik</td>
-            <td class="border p-1.5">Dilakukan di awal pembelajaran untuk mengetahui pengetahuan awal peserta didik dan kesiapan belajar. Contoh: "Sebutkan apa yang kamu ketahui tentang ...?"</td>
+            <td class="border p-1.5">Dilakukan di awal pembelajaran untuk mengetahui pengetahuan awal peserta didik dan kesiapan belajar. Contoh: "Sebutkan apa yang kamu ketahui tentang ...?" atau "Berikan contoh nyata dari ...?"</td>
           </tr>
           <tr>
             <td class="border p-1.5 font-semibold bg-emerald-50">Asesmen Formatif</td>
             <td class="border p-1.5">Observasi, Diskusi, LKPD, Presentasi</td>
-            <td class="border p-1.5">Dilakukan selama proses pembelajaran untuk memantau kemajuan belajar. Guru mengamati partisipasi, kualitas jawaban, dan interaksi peserta didik.</td>
+            <td class="border p-1.5">Dilakukan selama proses pembelajaran untuk memantau kemajuan belajar. Guru mengamati partisipasi, kualitas jawaban, interaksi peserta didik, dan pemahaman melalui pertanyaan tersirat.</td>
           </tr>
           <tr>
             <td class="border p-1.5 font-semibold bg-amber-50">Asesmen Sumatif</td>
             <td class="border p-1.5">Tes Tertulis, Proyek, Produk Karya</td>
-            <td class="border p-1.5">Dilakukan di akhir pembelajaran/materi untuk mengukur pencapaian TP. Bentuk: soal pilihan ganda, uraian, atau produk kreatif.</td>
+            <td class="border p-1.5">Dilakukan di akhir pembelajaran/materi untuk mengukur pencapaian TP. Bentuk: soal pilihan ganda, uraian, unjuk kerja, atau produk kreatif sesuai dengan indikator ketercapaian.</td>
           </tr>
         </tbody>
       </table>
@@ -2238,31 +2249,38 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
           <tbody>
             <tr>
               <td class="border p-1.5 font-semibold">Partisipasi</td>
-              <td class="border p-1.5 text-[9px]">Pasif, jarang berkontribusi</td>
-              <td class="border p-1.5 text-[9px]">Kadang berpartisipasi jika didorong</td>
-              <td class="border p-1.5 text-[9px]">Aktif berpartisipasi</td>
-              <td class="border p-1.5 text-[9px]">Sangat aktif dan menginisiasi diskusi</td>
+              <td class="border p-1.5 text-[9px]">Pasif, jarang berkontribusi meskipun didorong</td>
+              <td class="border p-1.5 text-[9px]">Kadang berpartisipasi jika didorong guru</td>
+              <td class="border p-1.5 text-[9px]">Aktif berpartisipasi tanpa dorongan</td>
+              <td class="border p-1.5 text-[9px]">Sangat aktif dan menginisiasi diskusi kelas</td>
             </tr>
             <tr>
               <td class="border p-1.5 font-semibold">Kolaborasi</td>
-              <td class="border p-1.5 text-[9px]">Sulit bekerjasama</td>
-              <td class="border p-1.5 text-[9px]">Bekerjasama jika diminta</td>
-              <td class="border p-1.5 text-[9px]">Bekerjasama dengan baik</td>
-              <td class="border p-1.5 text-[9px]">Kolaborator ulung, membantu teman</td>
+              <td class="border p-1.5 text-[9px]">Sulit bekerjasama dalam kelompok</td>
+              <td class="border p-1.5 text-[9px]">Bekerjasama jika diminta guru</td>
+              <td class="border p-1.5 text-[9px]">Bekerjasama dengan baik dan proaktif</td>
+              <td class="border p-1.5 text-[9px]">Kolaborator ulung, membantu teman yang kesulitan</td>
             </tr>
             <tr>
               <td class="border p-1.5 font-semibold">Penalaran Kritis</td>
-              <td class="border p-1.5 text-[9px]">Belum mampu menganalisis</td>
-              <td class="border p-1.5 text-[9px]">Menganalisis dengan bimbingan</td>
+              <td class="border p-1.5 text-[9px]">Belum mampu menganalisis informasi</td>
+              <td class="border p-1.5 text-[9px]">Menganalisis dengan bimbingan bertahap</td>
               <td class="border p-1.5 text-[9px]">Menganalisis secara mandiri</td>
-              <td class="border p-1.5 text-[9px]">Analisis mendalam dan orisinil</td>
+              <td class="border p-1.5 text-[9px]">Analisis mendalam, orisinil, dan berbasis bukti</td>
+            </tr>
+            <tr>
+              <td class="border p-1.5 font-semibold">Kreativitas</td>
+              <td class="border p-1.5 text-[9px]">Meniru contoh apa adanya</td>
+              <td class="border p-1.5 text-[9px]">Sedikit variasi dari contoh</td>
+              <td class="border p-1.5 text-[9px]">Menghasilkan ide yang berbeda</td>
+              <td class="border p-1.5 text-[9px]">Ide orisinil, unik, dan bermakna</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- PENGAYAAN & REMEDIAL -->
+    <!-- ===== VI. PENGAYAAN & REMEDIAL ===== -->
     <div class="mb-3">
       <div class="section-title bg-teal-600 text-white">VI. PENGAYAAN & REMEDIAL</div>
       <div class="grid grid-cols-2 gap-2">
@@ -2270,36 +2288,39 @@ function renderModulAjar(sub,ttdPlan,cpK,rom,kelas,fase){
           <b class="text-[10px] text-emerald-700">📈 Pengayaan (bagi yang sudah mencapai TP):</b>
           <ul class="text-[10px] list-disc pl-4 mt-1 space-y-0.5">
             <li>Diberikan tugas mendalam terkait aplikasi TP dalam konteks lebih kompleks.</li>
-            <li>Diberi peran sebagai tutor sebaya untuk membantu teman.</li>
-            <li>Diberikan proyek/riset mini terkait tema.</li>
+            <li>Diberi peran sebagai tutor sebaya untuk membantu teman yang belum tuntas.</li>
+            <li>Diberikan proyek/riset mini terkait tema untuk mengembangkan kreativitas.</li>
+            <li>Dianjurkan membaca sumber tambahan atau menonton video pembelajaran lanjutan.</li>
           </ul>
         </div>
         <div class="border rounded p-2 bg-amber-50">
           <b class="text-[10px] text-amber-700">📉 Remedial (bagi yang belum mencapai TP):</b>
           <ul class="text-[10px] list-disc pl-4 mt-1 space-y-0.5">
             <li>Bimbingan individu/kelompok kecil di luar jam pelajaran.</li>
-            <li>Pemberian materi tambahan dengan pendekatan berbeda.</li>
-            <li>Penugasan ulang dengan tingkat kesulitan disesuaikan.</li>
+            <li>Pemberian materi tambahan dengan pendekatan berbeda (visual/audio/kinestetik).</li>
+            <li>Penugasan ulang dengan tingkat kesulitan disesuaikan bertahap.</li>
             <li>Kolaborasi dengan tutor sebaya (teman yang sudah menguasai).</li>
+            <li>Komunikasi dengan orang tua untuk dukungan pembelajaran di rumah.</li>
           </ul>
         </div>
       </div>
     </div>
 
-    <!-- LAMPIRAN -->
+    <!-- ===== VII. LAMPIRAN ===== -->
     <div class="mb-3">
       <div class="section-title bg-indigo-600 text-white">VII. LAMPIRAN</div>
       <ol class="text-[10px] list-decimal pl-5 space-y-0.5">
-        <li><b>Lembar Kerja Peserta Didik (LKPD):</b> Terlampir (disusun terpisah dengan format visual menarik)</li>
-        <li><b>Materi Ajar:</b> Handout / slide presentasi terkait TP</li>
-        <li><b>Media Pembelajaran:</b> Video, gambar, poster, alat peraga</li>
-        <li><b>Instrumen Asesmen:</b> Soal-soal formatif dan sumatif beserta kunci jawaban</li>
-        <li><b>Rubrik Penilaian:</b> Rubrik penilaian sikap, keterampilan, dan pengetahuan</li>
+        <li><b>Lembar Kerja Peserta Didik (LKPD):</b> Terlampir (disusun terpisah dengan format visual menarik dan aktivitas Deep Learning)</li>
+        <li><b>Materi Ajar:</b> Handout / slide presentasi terkait TP dari berbagai sumber</li>
+        <li><b>Media Pembelajaran:</b> Video pembelajaran, gambar ilustrasi, poster, alat peraga, benda konkret</li>
+        <li><b>Instrumen Asesmen:</b> Soal-soal formatif dan sumatif beserta kunci jawaban dan rubrik penilaian</li>
+        <li><b>Rubrik Penilaian:</b> Rubrik penilaian sikap (Profil Lulusan), keterampilan, dan pengetahuan</li>
         <li><b>Daftar Referensi:</b>
           <ul class="list-disc pl-4 mt-0.5">
-            <li>Buku Teks ${ST.mapel} Kelas ${kelas.replace('Kelas ','')} Kurikulum Merdeka</li>
-            <li>Sumber digital: video pembelajaran, artikel edukasi, konten Youtube edukatif</li>
-            <li>Sumber otentik: pengalaman peserta didik, lingkungan sekitar</li>
+            <li>Buku Teks ${ST.mapel} Kelas ${kelas.replace('Kelas ','')} Kurikulum Merdeka (Kemdikbud)</li>
+            <li>Sumber digital: video pembelajaran, artikel edukasi, konten YouTube edukatif</li>
+            <li>Sumber otentik: pengalaman peserta didik, lingkungan sekitar, tokoh inspiratif</li>
+            <li>Panduan Pembelajaran & Asesmen Kurikulum Merdeka</li>
           </ul>
         </li>
       </ol>
@@ -2369,7 +2390,7 @@ KONTEKS MODUL AJAR:
 - Elemen: ${tp1?.E||'[sesuaikan]'}
 - Metode/Model: ${tp1?.M||METODE[0]}
 - Dimensi Profil Lulusan: ${tp1?.Di||DIMEN}
-- Alokasi: ${tp1?.P||2} pertemuan (${(tp1?.P||2)*2*getJPDur(jn)} menit total)
+- Alokasi: ${tp1?.P||2} pertemuan × ${getJPPerPertemuan()} JP = ${(tp1?.P||2)*getJPPerPertemuan()} JP total
 
 INSTRUKSI PEMBUATAN LKPD (BUAT SANGAT DETAIL & VISUAL):
 
