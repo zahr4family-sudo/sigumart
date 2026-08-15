@@ -798,14 +798,34 @@ async function saveWAConfig(){
   const template=$('waTemplateInput').value.trim();
   if(!phone)return toast('warning','','Nomor WA harus diisi');
   if(!template)return toast('warning','','Template pesan harus diisi');
+  
+  // Cek status admin
+  if(!CU){return toast('error','Belum Login','Login sebagai admin dulu')}
+  if(CU.email!==ADMIN_EMAIL){return toast('error','Bukan Admin',`Hanya ${ADMIN_EMAIL} yang bisa menyimpan`)}
+  
+  const btnList=document.querySelectorAll('#mWA button');
+  const saveBtn=btnList[0];
+  const origHTML=saveBtn?.innerHTML||'Simpan';
+  if(saveBtn){saveBtn.disabled=true;saveBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin mr-1"></i>Menyimpan...'}
+  
   try{
-    adminWAConfig={phone:phone.replace(/\D/g,''),template};
-    await db.collection('config').doc('waContact').set(adminWAConfig);
+    const newConfig={
+      phone:phone.replace(/\D/g,''),
+      template:template,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:CU.email
+    };
+    console.log('Saving WA config:',newConfig);
+    await db.collection('config').doc('waContact').set(newConfig,{merge:true});
+    adminWAConfig={phone:newConfig.phone,template:newConfig.template};
     toast('success','Tersimpan!','Konfigurasi WA berhasil disimpan');
-    closeM('mWA');
-  }catch(e){toast('error','Gagal',e.message)}
+    setTimeout(()=>closeM('mWA'),500);
+  }catch(e){
+    console.error('Save WA error:',e);
+    toast('error','Gagal Simpan',`${e.code||''}: ${e.message}`);
+  }
+  if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML=origHTML}
 }
-
 // ============ AUTH STATE ============
 auth.onAuthStateChanged(async u=>{
   if(u){
@@ -1463,11 +1483,11 @@ function rJurnal(){
   const monthIdx=BULAN_IDX_JS[bln];
   const lastDay=new Date(yr,monthIdx+1,0).getDate();
   
-  // Generate entries: setiap tanggal di bulan tsb yang cocok dengan hari mengajar mapel ini
-  let entries=[];
+  // Kumpulkan semua pertemuan raw (per JP)
+  let rawEntries=[];
   for(let d=1;d<=lastDay;d++){
     const dt=new Date(yr,monthIdx,d);
-    const dow=dt.getDay(); // 0=Min,1=Sen,...
+    const dow=dt.getDay();
     const dayName=ALLDAYS[dow-1];
     if(!dayName||!days.includes(dayName))continue;
     D.jadwal.forEach(r=>{
@@ -1477,14 +1497,14 @@ function rJurnal(){
       const mp=(parts[0]||'').toLowerCase();
       const rb=(parts[1]||'').trim();
       if(mp.includes(mapelLC)){
-        entries.push({day:dayName,date:d,jam:r.j,waktu:r.w,rombel:rb||ST.rombel});
+        rawEntries.push({day:dayName,date:d,jam:r.j,waktu:r.w,rombel:rb||ST.rombel});
       }
     });
   }
   
   if(!D.jurnal[bln])D.jurnal[bln]=[];
   const jd=D.jurnal[bln];
-  while(jd.length<entries.length)jd.push({tp:'',keg:'',cat:''});
+  while(jd.length<rawEntries.length)jd.push({tp:'',keg:'',cat:''});
   
   const cpAll=D.cp;
   const sub=`${v('fS')} • ${ST.mapel} • Bulan ${bln} TA ${v('fTA')}`;
@@ -1492,7 +1512,7 @@ function rJurnal(){
   let html=`<h2 class="text-sm font-bold text-center uppercase">JURNAL PEMBELAJARAN</h2>
     <p class="text-[10px] text-center font-semibold mb-2">${sub}</p>`;
   
-  if(!entries.length){
+  if(!rawEntries.length){
     html+=`<div class="bg-amber-50 border border-amber-200 rounded p-3 text-center text-[11px] text-amber-700">
       <i class="fa-solid fa-exclamation-triangle mr-1"></i>Belum ada pertemuan di bulan ${bln}. Isi jadwal dulu di menu <b>Jadwal</b>.
     </div>${makeTTD(getTTDPelaporan(bln))}`;
@@ -1500,10 +1520,71 @@ function rJurnal(){
     return;
   }
   
+  // GROUPING: Ringkas berdasarkan (tanggal + rombel + TP yang sama) → gabungkan JP berurutan
+  // Struktur: entries dengan info jam mulai-selesai
+  let grouped=[];
+  let processed=new Set();
+  
+  rawEntries.forEach((e,i)=>{
+    if(processed.has(i))return;
+    const j=jd[i]||{};
+    const key=`${e.date}_${e.rombel}_${j.tp||''}`;
+    
+    // Cari semua entry berikutnya yang sama tanggal, rombel, TP, dan JP berurutan
+    let jamList=[e.jam];
+    let jamIndices=[i];
+    let lastJam=e.jam;
+    
+    for(let k=i+1;k<rawEntries.length;k++){
+      if(processed.has(k))continue;
+      const e2=rawEntries[k];
+      const j2=jd[k]||{};
+      if(e2.date===e.date && e2.rombel===e.rombel && (j2.tp||'')===(j.tp||'')){
+        // Cek apakah JP berurutan (contoh: 1,2,3 atau 4,5)
+        if(typeof e2.jam==='number' && typeof lastJam==='number' && e2.jam===lastJam+1){
+          jamList.push(e2.jam);
+          jamIndices.push(k);
+          lastJam=e2.jam;
+          processed.add(k);
+        }
+      }
+    }
+    processed.add(i);
+    
+    // Ringkas jam: [1,2,3,4] → "JP1 - JP4", [1] → "JP1"
+    let jamText='';
+    if(jamList.length===1){
+      jamText=`JP${jamList[0]}`;
+    } else {
+      jamText=`JP${jamList[0]} - JP${jamList[jamList.length-1]}`;
+    }
+    
+    // Ringkas waktu: ambil waktu awal dari JP pertama dan waktu akhir dari JP terakhir
+    const firstWaktu=rawEntries[jamIndices[0]].waktu||'';
+    const lastWaktu=rawEntries[jamIndices[jamIndices.length-1]].waktu||'';
+    const startTime=firstWaktu.split('-')[0]||'';
+    const endTime=lastWaktu.split('-')[1]||'';
+    const waktuText=startTime&&endTime?`${startTime}-${endTime}`:firstWaktu;
+    
+    grouped.push({
+      day:e.day,
+      date:e.date,
+      bulan:bln,
+      rombel:e.rombel,
+      jamList:jamList,
+      jamText:jamText,
+      waktuText:waktuText,
+      jpCount:jamList.length,
+      firstIdx:jamIndices[0],
+      j:j
+    });
+  });
+  
   html+=`<table class="w-full text-[9px]"><thead class="bg-slate-100"><tr>
     <th class="border p-1">No</th>
     <th class="border p-1">Hari, Tanggal</th>
     <th class="border p-1">Rombel</th>
+    <th class="border p-1">Jam / Waktu</th>
     <th class="border p-1">JP</th>
     <th class="border p-1">Tujuan Pembelajaran / Materi</th>
     <th class="border p-1">Kegiatan Pembelajaran</th>
@@ -1514,25 +1595,30 @@ function rJurnal(){
     <th class="border p-1">Catatan</th>
   </tr></thead><tbody>`;
   
-  entries.forEach((e,i)=>{
-    const j=jd[i]||{};
-    // Ambil absen data untuk hari itu
-    const abBln=D.absen[e.rombel]?.[bln]||{};
-    const swList=D.siswa[e.rombel]||[];
+  grouped.forEach((g,gi)=>{
+    const i=g.firstIdx;
+    const j=g.j;
+    // Absen
+    const abBln=D.absen[g.rombel]?.[bln]||{};
+    const swList=D.siswa[g.rombel]||[];
     let h=0,s=0,iz=0,a=0;
-    swList.forEach((sw,si)=>{const av=abBln[`${si}_${i}`]||'H';if(av==='H')h++;else if(av==='S')s++;else if(av==='I')iz++;else if(av==='A')a++});
-    // TP options berdasarkan kelas rombel
-    const kelasRom='Kelas '+(parseInt(e.rombel.replace(/\D/g,''))||1);
+    swList.forEach((sw,si)=>{
+      const av=abBln[`${si}_${i}`]||'H';
+      if(av==='H')h++;else if(av==='S')s++;else if(av==='I')iz++;else if(av==='A')a++;
+    });
+    // TP options
+    const kelasRom='Kelas '+(parseInt(g.rombel.replace(/\D/g,''))||1);
     const cpForRombel=cpAll.filter(c=>c.K===kelasRom);
     const tpOpts=cpForRombel.map((c,ci)=>`<option value="${ci}" ${j.tp==ci?'selected':''}>${(c.T||'').substring(0,40)}</option>`).join('');
     
-    html+=`<tr class="border ${i%2?'bg-slate-50/30':''}">
-      <td class="border p-0.5 text-center">${i+1}</td>
-      <td class="border p-0.5 text-center text-[8px]">${e.day},<br>${e.date} ${bln.substring(0,3)}</td>
-      <td class="border p-0.5 text-center font-bold text-blue-600">${e.rombel}</td>
-      <td class="border p-0.5 text-center text-[8px]">JP${e.jam}<br>(${e.waktu})</td>
+    html+=`<tr class="border ${gi%2?'bg-slate-50/30':''}">
+      <td class="border p-0.5 text-center">${gi+1}</td>
+      <td class="border p-0.5 text-center text-[9px]"><b>${g.day}</b><br>${g.date} ${g.bulan.substring(0,3)}</td>
+      <td class="border p-0.5 text-center font-bold text-blue-600">${g.rombel}</td>
+      <td class="border p-0.5 text-center text-[9px]"><b>${g.jamText}</b><br><span class="text-[8px] text-slate-500">${g.waktuText}</span></td>
+      <td class="border p-0.5 text-center font-bold text-emerald-700">${g.jpCount}</td>
       <td class="border p-0.5">
-        <select onchange="D.jurnal['${bln}'][${i}].tp=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}>
+        <select onchange="D.jurnal['${bln}'][${i}].tp=this.value;rJurnal()" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}>
           <option value="">-Pilih TP-</option>${tpOpts}
         </select>
       </td>
@@ -1544,12 +1630,17 @@ function rJurnal(){
       <td class="border p-0.5"><input value="${j.cat||''}" onchange="D.jurnal['${bln}'][${i}].cat=this.value" class="w-full border rounded p-0.5 text-[8px] ef" ${ie?'':'disabled'}></td>
     </tr>`;
   });
+  
   html+=`</tbody></table>
-    <p class="text-[9px] text-slate-400 mt-1">Total pertemuan bulan ${bln}: <b>${entries.length}</b> pertemuan</p>`;
+    <div class="mt-2 bg-blue-50 border border-blue-200 rounded p-2 text-[9px] text-blue-700">
+      <b><i class="fa-solid fa-info-circle mr-1"></i>Info Ringkasan Jurnal:</b> 
+      Baris jurnal <b>otomatis diringkas</b> jika tanggal, rombel, dan TP sama serta jam pelajaran berurutan. 
+      Contoh: JP1-JP4 pada tanggal & TP sama → tampil 1 baris (bukan 4 baris).
+      <br>Total baris ringkas: <b>${grouped.length}</b> dari <b>${rawEntries.length}</b> pertemuan raw.
+    </div>`;
   html+=makeTTD(getTTDPelaporan(bln));
   $('jrContent').innerHTML=html;
 }
-
 // ============ PROFILE MODAL ============
 function openProfile(){
   if(!CU||!UD)return;
